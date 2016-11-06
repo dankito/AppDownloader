@@ -180,6 +180,8 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     DownloadManager downloadManager = getDownloadManager();
 
     downloadManager.remove(downloadId);
+
+    currentDownloads.remove(downloadId);
   }
 
 
