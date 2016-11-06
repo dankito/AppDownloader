@@ -2,7 +2,6 @@ package net.dankito.appdownloader.responses;
 
 import net.dankito.appdownloader.util.StringUtils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +40,7 @@ public class AppSearchResult {
 
   protected List<String> downloadUrls = new ArrayList<>();
 
-  protected File downloadLocation = null;
+  protected String downloadLocationUri = null;
 
 
   public AppSearchResult(String packageName) {
@@ -164,17 +163,16 @@ public class AppSearchResult {
   }
 
   public boolean isAlreadyDownloaded() {
-    return downloadLocation != null;
+    return downloadLocationUri != null;
   }
 
-  public File getDownloadLocation() {
-    return downloadLocation;
+  public String getDownloadLocationUri() {
+    return downloadLocationUri;
   }
 
-  public void setDownloadLocation(File downloadLocation) {
-    this.downloadLocation = downloadLocation;
+  public void setDownloadLocationUri(String downloadLocationUri) {
+    this.downloadLocationUri = downloadLocationUri;
   }
-
 
   @Override
   public String toString() {
