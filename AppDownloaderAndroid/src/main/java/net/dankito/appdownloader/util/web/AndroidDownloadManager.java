@@ -118,7 +118,9 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
         EnqueuedDownload enqueuedDownload = getEnqueuedDownloadForId(downloadId);
 
         if(enqueuedDownload != null) {
-          installApp(enqueuedDownload.getDownloadLocationUri());
+          if(enqueuedDownload.wasDownloadSuccessful()) {
+            installApp(enqueuedDownload.getDownloadLocationUri());
+          }
         }
       } catch(Exception e) {
         log.error("Could not handle successful Download", e);
@@ -173,6 +175,8 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     intent.setAction(android.content.Intent.ACTION_VIEW);
     intent.setDataAndType(Uri.parse(downloadLocation), "application/vnd.android.package-archive");
     context.startActivityForResult(intent, 10);
+
+    // TODO: remove downloaded file when installation was successful
   }
 
 

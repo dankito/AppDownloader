@@ -73,6 +73,10 @@ public class EnqueuedDownload {
     this.bytesDownloadedSoFar = bytesDownloadedSoFar;
   }
 
+  public boolean wasDownloadSuccessful() {
+    return getFileSize() == getBytesDownloadedSoFar();
+  }
+
   public String getStatus() {
     return status;
   }
