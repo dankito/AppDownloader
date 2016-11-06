@@ -40,6 +40,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
 
   protected Activity context;
 
+  // TODO: save currentDownloaded so that on an App restart aborted and on restart finished downloads can be handled
   protected Map<Long, AppSearchResult> currentDownloads = new ConcurrentHashMap<>();
 
 
@@ -67,7 +68,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
       request.setAllowedOverRoaming(false);
 
       request.setTitle(appSearchResult.getTitle());
-      request.setDescription("Downloading " + appSearchResult.getTitle());
+      request.setDescription(appSearchResult.getTitle());
 
       String destinationFileName = getDestinationFilename(appSearchResult, url);
       request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, destinationFileName);
