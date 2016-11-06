@@ -88,11 +88,9 @@ public class OkHttpWebClient implements IWebClient {
 
     if(parameters.isConnectionTimeoutSet()) {
       client.setConnectTimeout(parameters.getConnectionTimeoutMillis(), TimeUnit.MILLISECONDS);
-      client.setReadTimeout(parameters.getConnectionTimeoutMillis(), TimeUnit.MILLISECONDS);
     }
     else {
       client.setConnectTimeout(DEFAULT_CONNECTION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-      client.setReadTimeout(DEFAULT_CONNECTION_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
     }
   }
 
