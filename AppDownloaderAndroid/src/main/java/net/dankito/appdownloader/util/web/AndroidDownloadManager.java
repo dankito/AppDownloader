@@ -5,6 +5,7 @@ import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
@@ -42,6 +43,12 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
 
   public AndroidDownloadManager(Activity context) {
     this.context = context;
+
+    registerBroadcastReceivers(context);
+  }
+
+  private void registerBroadcastReceivers(Activity context) {
+    context.registerReceiver(this, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
   }
 
 
@@ -116,7 +123,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     }
   }
 
-  private void installApp(String downloadLocation) {
+  protected void installApp(String downloadLocation) {
     Intent intent = new Intent();
     intent.setAction(android.content.Intent.ACTION_VIEW);
     intent.setDataAndType(Uri.fromFile(new File(downloadLocation)), "application/vnd.android.package-archive");

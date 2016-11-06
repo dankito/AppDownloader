@@ -1,10 +1,8 @@
 package net.dankito.appdownloader.fragments;
 
-import android.app.DownloadManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -109,10 +107,6 @@ public class AppSearchResultsFragment extends Fragment {
     appDownloaders.add(evoziPlayStoreAppDownloader);
 
     this.downloadManager = new AndroidDownloadManager(getActivity());
-
-    //set filter to only when download is complete and register broadcast receiver
-    IntentFilter filter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
-    getActivity().registerReceiver(downloadManager, filter);
   }
 
 
