@@ -72,7 +72,6 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
       String destinationFileName = getDestinationFilename(appSearchResult, url);
       request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, destinationFileName);
 
-      // enqueue this request
       DownloadManager downloadManager = getDownloadManager();
       currentDownloads.put(downloadManager.enqueue(request), appSearchResult);
     } catch(Exception e) {
@@ -83,14 +82,6 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
   @NonNull
   protected String getDestinationFilename(AppSearchResult appSearchResult, String url) {
     return removeReservedCharacters(appSearchResult.getTitle()) + "_" +  DOWNLOAD_TIME_DATE_FORMAT.format(new Date()) + ".apk";
-
-//    try {
-//      URL downloadUrl = new URL(url);
-//      File file = new File(downloadUrl.getPath());
-//      return file.getName() + "_" + DOWNLOAD_TIME_DATE_FORMAT.format(new Date()) + ".apk";
-//    } catch(Exception e) {
-//      log.error("Could not extract destination filename from " + url);
-//    }
   }
 
   protected String removeReservedCharacters(String filename) {
