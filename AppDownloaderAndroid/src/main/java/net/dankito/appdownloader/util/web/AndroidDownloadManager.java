@@ -49,6 +49,10 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
 
   private void registerBroadcastReceivers(Activity context) {
     context.registerReceiver(this, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+
+    context.registerReceiver(this, new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));
+
+    context.registerReceiver(this, new IntentFilter(DownloadManager.ACTION_VIEW_DOWNLOADS));
   }
 
 
@@ -69,7 +73,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
       request.setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, destinationFileName);
 
       // enqueue this request
-      DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+      DownloadManager downloadManager = getDownloadManager();
       currentDownloads.add(downloadManager.enqueue(request));
     } catch(Exception e) {
       log.error("Could not start Download for " + appSearchResult, e);
@@ -101,11 +105,27 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
   @Override
   public void onReceive(Context context, Intent intent) {
     long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+    String action = intent.getAction();
+
+    switch(action) {
+      case DownloadManager.ACTION_DOWNLOAD_COMPLETE:
+        handleDownloadCompleteBroadcast(downloadId);
+        break;
+      case DownloadManager.ACTION_NOTIFICATION_CLICKED:
+        handleNotificationClickedBroadcast(downloadId);
+        break;
+      case DownloadManager.ACTION_VIEW_DOWNLOADS:
+        handleViewDownloadsBroadcast(downloadId);
+        break;
+    }
+  }
+
+  protected void handleDownloadCompleteBroadcast(long downloadId) {
     if(currentDownloads.contains(downloadId)) { // yeah, we started this download
       currentDownloads.remove(downloadId);
 
       try {
-        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        DownloadManager downloadManager = getDownloadManager();
         DownloadManager.Query query = new DownloadManager.Query();
         query.setFilterById(downloadId);
         Cursor cursor = downloadManager.query(query);
@@ -129,4 +149,19 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     intent.setDataAndType(Uri.fromFile(new File(downloadLocation)), "application/vnd.android.package-archive");
     context.startActivityForResult(intent, 10);
   }
+
+
+  protected void handleNotificationClickedBroadcast(long downloadId) {
+
+  }
+
+  protected void handleViewDownloadsBroadcast(long downloadId) {
+
+  }
+
+
+  protected DownloadManager getDownloadManager() {
+    return (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+  }
+
 }
