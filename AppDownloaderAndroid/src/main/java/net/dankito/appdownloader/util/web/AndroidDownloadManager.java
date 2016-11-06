@@ -4,13 +4,16 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 
+import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.responses.AppSearchResult;
 
 import org.slf4j.Logger;
@@ -20,8 +23,8 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by ganymed on 05/11/16.
@@ -38,7 +41,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
 
   protected Activity context;
 
-  protected List<Long> currentDownloads = new CopyOnWriteArrayList<>();
+  protected Map<Long, AppSearchResult> currentDownloads = new ConcurrentHashMap<>();
 
 
   public AndroidDownloadManager(Activity context) {
@@ -74,7 +77,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
 
       // enqueue this request
       DownloadManager downloadManager = getDownloadManager();
-      currentDownloads.add(downloadManager.enqueue(request));
+      currentDownloads.put(downloadManager.enqueue(request), appSearchResult);
     } catch(Exception e) {
       log.error("Could not start Download for " + appSearchResult, e);
     }
@@ -104,24 +107,25 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
 
   @Override
   public void onReceive(Context context, Intent intent) {
-    long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
     String action = intent.getAction();
 
     switch(action) {
       case DownloadManager.ACTION_DOWNLOAD_COMPLETE:
-        handleDownloadCompleteBroadcast(downloadId);
+        handleDownloadCompleteBroadcast(intent);
         break;
       case DownloadManager.ACTION_NOTIFICATION_CLICKED:
-        handleNotificationClickedBroadcast(downloadId);
+        handleNotificationClickedBroadcast(intent);
         break;
       case DownloadManager.ACTION_VIEW_DOWNLOADS:
-        handleViewDownloadsBroadcast(downloadId);
+        handleViewDownloadsBroadcast(intent);
         break;
     }
   }
 
-  protected void handleDownloadCompleteBroadcast(long downloadId) {
-    if(currentDownloads.contains(downloadId)) { // yeah, we started this download
+  protected void handleDownloadCompleteBroadcast(Intent intent) {
+    long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+
+    if(currentDownloads.containsKey(downloadId)) { // yeah, we started this download
       currentDownloads.remove(downloadId);
 
       try {
@@ -151,11 +155,36 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
   }
 
 
-  protected void handleNotificationClickedBroadcast(long downloadId) {
+  protected void handleNotificationClickedBroadcast(final Intent intent) {
+    long[] downloadIds = intent.getLongArrayExtra(DownloadManager.EXTRA_NOTIFICATION_CLICK_DOWNLOAD_IDS);
 
+    for(final long downloadId : downloadIds) {
+      AppSearchResult appToStop = currentDownloads.get(downloadId);
+      String appTitle = appToStop == null ? "" : appToStop.getTitle();
+
+      AlertDialog.Builder builder = new AlertDialog.Builder(context);
+      builder = builder.setMessage(context.getString(R.string.alert_message_cancel_download, appTitle));
+
+      builder.setNegativeButton(R.string.no, null);
+      builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i) {
+          cancelDownload(downloadId);
+        }
+      });
+
+      builder.create().show();
+    }
   }
 
-  protected void handleViewDownloadsBroadcast(long downloadId) {
+  protected void cancelDownload(long downloadId) {
+    DownloadManager downloadManager = getDownloadManager();
+
+    downloadManager.remove(downloadId);
+  }
+
+
+  protected void handleViewDownloadsBroadcast(Intent intent) {
 
   }
 
