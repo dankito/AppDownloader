@@ -115,22 +115,57 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
       currentDownloads.remove(downloadId);
 
       try {
-        DownloadManager downloadManager = getDownloadManager();
-        DownloadManager.Query query = new DownloadManager.Query();
-        query.setFilterById(downloadId);
-        Cursor cursor = downloadManager.query(query);
+        EnqueuedDownload enqueuedDownload = getEnqueuedDownloadForId(downloadId);
 
-        if(cursor != null && cursor.moveToFirst()) {
-          String downloadLocation = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-
-          installApp(downloadLocation);
-
-          cursor.close();
+        if(enqueuedDownload != null) {
+          installApp(enqueuedDownload.getDownloadLocationUri());
         }
       } catch(Exception e) {
         log.error("Could not handle successful Download", e);
       }
     }
+  }
+
+  protected EnqueuedDownload getEnqueuedDownloadForId(long downloadId) {
+    DownloadManager downloadManager = getDownloadManager();
+    DownloadManager.Query query = new DownloadManager.Query();
+    query.setFilterById(downloadId);
+    Cursor cursor = downloadManager.query(query);
+
+    if(cursor != null && cursor.moveToFirst()) {
+      EnqueuedDownload result = deserializeDatabaseEntry(cursor);
+
+      cursor.close();
+
+      return result;
+    }
+
+    return null;
+  }
+
+  protected EnqueuedDownload deserializeDatabaseEntry(Cursor cursor) {
+    EnqueuedDownload result = new EnqueuedDownload();
+
+    result.setId(cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_ID)));
+
+    result.setUri(cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_URI)));
+    result.setDownloadLocationUri(cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)));
+
+    result.setFileSize(cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)));
+    result.setBytesDownloadedSoFar(cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)));
+
+    result.setStatus(cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)));
+    result.setReason(cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_REASON)));
+
+    result.setTitle(cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_TITLE)));
+    result.setDescription(cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_DESCRIPTION)));
+
+    result.setLastModified(new Date(cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_LAST_MODIFIED_TIMESTAMP))));
+
+    result.setMediaType(cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE)));
+    result.setMediaProviderUri(cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_MEDIAPROVIDER_URI)));
+
+    return result;
   }
 
   protected void installApp(String downloadLocation) {
