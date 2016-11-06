@@ -19,7 +19,6 @@ import net.dankito.appdownloader.responses.AppSearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -150,7 +149,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
   protected void installApp(String downloadLocation) {
     Intent intent = new Intent();
     intent.setAction(android.content.Intent.ACTION_VIEW);
-    intent.setDataAndType(Uri.fromFile(new File(downloadLocation)), "application/vnd.android.package-archive");
+    intent.setDataAndType(Uri.parse(downloadLocation), "application/vnd.android.package-archive");
     context.startActivityForResult(intent, 10);
   }
 
