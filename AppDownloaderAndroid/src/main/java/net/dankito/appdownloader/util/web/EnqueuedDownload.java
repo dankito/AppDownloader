@@ -77,6 +77,10 @@ public class EnqueuedDownload {
     return getFileSize() == getBytesDownloadedSoFar();
   }
 
+  public boolean isStatusOk() {
+    return "200".equals(getStatus());
+  }
+
   public String getStatus() {
     return status;
   }
