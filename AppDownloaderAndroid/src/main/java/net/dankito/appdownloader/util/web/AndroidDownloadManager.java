@@ -72,7 +72,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
       request.setDescription("Downloading " + appSearchResult.getTitle());
 
       String destinationFileName = getDestinationFilename(appSearchResult, url);
-      request.setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, destinationFileName);
+      request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, destinationFileName);
 
       // enqueue this request
       DownloadManager downloadManager = getDownloadManager();
