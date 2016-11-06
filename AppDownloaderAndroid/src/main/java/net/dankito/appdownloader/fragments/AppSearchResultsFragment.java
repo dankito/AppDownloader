@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
@@ -177,27 +178,32 @@ public class AppSearchResultsFragment extends Fragment {
 
   protected void getAppDownloadLinkAndDownloadApp(final AppSearchResult clickedApp) {
     final AtomicBoolean hasDownloadUrlBeenRetrieved = new AtomicBoolean(false);
+    final AtomicInteger countRequestsAppDownloadLinkCompleted = new AtomicInteger(0);
 
     for(IAppDownloader appDownloader : appDownloaders) {
       appDownloader.getAppDownloadLinkAsync(clickedApp, new GetAppDownloadUrlResponseCallback() {
         @Override
         public void completed(GetAppDownloadUrlResponse response) {
           synchronized(hasDownloadUrlBeenRetrieved) {
-            getAppDownloadLinkCompleted(clickedApp, response, hasDownloadUrlBeenRetrieved);
+            getAppDownloadLinkCompleted(clickedApp, response, hasDownloadUrlBeenRetrieved, countRequestsAppDownloadLinkCompleted);
           }
         }
       });
     }
   }
 
-  protected void getAppDownloadLinkCompleted(AppSearchResult clickedApp, GetAppDownloadUrlResponse response, AtomicBoolean hasDownloadUrlBeenRetrieved) {
+  protected void getAppDownloadLinkCompleted(AppSearchResult clickedApp, GetAppDownloadUrlResponse response, AtomicBoolean hasDownloadUrlBeenRetrieved, AtomicInteger countRequestsAppDownloadLinkCompleted) {
+    countRequestsAppDownloadLinkCompleted.incrementAndGet();
+
     if(response.isSuccessful()) {
       clickedApp.addDownloadUrl(response.getUrl());
     }
 
     if(hasDownloadUrlBeenRetrieved.get() == false) {
       if(response.isSuccessful() == false) {
-        showErrorMessageThreadSafe(getString(R.string.error_message_could_not_download_app, response.getError()));
+        if(countRequestsAppDownloadLinkCompleted.get() == appDownloaders.size()) { // only show error message if it's been the last AppDownloader which's request completed
+          showErrorMessageThreadSafe(getString(R.string.error_message_could_not_download_app, response.getError()));
+        }
       }
       else {
         downloadApp(clickedApp, response.getUrl());
