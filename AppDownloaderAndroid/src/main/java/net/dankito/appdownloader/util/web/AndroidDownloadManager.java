@@ -19,11 +19,16 @@ import net.dankito.appdownloader.responses.AppSearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by ganymed on 05/11/16.
@@ -43,6 +48,8 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
   // TODO: save currentDownloaded so that on an App restart aborted and on restart finished downloads can be handled
   protected Map<Long, AppSearchResult> currentDownloads = new ConcurrentHashMap<>();
 
+  protected List<AppSearchResult> appsBeingInstalled = new CopyOnWriteArrayList<>();
+
 
   public AndroidDownloadManager(Activity context) {
     this.context = context;
@@ -54,6 +61,10 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     context.registerReceiver(this, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
     context.registerReceiver(this, new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));
+
+    IntentFilter packageAddedIntentFilter = new IntentFilter(Intent.ACTION_PACKAGE_ADDED);
+    packageAddedIntentFilter.addDataScheme("package"); // this seems to be absolutely necessary for PACKAGE_ADDED, see https://stackoverflow.com/questions/11246326/how-to-receiving-broadcast-when-application-installed-or-removed
+    context.registerReceiver(this, packageAddedIntentFilter);
   }
 
 
@@ -105,6 +116,10 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
       case DownloadManager.ACTION_NOTIFICATION_CLICKED:
         handleNotificationClickedBroadcast(intent);
         break;
+      case Intent.ACTION_PACKAGE_ADDED:
+      case Intent.ACTION_PACKAGE_CHANGED:
+        handlePackageAddedOrChanged(intent);
+        break;
     }
   }
 
@@ -112,14 +127,16 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
 
     if(currentDownloads.containsKey(downloadId)) { // yeah, we started this download
-      currentDownloads.remove(downloadId);
+      AppSearchResult appHavingDownloaded = currentDownloads.remove(downloadId);
 
       try {
         EnqueuedDownload enqueuedDownload = getEnqueuedDownloadForId(downloadId);
 
         if(enqueuedDownload != null) {
           if(enqueuedDownload.wasDownloadSuccessful()) {
-            installApp(enqueuedDownload.getDownloadLocationUri());
+            appHavingDownloaded.setDownloadLocationUri(enqueuedDownload.getDownloadLocationUri());
+
+            installApp(appHavingDownloaded, enqueuedDownload.getDownloadLocationUri());
           }
         }
       } catch(Exception e) {
@@ -170,13 +187,13 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     return result;
   }
 
-  protected void installApp(String downloadLocation) {
+  protected void installApp(AppSearchResult appToInstall, String downloadLocation) {
     Intent intent = new Intent();
     intent.setAction(android.content.Intent.ACTION_VIEW);
     intent.setDataAndType(Uri.parse(downloadLocation), "application/vnd.android.package-archive");
-    context.startActivityForResult(intent, 10);
+    context.startActivityForResult(intent, -1);
 
-    // TODO: remove downloaded file when installation was successful
+    appsBeingInstalled.add(appToInstall);
   }
 
 
@@ -212,6 +229,36 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     downloadManager.remove(downloadId);
 
     currentDownloads.remove(downloadId);
+  }
+
+
+  protected void handlePackageAddedOrChanged(Intent intent) {
+    if(appsBeingInstalled.size() > 0) {
+      String dataString = intent.getDataString();
+      String changedAppPackage = dataString.substring(dataString.indexOf(':') + 1); // remove scheme (= package:)
+
+      for(AppSearchResult appBeingInstalled : new ArrayList<>(appsBeingInstalled)) {
+        if(appBeingInstalled.getPackageName().equals(changedAppPackage)) {
+          deletedDownloadedApk(appBeingInstalled);
+
+          appsBeingInstalled.remove(appBeingInstalled);
+          break;
+        }
+      }
+    }
+  }
+
+  protected void deletedDownloadedApk(AppSearchResult appBeingInstalled) {
+    try {
+      URI uri = URI.create(appBeingInstalled.getDownloadLocationUri()); // get File from Uri
+      File file = new File(uri.getPath());
+      if(file.exists()) {
+        log.info("Deleting installed Apk file " + file.getAbsolutePath());
+        file.delete();
+      }
+    } catch(Exception e) {
+      log.error("Could not deleted installed Apk file " + appBeingInstalled.getDownloadLocationUri(), e);
+    }
   }
 
 
