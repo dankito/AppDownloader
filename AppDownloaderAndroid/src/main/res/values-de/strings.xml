@@ -2,9 +2,15 @@
 <resources>
     <string name="action_settings">Einstellungen</string>
 
+    <string name="ok">OK</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+
     <string name="search_title">Suchen</string>
     <string name="search_hint_search_apps">Apps suchen</string>
 
     <string name="error_message_could_not_search_for_apps">Konnte nicht nach Apps suchen: %s</string>
     <string name="error_message_could_not_download_app">App konnte nicht gedownloaded werden: %s</string>
+
+    <string name="alert_message_cancel_download">Download von %s abbrechen?</string>
 </resources>
