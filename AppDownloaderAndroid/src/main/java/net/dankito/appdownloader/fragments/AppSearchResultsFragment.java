@@ -193,28 +193,30 @@ public class AppSearchResultsFragment extends Fragment {
       appDownloader.getAppDownloadLinkAsync(clickedApp, new GetAppDownloadUrlResponseCallback() {
         @Override
         public void completed(GetAppDownloadUrlResponse response) {
-          if(hasDownloadUrlBeenRetrieved.get() == false) {
-            hasDownloadUrlBeenRetrieved.set(response.isSuccessful());
+          synchronized(hasDownloadUrlBeenRetrieved) {
+            getAppDownloadLinkCompleted(clickedApp, response, hasDownloadUrlBeenRetrieved);
           }
-
-          if(response.isSuccessful()) {
-            clickedApp.addDownloadUrl(response.getUrl());
-          }
-
-//          if(hasDownloadUrlBeenRetrieved.get() == false) {
-            getAppDownloadLinkCompleted(response, clickedApp);
-//          }
         }
       });
     }
   }
 
-  protected void getAppDownloadLinkCompleted(GetAppDownloadUrlResponse response, AppSearchResult clickedApp) {
-    if(response.isSuccessful() == false) {
-      showErrorMessageThreadSafe(getString(R.string.error_message_could_not_download_app, response.getError()));
+  protected void getAppDownloadLinkCompleted(AppSearchResult clickedApp, GetAppDownloadUrlResponse response, AtomicBoolean hasDownloadUrlBeenRetrieved) {
+    if(response.isSuccessful()) {
+      clickedApp.addDownloadUrl(response.getUrl());
     }
-    else {
-      downloadApp(clickedApp, response.getUrl());
+
+    if(hasDownloadUrlBeenRetrieved.get() == false) {
+      if(response.isSuccessful() == false) {
+        showErrorMessageThreadSafe(getString(R.string.error_message_could_not_download_app, response.getError()));
+      }
+      else {
+        downloadApp(clickedApp, response.getUrl());
+      }
+    }
+
+    if(response.isSuccessful()) {
+      hasDownloadUrlBeenRetrieved.set(true);
     }
   }
 
