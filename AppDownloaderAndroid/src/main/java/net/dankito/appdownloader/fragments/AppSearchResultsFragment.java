@@ -133,7 +133,6 @@ public class AppSearchResultsFragment extends Fragment {
 
     @Override
     public boolean onQueryTextChange(String query) {
-//      searchApps(query);
       return true;
     }
   };
@@ -219,22 +218,11 @@ public class AppSearchResultsFragment extends Fragment {
 
     downloadAppViaAndroidDownloadManager(clickedApp, appDownloadUrl);
 
-//    downloadAppBySelectingAppToDownloadViaIntent(appDownloadUrl);
-//
 //    downloadAppViaAppDownloader(clickedApp);
   }
 
   protected void downloadAppViaAndroidDownloadManager(AppSearchResult clickedApp, String appDownloadUrl) {
     downloadManager.downloadUrlAsync(clickedApp, appDownloadUrl);
-  }
-
-  protected void downloadAppBySelectingAppToDownloadViaIntent(String appDownloadUrl) {
-    try {
-      Intent intent = new Intent();
-      intent.setAction(Intent.ACTION_VIEW);
-      intent.setData(Uri.parse(appDownloadUrl));
-      startActivityForResult(intent, 10);
-    } catch(Exception e) { showErrorMessageThreadSafe("Could not parse App Download Link " + appDownloadUrl + ": " + e.getLocalizedMessage()); }
   }
 
   protected void downloadAppViaAppDownloader(final AppSearchResult clickedApp) {
@@ -283,8 +271,6 @@ public class AppSearchResultsFragment extends Fragment {
   }
 
   protected void showErrorMessage(String errorMessage) {
-//    Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
-
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     builder = builder.setMessage(errorMessage);
 
