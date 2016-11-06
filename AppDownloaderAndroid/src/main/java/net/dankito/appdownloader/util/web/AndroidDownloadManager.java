@@ -53,8 +53,6 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     context.registerReceiver(this, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
     context.registerReceiver(this, new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));
-
-    context.registerReceiver(this, new IntentFilter(DownloadManager.ACTION_VIEW_DOWNLOADS));
   }
 
 
@@ -64,7 +62,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
       Uri uri = Uri.parse(url);
       DownloadManager.Request request = new DownloadManager.Request(uri);
 
-      // TODO: make configurable if allowed to download over celluar network and on roaming
+      // TODO: make configurable if allowed to download over cellular network and on roaming
       request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
       request.setAllowedOverRoaming(false);
 
@@ -114,9 +112,6 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
         break;
       case DownloadManager.ACTION_NOTIFICATION_CLICKED:
         handleNotificationClickedBroadcast(intent);
-        break;
-      case DownloadManager.ACTION_VIEW_DOWNLOADS:
-        handleViewDownloadsBroadcast(intent);
         break;
     }
   }
@@ -182,11 +177,6 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     downloadManager.remove(downloadId);
 
     currentDownloads.remove(downloadId);
-  }
-
-
-  protected void handleViewDownloadsBroadcast(Intent intent) {
-
   }
 
 
