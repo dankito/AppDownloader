@@ -145,22 +145,26 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     long[] downloadIds = intent.getLongArrayExtra(DownloadManager.EXTRA_NOTIFICATION_CLICK_DOWNLOAD_IDS);
 
     for(final long downloadId : downloadIds) {
-      AppSearchResult appToStop = currentDownloads.get(downloadId);
-      String appTitle = appToStop == null ? "" : appToStop.getTitle();
-
-      AlertDialog.Builder builder = new AlertDialog.Builder(context);
-      builder = builder.setMessage(context.getString(R.string.alert_message_cancel_download, appTitle));
-
-      builder.setNegativeButton(R.string.no, null);
-      builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialogInterface, int i) {
-          cancelDownload(downloadId);
-        }
-      });
-
-      builder.create().show();
+      askShouldDownloadGetCancelled(downloadId);
     }
+  }
+
+  protected void askShouldDownloadGetCancelled(final long downloadId) {
+    AppSearchResult appToStop = currentDownloads.get(downloadId);
+    String appTitle = appToStop == null ? "" : appToStop.getTitle();
+
+    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+    builder = builder.setMessage(context.getString(R.string.alert_message_cancel_download, appTitle));
+
+    builder.setNegativeButton(R.string.no, null);
+    builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialogInterface, int i) {
+        cancelDownload(downloadId);
+      }
+    });
+
+    builder.create().show();
   }
 
   protected void cancelDownload(long downloadId) {
