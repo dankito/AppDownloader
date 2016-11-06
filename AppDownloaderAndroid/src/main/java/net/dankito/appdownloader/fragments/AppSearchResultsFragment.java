@@ -2,8 +2,6 @@ package net.dankito.appdownloader.fragments;
 
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -25,11 +23,9 @@ import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.EvoziPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.IAppDownloader;
 import net.dankito.appdownloader.responses.AppSearchResult;
-import net.dankito.appdownloader.responses.DownloadAppResponse;
 import net.dankito.appdownloader.responses.GetAppDetailsResponse;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.SearchAppsResponse;
-import net.dankito.appdownloader.responses.callbacks.DownloadAppCallback;
 import net.dankito.appdownloader.responses.callbacks.GetAppDetailsCallback;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
 import net.dankito.appdownloader.responses.callbacks.SearchAppsResponseCallback;
@@ -217,35 +213,10 @@ public class AppSearchResultsFragment extends Fragment {
     log.info("Starting to download App " + clickedApp + " from " + appDownloadUrl + " ...");
 
     downloadAppViaAndroidDownloadManager(clickedApp, appDownloadUrl);
-
-//    downloadAppViaAppDownloader(clickedApp);
   }
 
   protected void downloadAppViaAndroidDownloadManager(AppSearchResult clickedApp, String appDownloadUrl) {
     downloadManager.downloadUrlAsync(clickedApp, appDownloadUrl);
-  }
-
-  protected void downloadAppViaAppDownloader(final AppSearchResult clickedApp) {
-    apkDownloaderPlayStoreAppDownloader.downloadAppAsync(clickedApp, new DownloadAppCallback() {
-      @Override
-      public void completed(DownloadAppResponse response) {
-        appDownloadCompleted(clickedApp, response);
-      }
-    });
-  }
-
-  protected void appDownloadCompleted(AppSearchResult clickedApp, DownloadAppResponse response) {
-    if(response.isSuccessful() == false) {
-      showErrorMessageThreadSafe(getString(R.string.error_message_could_not_download_app, response.getError()));
-    }
-    else {
-      clickedApp.setDownloadLocation(response.getDownloadLocation());
-
-      Intent intent = new Intent();
-      intent.setAction(android.content.Intent.ACTION_VIEW);
-      intent.setDataAndType(Uri.fromFile(response.getDownloadLocation()), "application/vnd.android.package-archive");
-      startActivityForResult(intent, 10);
-    }
   }
 
   protected GetAppDetailsCallback appDetailsRetrievedListener = new GetAppDetailsCallback() {
