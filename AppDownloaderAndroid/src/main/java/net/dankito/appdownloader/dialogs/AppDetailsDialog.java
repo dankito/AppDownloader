@@ -42,6 +42,12 @@ public class AppDetailsDialog extends FullscreenDialog {
 
   protected WebView wbvwViewAppDetails;
 
+  protected View installAppActionView;
+
+  protected ProgressBar prgbrInstallationProgress;
+
+  protected TextView txtvwInstallationStep;
+
 
   public AppDetailsDialog(AppCompatActivity context) {
     super(context);
@@ -94,11 +100,13 @@ public class AppDetailsDialog extends FullscreenDialog {
   }
 
   protected void setAppValues() {
-//    toolbar.setTitle(appSearchResult.getTitle());
+    toolbar.setTitle(appSearchResult.getTitle());
 
     wbvwViewAppDetails.loadUrl(appSearchResult.getAppDetailsPageUrl());
 
     invalidateOptionsMenu();
+
+    setActionMenuInstallAppState();
   }
 
 
@@ -131,12 +139,14 @@ public class AppDetailsDialog extends FullscreenDialog {
     menuInflater.inflate(R.menu.menu_app_details_dialog, menu);
 
     MenuItem installAppItem = menu.findItem(R.id.mnitmInstallApp);
-    View actionView = installAppItem.getActionView();
+    installAppActionView = installAppItem.getActionView();
 
-    ProgressBar prgbrInstallationProgress = (ProgressBar)actionView.findViewById(R.id.prgbrInstallationProgress);
+    prgbrInstallationProgress = (ProgressBar)installAppActionView.findViewById(R.id.prgbrInstallationProgress);
     prgbrInstallationProgress.setIndeterminate(true);
 
-    actionView.setOnClickListener(mnitmInstallAppClickListener);
+    txtvwInstallationStep = (TextView)installAppActionView.findViewById(R.id.txtvwInstallationStep);
+
+    installAppActionView.setOnClickListener(mnitmInstallAppClickListener);
 
     return super.onCreateOptionsMenu(menu);
   }
@@ -144,14 +154,13 @@ public class AppDetailsDialog extends FullscreenDialog {
   protected View.OnClickListener mnitmInstallAppClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View view) {
-      mnitmInstallAppClicked(view);
+      mnitmInstallAppClicked();
     }
   };
 
-  protected void mnitmInstallAppClicked(View actionView) {
-    TextView txtvwInstallationStep = (TextView)actionView.findViewById(R.id.txtvwInstallationStep);
-    txtvwInstallationStep.setText("Getting Download Url");
-    ProgressBar prgbrInstallationProgress = (ProgressBar)actionView.findViewById(R.id.prgbrInstallationProgress);
+  protected void mnitmInstallAppClicked() {
+    txtvwInstallationStep.setText(R.string.get_download_url);
+
     prgbrInstallationProgress.setIndeterminate(true);
     prgbrInstallationProgress.setVisibility(View.VISIBLE);
 
@@ -226,6 +235,21 @@ public class AppDetailsDialog extends FullscreenDialog {
 
   protected void downloadAppViaAndroidDownloadManager(AppSearchResult clickedApp, String appDownloadUrl) {
     downloadManager.downloadUrlAsync(clickedApp, appDownloadUrl);
+  }
+
+
+  protected void setActionMenuInstallAppState() {
+    setActionMenuInstallAppToStateInstallable();
+  }
+
+  protected void setActionMenuInstallAppToStateInstallable() {
+    if(txtvwInstallationStep != null) {
+      txtvwInstallationStep.setText(R.string.install);
+    }
+
+    if(prgbrInstallationProgress != null) {
+      prgbrInstallationProgress.setVisibility(View.GONE);
+    }
   }
 
 }

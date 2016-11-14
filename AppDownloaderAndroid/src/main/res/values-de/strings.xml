@@ -10,6 +10,7 @@
     <string name="search_hint_search_apps">Apps suchen</string>
 
     <string name="install">Installieren</string>
+    <string name="get_download_url">Download Url ermitteln</string>
 
     <string name="error_message_could_not_search_for_apps">Konnte nicht nach Apps suchen: %s</string>
     <string name="error_message_could_not_download_app">App konnte nicht gedownloaded werden: %s</string>
