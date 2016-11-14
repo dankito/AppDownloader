@@ -37,8 +37,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
   public void getAppDownloadLinkAsync(final AppSearchResult appToDownload, final GetAppDownloadUrlResponseCallback callback) {
     try {
       String url = APK_DOWNLOADER_APP_DETAILS_PAGE_URL + URLEncoder.encode(appToDownload.getPackageName(), "ASCII");
-      RequestParameters parameters = new RequestParameters(url);
-      parameters.setConnectionTimeoutMillis(DOWNLOAD_CONNECTION_TIMEOUT_MILLIS);
+      RequestParameters parameters = createRequestParametersWithDefaultValues(url);
 
       webClient.getAsync(parameters, new RequestCallback() {
         @Override
@@ -85,7 +84,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
   }
 
   protected void downloadAndParseAppDownloadPage(final AppSearchResult appToDownload, final String appDownloadPageUrl, final GetAppDownloadUrlResponseCallback callback) {
-    RequestParameters parameters = new RequestParameters(appDownloadPageUrl);
+    RequestParameters parameters = createRequestParametersWithDefaultValues(appDownloadPageUrl);
 
     webClient.getAsync(parameters, new RequestCallback() {
       @Override
@@ -123,7 +122,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
   }
 
   protected void downloadAndParseAppDetailDownloadPage(final AppSearchResult appToDownload, String appDetailDownloadPageUrl, final GetAppDownloadUrlResponseCallback callback) {
-    RequestParameters parameters = new RequestParameters(appDetailDownloadPageUrl);
+    RequestParameters parameters = createRequestParametersWithDefaultValues(appDetailDownloadPageUrl);
 
     webClient.getAsync(parameters, new RequestCallback() {
       @Override

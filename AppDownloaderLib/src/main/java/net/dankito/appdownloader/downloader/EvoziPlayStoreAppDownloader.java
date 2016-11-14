@@ -54,8 +54,8 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
   }
 
   protected void requestAppDownloadUrl(final AppSearchResult appToDownload, final AppDownloadRequestParameters requestParameters, final GetAppDownloadUrlResponseCallback callback) {
-    RequestParameters parameters = new RequestParameters(APPS_EVOZI_DOWNLOAD_APP_URL, requestParameters.getRequestBodyString());
-    parameters.setConnectionTimeoutMillis(DOWNLOAD_CONNECTION_TIMEOUT_MILLIS);
+    RequestParameters parameters = createRequestParametersWithDefaultValues(APPS_EVOZI_DOWNLOAD_APP_URL);
+    parameters.setBody(requestParameters.getRequestBodyString());
 
     webClient.postAsync(parameters, new RequestCallback() {
       @Override
@@ -83,8 +83,7 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
   }
 
   protected void getAppDownloadRequestParametersAsync(final String appPackageName, final GetAppDownloadRequestParametersCallback callback) {
-    RequestParameters parameters = new RequestParameters(APPS_EVOZI_START_PAGE_URL);
-    parameters.setConnectionTimeoutMillis(4000);
+    RequestParameters parameters = createRequestParametersWithDefaultValues(APPS_EVOZI_START_PAGE_URL);
 
     webClient.getAsync(parameters, new RequestCallback() {
       @Override

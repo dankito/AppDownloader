@@ -25,7 +25,10 @@ import java.io.OutputStream;
 
 public abstract class AppDownloaderBase implements IAppDownloader {
 
-  public static final int DOWNLOAD_CONNECTION_TIMEOUT_MILLIS = 3 * 60 * 1000; // it can take up to 3 minutes till download link is created
+  public static final int DOWNLOAD_CONNECTION_TIMEOUT_MILLIS = 2000;
+
+  public static final int COUNT_CONNECTION_RETRIES = 2;
+
 
   private static final Logger log = LoggerFactory.getLogger(AppDownloaderBase.class);
 
@@ -67,9 +70,8 @@ public abstract class AppDownloaderBase implements IAppDownloader {
       final File targetFile = File.createTempFile(appToDownload.getTitle(), ".apk");
       final OutputStream outStream = new FileOutputStream(targetFile);
 
-      RequestParameters parameters = new RequestParameters(response.getUrl());
+      RequestParameters parameters = createRequestParametersWithDefaultValues(response.getUrl());
       parameters.setHasStringResponse(false);
-      parameters.setConnectionTimeoutMillis(DOWNLOAD_CONNECTION_TIMEOUT_MILLIS);
 
       parameters.setDownloadProgressListener(new DownloadProgressListener() {
         @Override
@@ -104,4 +106,13 @@ public abstract class AppDownloaderBase implements IAppDownloader {
       callback.completed(new DownloadAppResponse(e.getLocalizedMessage()));
     }
   }
+
+
+  protected RequestParameters createRequestParametersWithDefaultValues(String url) {
+    RequestParameters parameters = new RequestParameters(url);
+    parameters.setConnectionTimeoutMillis(DOWNLOAD_CONNECTION_TIMEOUT_MILLIS);
+    parameters.setCountConnectionRetries(COUNT_CONNECTION_RETRIES);
+    return parameters;
+  }
+
 }

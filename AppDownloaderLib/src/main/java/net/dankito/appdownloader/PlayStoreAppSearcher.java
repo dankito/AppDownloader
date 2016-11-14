@@ -34,6 +34,9 @@ public class PlayStoreAppSearcher {
   protected static final String PACKAGE_NAME_ATTRIBUTE_NAME = "data-docid";
   protected static final String COOKIE_ATTRIBUTE_NAME = "data-server-cookie";
 
+  protected static final int CONNECTION_TIMEOUT_MILLIS = 2000;
+  protected static final int COUNT_CONNECTION_RETRIES = 2;
+
   private static final Logger log = LoggerFactory.getLogger(PlayStoreAppSearcher.class);
 
 
@@ -52,7 +55,8 @@ public class PlayStoreAppSearcher {
     try {
       String searchUrl = "https://play.google.com/store/search?q=" + URLEncoder.encode(searchTerm, "ASCII") + "&authuser=0";
       RequestParameters parameters = new RequestParameters(searchUrl, "ipf=1&xhr=1");
-      parameters.setConnectionTimeoutMillis(4000);
+      parameters.setConnectionTimeoutMillis(CONNECTION_TIMEOUT_MILLIS);
+      parameters.setCountConnectionRetries(COUNT_CONNECTION_RETRIES);
 
       webClient.postAsync(parameters, new RequestCallback() {
         @Override
@@ -175,8 +179,9 @@ public class PlayStoreAppSearcher {
 
   public void getAppDetailsAsync(final AppSearchResult appSearchResult, final GetAppDetailsCallback callback) {
     try {
-      String url = GET_APP_DETAIL_PAGE_URL + URLEncoder.encode(appSearchResult.getPackageName(), "ASCII");
-      RequestParameters parameters = new RequestParameters(url);
+      RequestParameters parameters = new RequestParameters(appSearchResult.getAppDetailsPageUrl());
+      parameters.setConnectionTimeoutMillis(CONNECTION_TIMEOUT_MILLIS);
+      parameters.setCountConnectionRetries(COUNT_CONNECTION_RETRIES);
 
       webClient.getAsync(parameters, new RequestCallback() {
         @Override
