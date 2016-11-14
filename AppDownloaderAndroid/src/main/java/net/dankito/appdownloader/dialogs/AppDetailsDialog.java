@@ -13,6 +13,8 @@ import android.widget.TextView;
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.downloader.IAppDownloader;
 import net.dankito.appdownloader.responses.AppSearchResult;
+import net.dankito.appdownloader.responses.AppSearchResultState;
+import net.dankito.appdownloader.responses.AppSearchResultStateListener;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
 import net.dankito.appdownloader.util.AlertHelper;
@@ -58,6 +60,8 @@ public class AppDetailsDialog extends FullscreenDialog {
 
   public void setAppSearchResult(AppSearchResult appSearchResult) {
     this.appSearchResult = appSearchResult;
+
+    appSearchResult.addStateListener(appSearchResultStateListener);
   }
 
   public void setAppDownloaders(List<IAppDownloader> appDownloaders) {
@@ -159,11 +163,6 @@ public class AppDetailsDialog extends FullscreenDialog {
   };
 
   protected void mnitmInstallAppClicked() {
-    txtvwInstallationStep.setText(R.string.get_download_url);
-
-    prgbrInstallationProgress.setIndeterminate(true);
-    prgbrInstallationProgress.setVisibility(View.VISIBLE);
-
     installApp();
   }
 
@@ -189,6 +188,8 @@ public class AppDetailsDialog extends FullscreenDialog {
   }
 
   protected void getAppDownloadLinkAndDownloadApp(final AppSearchResult clickedApp) {
+    appSearchResult.setState(AppSearchResultState.GETTING_DOWNLOAD_URL);
+
     final AtomicBoolean hasDownloadUrlBeenRetrieved = new AtomicBoolean(false);
     final AtomicInteger countRequestsAppDownloadLinkCompleted = new AtomicInteger(0);
 
@@ -230,6 +231,8 @@ public class AppDetailsDialog extends FullscreenDialog {
   protected void downloadApp(AppSearchResult clickedApp, String appDownloadUrl) {
     log.info("Starting to download App " + clickedApp + " from " + appDownloadUrl + " ...");
 
+    appSearchResult.setState(AppSearchResultState.DOWNLOADING);
+
     downloadAppViaAndroidDownloadManager(clickedApp, appDownloadUrl);
   }
 
@@ -238,8 +241,31 @@ public class AppDetailsDialog extends FullscreenDialog {
   }
 
 
+  protected void setActionMenuInstallAppStateThreadSafe() {
+    activity.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        setActionMenuInstallAppState();
+      }
+    });
+  }
+
   protected void setActionMenuInstallAppState() {
-    setActionMenuInstallAppToStateInstallable();
+    if(appSearchResult.getState() == AppSearchResultState.INSTALLABLE) {
+      setActionMenuInstallAppToStateInstallable();
+    }
+    else if(appSearchResult.getState() == AppSearchResultState.UPDATABLE) {
+      setActionMenuInstallAppToStateUpdatable();
+    }
+    else if(appSearchResult.getState() == AppSearchResultState.GETTING_DOWNLOAD_URL) {
+      setActionMenuInstallAppToStateGettingDownloadUrl();
+    }
+    else if(appSearchResult.getState() == AppSearchResultState.DOWNLOADING) {
+      setActionMenuInstallAppToStateDownloading();
+    }
+    else if(appSearchResult.getState() == AppSearchResultState.INSTALLING) {
+      setActionMenuInstallAppToStateInstalling();
+    }
   }
 
   protected void setActionMenuInstallAppToStateInstallable() {
@@ -250,6 +276,59 @@ public class AppDetailsDialog extends FullscreenDialog {
     if(prgbrInstallationProgress != null) {
       prgbrInstallationProgress.setVisibility(View.GONE);
     }
+
+    if(installAppActionView != null) {
+      installAppActionView.setEnabled(true);
+    }
   }
+
+  protected void setActionMenuInstallAppToStateUpdatable() {
+    if(txtvwInstallationStep != null) {
+      txtvwInstallationStep.setText(R.string.update);
+    }
+
+    if(prgbrInstallationProgress != null) {
+      prgbrInstallationProgress.setVisibility(View.GONE);
+    }
+
+    if(installAppActionView != null) {
+      installAppActionView.setEnabled(true);
+    }
+  }
+
+  protected void setActionMenuInstallAppToStateGettingDownloadUrl() {
+    txtvwInstallationStep.setText(R.string.get_download_url);
+
+    prgbrInstallationProgress.setIndeterminate(true);
+    prgbrInstallationProgress.setVisibility(View.VISIBLE);
+
+    installAppActionView.setEnabled(false);
+  }
+
+  protected void setActionMenuInstallAppToStateDownloading() {
+    txtvwInstallationStep.setText(R.string.downloading);
+
+    prgbrInstallationProgress.setIndeterminate(true);
+    prgbrInstallationProgress.setVisibility(View.VISIBLE);
+
+    installAppActionView.setEnabled(false);
+  }
+
+  protected void setActionMenuInstallAppToStateInstalling() {
+    txtvwInstallationStep.setText(R.string.installing);
+
+    prgbrInstallationProgress.setIndeterminate(true);
+    prgbrInstallationProgress.setVisibility(View.VISIBLE);
+
+    installAppActionView.setEnabled(false);
+  }
+
+
+  protected AppSearchResultStateListener appSearchResultStateListener = new AppSearchResultStateListener() {
+    @Override
+    public void stateChanged(AppSearchResultState newState, AppSearchResultState previousState) {
+      setActionMenuInstallAppStateThreadSafe();
+    }
+  };
 
 }

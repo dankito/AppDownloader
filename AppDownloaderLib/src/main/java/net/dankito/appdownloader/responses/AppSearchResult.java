@@ -25,7 +25,7 @@ public class AppSearchResult {
 
   protected String appDetailsPageUrl;
 
-  protected AppSearchResultState state;
+  protected AppSearchResultState state = AppSearchResultState.INSTALLABLE;
 
   protected List<AppSearchResultStateListener> stateListeners = new ArrayList<>();
 

@@ -15,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.responses.AppSearchResult;
+import net.dankito.appdownloader.responses.AppSearchResultState;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,6 +137,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
           if(enqueuedDownload.wasDownloadSuccessful()) {
             appHavingDownloaded.setDownloadLocationUri(enqueuedDownload.getDownloadLocationUri());
 
+            // TODO: call listener, installApp is not a task of DownloadManager
             installApp(appHavingDownloaded, enqueuedDownload.getDownloadLocationUri());
           }
         }
@@ -188,6 +190,8 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
   }
 
   protected void installApp(AppSearchResult appToInstall, String downloadLocation) {
+    appToInstall.setState(AppSearchResultState.INSTALLING);
+
     Intent intent = new Intent();
     intent.setAction(android.content.Intent.ACTION_VIEW);
     intent.setDataAndType(Uri.parse(downloadLocation), "application/vnd.android.package-archive");
@@ -242,6 +246,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
           deletedDownloadedApk(appBeingInstalled);
 
           appsBeingInstalled.remove(appBeingInstalled);
+          appBeingInstalled.setState(AppSearchResultState.UPDATABLE);
           break;
         }
       }
