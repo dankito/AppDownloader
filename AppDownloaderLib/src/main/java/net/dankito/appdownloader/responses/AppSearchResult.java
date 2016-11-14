@@ -23,6 +23,8 @@ public class AppSearchResult {
 
   protected String largeCoverImageUrl;
 
+  protected String appDetailsPageUrl;
+
 
   // from App Details Page
 
@@ -95,6 +97,14 @@ public class AppSearchResult {
 
   public void setLargeCoverImageUrl(String largeCoverImageUrl) {
     this.largeCoverImageUrl = largeCoverImageUrl;
+  }
+
+  public String getAppDetailsPageUrl() {
+    return appDetailsPageUrl;
+  }
+
+  public void setAppDetailsPageUrl(String appDetailsPageUrl) {
+    this.appDetailsPageUrl = appDetailsPageUrl;
   }
 
 

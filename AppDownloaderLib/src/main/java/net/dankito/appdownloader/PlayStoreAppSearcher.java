@@ -119,6 +119,10 @@ public class PlayStoreAppSearcher {
     String cookie = cardContentElement.attr(COOKIE_ATTRIBUTE_NAME); // TODO: do we need this?
 
     AppSearchResult appSearchResult = new AppSearchResult(packageName);
+    try {
+      String appDetailsPageUrl = GET_APP_DETAIL_PAGE_URL + URLEncoder.encode(appSearchResult.getPackageName(), "ASCII");
+      appSearchResult.setAppDetailsPageUrl(appDetailsPageUrl);
+    } catch(Exception e) { log.error("Could not create App Details Page Url from Package Name " + appSearchResult.getPackageName(), e); }
 
     for(Element child : cardContentElement.children()) {
       if("div".equals(child.nodeName())) {
