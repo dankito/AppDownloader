@@ -4,7 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,19 +19,18 @@ import net.dankito.appdownloader.AppDownloaderApplication;
 import net.dankito.appdownloader.PlayStoreAppSearcher;
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.adapter.AppSearchResultsAdapter;
+import net.dankito.appdownloader.dialogs.AppDetailsDialog;
 import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.EvoziPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.IAppDownloader;
 import net.dankito.appdownloader.responses.AppSearchResult;
 import net.dankito.appdownloader.responses.GetAppDetailsResponse;
-import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.SearchAppsResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDetailsCallback;
-import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
 import net.dankito.appdownloader.responses.callbacks.SearchAppsResponseCallback;
+import net.dankito.appdownloader.util.AlertHelper;
 import net.dankito.appdownloader.util.AndroidOnUiThreadRunner;
 import net.dankito.appdownloader.util.IOnUiThreadRunner;
-import net.dankito.appdownloader.util.web.AndroidDownloadManager;
 import net.dankito.appdownloader.util.web.IWebClient;
 
 import org.slf4j.Logger;
@@ -39,8 +38,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
@@ -68,9 +65,9 @@ public class AppSearchResultsFragment extends Fragment {
   @Inject
   protected IWebClient webClient;
 
-  protected AndroidDownloadManager downloadManager;
-
   protected AppSearchResultsAdapter searchResultsAdapter;
+
+  protected AppDetailsDialog appDetailsDialog = null;
 
 
   public AppSearchResultsFragment() {
@@ -102,23 +99,52 @@ public class AppSearchResultsFragment extends Fragment {
 
     appDownloaders.add(apkDownloaderPlayStoreAppDownloader);
     appDownloaders.add(evoziPlayStoreAppDownloader);
-
-    this.downloadManager = new AndroidDownloadManager(getActivity());
   }
 
 
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-    MenuItem searchItem = menu.findItem(R.id.search);
-    SearchView searchView = (SearchView) searchItem.getActionView();
-    if(searchView != null) {
-      SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-      searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-      searchView.setQueryHint(getActivity().getString(R.string.search_hint_search_apps));
-      searchView.setOnQueryTextListener(entriesQueryTextListener);
+    if(isAppDetailsDialogShowing()) {
+      appDetailsDialog.onCreateOptionsMenu(menu);
     }
+    else {
+      inflater.inflate(R.menu.menu_main, menu);
 
-    super.onCreateOptionsMenu(menu, inflater);
+      MenuItem searchItem = menu.findItem(R.id.search);
+      SearchView searchView = (SearchView) searchItem.getActionView();
+      if(searchView != null) {
+        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setQueryHint(getActivity().getString(R.string.search_hint_search_apps));
+        searchView.setOnQueryTextListener(entriesQueryTextListener);
+      }
+
+      super.onCreateOptionsMenu(menu, inflater);
+    }
+  }
+
+  @Override
+  public void onPrepareOptionsMenu(Menu menu) {
+    if(isAppDetailsDialogShowing()) {
+      appDetailsDialog.onPrepareOptionsMenu(menu);
+    }
+    else {
+      super.onPrepareOptionsMenu(menu);
+    }
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    if(isAppDetailsDialogShowing()) {
+      return appDetailsDialog.onOptionsItemSelected(item);
+    }
+    else {
+      return super.onOptionsItemSelected(item);
+    }
+  }
+
+  protected boolean isAppDetailsDialogShowing() {
+    return appDetailsDialog != null && appDetailsDialog.isShowing();
   }
 
   protected SearchView.OnQueryTextListener entriesQueryTextListener = new SearchView.OnQueryTextListener() {
@@ -142,7 +168,7 @@ public class AppSearchResultsFragment extends Fragment {
           appSearchResultRetrieved(response.getAppSearchResults());
         }
         else {
-          showErrorMessageThreadSafe(getString(R.string.error_message_could_not_search_for_apps, response.getError()));
+          AlertHelper.showErrorMessageThreadSafe(getActivity(), getString(R.string.error_message_could_not_search_for_apps, response.getError()));
         }
       }
     });
@@ -163,66 +189,31 @@ public class AppSearchResultsFragment extends Fragment {
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
       final AppSearchResult clickedApp = (AppSearchResult)view.getTag();
 
-      if(clickedApp.isAlreadyDownloaded() == false) {
-        if(clickedApp.hasDownloadUrls()) {
-          for(String appDownloadUrl : clickedApp.getDownloadUrls()) {
-            downloadApp(clickedApp, appDownloadUrl);
-          }
-        }
-        else {
-          getAppDownloadLinkAndDownloadApp(clickedApp);
-        }
-      }
+      appSearchResultSelected(clickedApp);
     }
   };
 
-  protected void getAppDownloadLinkAndDownloadApp(final AppSearchResult clickedApp) {
-    final AtomicBoolean hasDownloadUrlBeenRetrieved = new AtomicBoolean(false);
-    final AtomicInteger countRequestsAppDownloadLinkCompleted = new AtomicInteger(0);
+  protected void appSearchResultSelected(AppSearchResult clickedApp) {
+    AppDetailsDialog appDetailsDialog = getAppDetailsDialog();
 
-    for(IAppDownloader appDownloader : appDownloaders) {
-      appDownloader.getAppDownloadLinkAsync(clickedApp, new GetAppDownloadUrlResponseCallback() {
-        @Override
-        public void completed(GetAppDownloadUrlResponse response) {
-          synchronized(hasDownloadUrlBeenRetrieved) {
-            getAppDownloadLinkCompleted(clickedApp, response, hasDownloadUrlBeenRetrieved, countRequestsAppDownloadLinkCompleted);
-          }
-        }
-      });
-    }
+    appDetailsDialog.setAppSearchResult(clickedApp);
+    appDetailsDialog.setAppDownloaders(appDownloaders);
+
+    appDetailsDialog.show();
   }
 
-  protected void getAppDownloadLinkCompleted(AppSearchResult clickedApp, GetAppDownloadUrlResponse response, AtomicBoolean hasDownloadUrlBeenRetrieved, AtomicInteger countRequestsAppDownloadLinkCompleted) {
-    countRequestsAppDownloadLinkCompleted.incrementAndGet();
-
-    if(response.isSuccessful()) {
-      clickedApp.addDownloadUrl(response.getUrl());
+  protected AppDetailsDialog getAppDetailsDialog() {
+    if(appDetailsDialog == null) {
+      appDetailsDialog = createAppDetailsDialog();
     }
 
-    if(hasDownloadUrlBeenRetrieved.get() == false) {
-      if(response.isSuccessful() == false) {
-        if(countRequestsAppDownloadLinkCompleted.get() == appDownloaders.size()) { // only show error message if it's been the last AppDownloader which's request completed
-          showErrorMessageThreadSafe(getString(R.string.error_message_could_not_download_app, response.getError()));
-        }
-      }
-      else {
-        downloadApp(clickedApp, response.getUrl());
-      }
-    }
-
-    if(response.isSuccessful()) {
-      hasDownloadUrlBeenRetrieved.set(true);
-    }
+    return appDetailsDialog;
   }
 
-  protected void downloadApp(AppSearchResult clickedApp, String appDownloadUrl) {
-    log.info("Starting to download App " + clickedApp + " from " + appDownloadUrl + " ...");
+  protected AppDetailsDialog createAppDetailsDialog() {
+    AppDetailsDialog appDetailsDialog = new AppDetailsDialog((AppCompatActivity)getActivity());
 
-    downloadAppViaAndroidDownloadManager(clickedApp, appDownloadUrl);
-  }
-
-  protected void downloadAppViaAndroidDownloadManager(AppSearchResult clickedApp, String appDownloadUrl) {
-    downloadManager.downloadUrlAsync(clickedApp, appDownloadUrl);
+    return appDetailsDialog;
   }
 
   protected GetAppDetailsCallback appDetailsRetrievedListener = new GetAppDetailsCallback() {
@@ -236,24 +227,5 @@ public class AppSearchResultsFragment extends Fragment {
       });
     }
   };
-
-
-  protected void showErrorMessageThreadSafe(final String errorMessage) {
-    getActivity().runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        showErrorMessage(errorMessage);
-      }
-    });
-  }
-
-  protected void showErrorMessage(String errorMessage) {
-    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-    builder = builder.setMessage(errorMessage);
-
-    builder.setNegativeButton(R.string.ok, null);
-
-    builder.create().show();
-  }
 
 }
