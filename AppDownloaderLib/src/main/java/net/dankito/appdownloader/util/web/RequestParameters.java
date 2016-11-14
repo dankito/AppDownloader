@@ -22,6 +22,8 @@ public class RequestParameters {
 
   protected int connectionTimeoutMillis;
 
+  protected int countConnectionRetries = 0;
+
   protected boolean hasStringResponse = true;
 
   protected int downloadBufferSize = DEFAULT_DOWNLOAD_BUFFER_SIZE;
@@ -90,6 +92,22 @@ public class RequestParameters {
 
   public void setConnectionTimeoutMillis(int connectionTimeoutMillis) {
     this.connectionTimeoutMillis = connectionTimeoutMillis;
+  }
+
+  public boolean isCountConnectionRetriesSet() {
+    return countConnectionRetries > 0;
+  }
+
+  public int getCountConnectionRetries() {
+    return countConnectionRetries;
+  }
+
+  public void setCountConnectionRetries(int countConnectionRetries) {
+    this.countConnectionRetries = countConnectionRetries;
+  }
+
+  public void decrementCountConnectionRetries() {
+    this.countConnectionRetries--;
   }
 
   public boolean hasStringResponse() {
