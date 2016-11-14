@@ -25,6 +25,8 @@ public class AppSearchResult {
 
   protected String appDetailsPageUrl;
 
+  protected AppSearchResultState state;
+
 
   // from App Details Page
 
@@ -107,6 +109,13 @@ public class AppSearchResult {
     this.appDetailsPageUrl = appDetailsPageUrl;
   }
 
+  public AppSearchResultState getState() {
+    return state;
+  }
+
+  public void setState(AppSearchResultState state) {
+    this.state = state;
+  }
 
   public boolean areNecessaryInformationSet() {
     return StringUtils.isNotNullOrEmpty(packageName) && StringUtils.isNotNullOrEmpty(appUrl) && StringUtils.isNotNullOrEmpty(title);
