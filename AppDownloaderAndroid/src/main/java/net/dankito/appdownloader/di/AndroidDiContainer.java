@@ -27,9 +27,8 @@ public class AndroidDiContainer {
 
   @Provides
   @Singleton
-  public IWebClient provideWebClient(IThreadPool threadPool) {
+  public IWebClient provideWebClient() {
     return new OkHttpWebClient();
-//    return new ApacheHttpClientWebClient(threadPool);
   }
 
   @Provides
