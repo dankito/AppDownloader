@@ -40,34 +40,67 @@ public class OkHttpWebClient implements IWebClient {
   }
 
 
+  public WebClientResponse get(RequestParameters parameters) {
+    try {
+      Request request = createGetRequest(parameters);
+
+      Response response = executeRequest(parameters, request);
+
+      return getResponse(parameters, response);
+    } catch(Exception e) {
+      return getRequestFailed(parameters, e);
+    }
+  }
+
   public void getAsync(RequestParameters parameters, final RequestCallback callback) {
     try {
-      Request.Builder requestBuilder = new Request.Builder();
+      Request request = createGetRequest(parameters);
 
-      applyParameters(requestBuilder, parameters);
-
-      Request request = requestBuilder.build();
-
-      executeRequest(parameters, request, callback);
+      executeRequestAsync(parameters, request, callback);
     } catch(Exception e) {
-      callback.completed(new WebClientResponse(e.getLocalizedMessage()));
+      asyncGetRequestFailed(parameters, e, callback);
+    }
+  }
+
+  protected Request createGetRequest(RequestParameters parameters) {
+    Request.Builder requestBuilder = new Request.Builder();
+
+    applyParameters(requestBuilder, parameters);
+
+    return requestBuilder.build();
+  }
+
+
+  public WebClientResponse post(RequestParameters parameters) {
+    try {
+      Request request = createPostRequest(parameters);
+
+      Response response = executeRequest(parameters, request);
+
+      return getResponse(parameters, response);
+    } catch(Exception e) {
+      return postRequestFailed(parameters, e);
     }
   }
 
   public void postAsync(RequestParameters parameters, final RequestCallback callback) {
     try {
-      Request.Builder requestBuilder = new Request.Builder();
+      Request request = createPostRequest(parameters);
 
-      setPostBody(requestBuilder, parameters);
-
-      applyParameters(requestBuilder, parameters);
-
-      Request request = requestBuilder.build();
-
-      executeRequest(parameters, request, callback);
+      executeRequestAsync(parameters, request, callback);
     } catch(Exception e) {
-      callback.completed(new WebClientResponse(e.getLocalizedMessage()));
+      asyncPostRequestFailed(parameters, e, callback);
     }
+  }
+
+  protected Request createPostRequest(RequestParameters parameters) {
+    Request.Builder requestBuilder = new Request.Builder();
+
+    setPostBody(requestBuilder, parameters);
+
+    applyParameters(requestBuilder, parameters);
+
+    return requestBuilder.build();
   }
 
   protected void setPostBody(Request.Builder requestBuilder, RequestParameters parameters) {
@@ -94,12 +127,23 @@ public class OkHttpWebClient implements IWebClient {
     }
   }
 
-  protected void executeRequest(final RequestParameters parameters, Request request, final RequestCallback callback) {
+  protected Response executeRequest(final RequestParameters parameters, Request request) throws Exception {
+    Response response = client.newCall(request).execute();
+
+    if(response.isSuccessful() == false && parameters.isCountConnectionRetriesSet()) {
+      prepareConnectionRetry(parameters);
+      return executeRequest(parameters, request);
+    }
+    else {
+      return response;
+    }
+  }
+
+  protected void executeRequestAsync(final RequestParameters parameters, Request request, final RequestCallback callback) {
     client.newCall(request).enqueue(new Callback() {
       @Override
       public void onFailure(Request request, IOException e) {
-        log.error("Failure on Request to " + request.urlString(), e);
-        callback.completed(new WebClientResponse(e.getLocalizedMessage()));
+        asyncRequestFailed(parameters, request, e, callback);
       }
 
       @Override
@@ -107,6 +151,71 @@ public class OkHttpWebClient implements IWebClient {
         callback.completed(getResponse(parameters, response));
       }
     });
+  }
+
+  protected WebClientResponse getRequestFailed(RequestParameters parameters, Exception e) {
+    if(shouldRetryConnection(parameters, e)) {
+      prepareConnectionRetry(parameters);
+      return get(parameters);
+    }
+    else {
+      return new WebClientResponse(e.getLocalizedMessage());
+    }
+  }
+
+  protected void asyncGetRequestFailed(RequestParameters parameters, Exception e, RequestCallback callback) {
+    if(shouldRetryConnection(parameters, e)) {
+      prepareConnectionRetry(parameters);
+      getAsync(parameters, callback);
+    }
+    else {
+      callback.completed(new WebClientResponse(e.getLocalizedMessage()));
+    }
+  }
+
+  protected WebClientResponse postRequestFailed(RequestParameters parameters, Exception e) {
+    if(shouldRetryConnection(parameters, e)) {
+      prepareConnectionRetry(parameters);
+      return post(parameters);
+    }
+    else {
+      return new WebClientResponse(e.getLocalizedMessage());
+    }
+  }
+
+  protected void asyncPostRequestFailed(RequestParameters parameters, Exception e, RequestCallback callback) {
+    if(shouldRetryConnection(parameters, e)) {
+      prepareConnectionRetry(parameters);
+      postAsync(parameters, callback);
+    }
+    else {
+      callback.completed(new WebClientResponse(e.getLocalizedMessage()));
+    }
+  }
+
+  protected void asyncRequestFailed(RequestParameters parameters, Request request, Exception e, RequestCallback callback) {
+    if(shouldRetryConnection(parameters, e)) {
+      prepareConnectionRetry(parameters);
+      executeRequestAsync(parameters, request, callback);
+    }
+    else {
+      log.error("Failure on Request to " + request.urlString(), e);
+      callback.completed(new WebClientResponse(e.getLocalizedMessage()));
+    }
+  }
+
+  protected void prepareConnectionRetry(RequestParameters parameters) {
+    parameters.decrementCountConnectionRetries();
+    log.info("Going to retry to connect to " + parameters.getUrl() + " (count tries left: " + parameters.getCountConnectionRetries() + ")");
+  }
+
+  protected boolean shouldRetryConnection(RequestParameters parameters, Exception e) {
+    return parameters.isCountConnectionRetriesSet() && isConnectionException(e);
+  }
+
+  protected boolean isConnectionException(Exception e) {
+    String errorMessage = e.getMessage().toLowerCase();
+    return errorMessage.contains("timeout") || errorMessage.contains("failed to connect");
   }
 
   protected WebClientResponse getResponse(RequestParameters parameters, Response response) throws IOException {
