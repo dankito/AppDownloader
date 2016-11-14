@@ -3,6 +3,7 @@ package net.dankito.appdownloader.fragments;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -67,6 +68,8 @@ public class AppSearchResultsFragment extends Fragment {
 
   protected AppSearchResultsAdapter searchResultsAdapter;
 
+  protected SearchView searchView = null;
+
   protected AppDetailsDialog appDetailsDialog = null;
 
 
@@ -89,6 +92,10 @@ public class AppSearchResultsFragment extends Fragment {
     lstvwAppSearchResults.setAdapter(searchResultsAdapter);
     lstvwAppSearchResults.setOnItemClickListener(lstvwAppSearchResultsItemClickListener);
 
+
+    FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fabSearchApps);
+    fab.setOnClickListener(floatingActionButtonSearchOnClickListener);
+
     return view;
   }
 
@@ -110,8 +117,8 @@ public class AppSearchResultsFragment extends Fragment {
     else {
       inflater.inflate(R.menu.menu_main, menu);
 
-      MenuItem searchItem = menu.findItem(R.id.search);
-      SearchView searchView = (SearchView) searchItem.getActionView();
+      MenuItem searchMenuItem = menu.findItem(R.id.search);
+      searchView = (SearchView) searchMenuItem.getActionView();
       if(searchView != null) {
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
@@ -225,6 +232,16 @@ public class AppSearchResultsFragment extends Fragment {
           searchResultsAdapter.notifyDataSetChanged();
         }
       });
+    }
+  };
+
+
+  protected View.OnClickListener floatingActionButtonSearchOnClickListener = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      if(searchView != null) {
+        searchView.setIconified(false);
+      }
     }
   };
 
