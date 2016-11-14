@@ -27,6 +27,8 @@ public class AppSearchResult {
 
   protected AppSearchResultState state;
 
+  protected List<AppSearchResultStateListener> stateListeners = new ArrayList<>();
+
 
   // from App Details Page
 
@@ -114,8 +116,27 @@ public class AppSearchResult {
   }
 
   public void setState(AppSearchResultState state) {
+    AppSearchResultState previousState = this.state;
+
     this.state = state;
+
+    callStateListeners(state, previousState);
   }
+
+  public boolean addStateListener(AppSearchResultStateListener listener) {
+    return stateListeners.add(listener);
+  }
+
+  public boolean removeStateListener(AppSearchResultStateListener listener) {
+    return stateListeners.remove(listener);
+  }
+
+  protected void callStateListeners(AppSearchResultState newState, AppSearchResultState previousState) {
+    for(AppSearchResultStateListener listener : stateListeners) {
+      listener.stateChanged(newState, previousState);
+    }
+  }
+
 
   public boolean areNecessaryInformationSet() {
     return StringUtils.isNotNullOrEmpty(packageName) && StringUtils.isNotNullOrEmpty(appUrl) && StringUtils.isNotNullOrEmpty(title);
