@@ -9,6 +9,8 @@
     <string name="search_title">Search</string>
     <string name="search_hint_search_apps">Search Apps</string>
 
+    <string name="install">Install</string>
+
     <string name="error_message_could_not_search_for_apps">Could not search for Apps: %s</string>
     <string name="error_message_could_not_download_app">Could not download App: %s</string>
 
