@@ -7,9 +7,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 
+import net.dankito.appdownloader.MainActivity;
 import net.dankito.appdownloader.app.AppDownloadLink;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.app.AppState;
+import net.dankito.appdownloader.util.android.IActivityResultListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,8 @@ public class AndroidAppInstaller implements IAppInstaller {
 
   public AndroidAppInstaller(Activity activity) {
     this.activity = activity;
+
+    ((MainActivity)activity).registerActivityResultListener(APP_INSTALL_REQUEST_CODE, installAppActivityResultListener);
 
     registerBroadcastReceivers(activity);
   }
@@ -110,6 +114,24 @@ public class AndroidAppInstaller implements IAppInstaller {
       }
     } catch(Exception e) {
       log.error("Could not deleted installed Apk file " + appBeingInstalled.getDownloadLocationPath(), e);
+    }
+  }
+
+
+  protected IActivityResultListener installAppActivityResultListener = new IActivityResultListener() {
+    @Override
+    public void receivedActivityResult(int requestCode, int resultCode, Intent data) {
+      doneInstallingApp(requestCode, resultCode, data);
+    }
+  };
+
+  protected void doneInstallingApp(int requestCode, int resultCode, Intent data) {
+    AppInfo appBeingInstalled = appsBeingInstalled.remove(requestCode);
+
+    if(appBeingInstalled != null) { // it may has already been removed by handlePackageAddedOrChanged()
+      appBeingInstalled.setState(AppState.INSTALLABLE);
+
+      deletedDownloadedApk(appBeingInstalled);
     }
   }
 
