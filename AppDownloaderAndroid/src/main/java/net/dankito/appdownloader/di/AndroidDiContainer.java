@@ -9,6 +9,8 @@ import net.dankito.appdownloader.util.AndroidOnUiThreadRunner;
 import net.dankito.appdownloader.util.IOnUiThreadRunner;
 import net.dankito.appdownloader.util.IThreadPool;
 import net.dankito.appdownloader.util.ThreadPool;
+import net.dankito.appdownloader.util.web.AndroidDownloadManager;
+import net.dankito.appdownloader.util.web.IDownloadManager;
 import net.dankito.appdownloader.util.web.IWebClient;
 import net.dankito.appdownloader.util.web.OkHttpWebClient;
 
@@ -49,11 +51,19 @@ public class AndroidDiContainer {
     return new AndroidOnUiThreadRunner(getActivity());
   }
 
+
   @Provides
   @Singleton
   public IWebClient provideWebClient() {
     return new OkHttpWebClient();
   }
+
+  @Provides
+  @Singleton
+  public IDownloadManager provideDownloadManager() {
+    return new AndroidDownloadManager(getActivity());
+  }
+
 
   @Provides
   @Singleton

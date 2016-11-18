@@ -1,5 +1,6 @@
 package net.dankito.appdownloader.di;
 
+import net.dankito.appdownloader.dialogs.AppDetailsDialog;
 import net.dankito.appdownloader.fragments.AppSearchResultsFragment;
 import net.dankito.appdownloader.MainActivity;
 
@@ -18,5 +19,7 @@ public interface AndroidDiComponent {
   void inject(MainActivity activity);
 
   void inject(AppSearchResultsFragment appSearchResultsFragment);
+
+  void inject(AppDetailsDialog appDetailsDialog);
 
 }

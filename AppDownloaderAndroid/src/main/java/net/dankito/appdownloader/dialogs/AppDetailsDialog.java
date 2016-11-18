@@ -10,6 +10,7 @@ import android.webkit.WebView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import net.dankito.appdownloader.MainActivity;
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.downloader.IAppDownloader;
 import net.dankito.appdownloader.responses.AppInfo;
@@ -18,7 +19,7 @@ import net.dankito.appdownloader.responses.AppStateListener;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
 import net.dankito.appdownloader.util.AlertHelper;
-import net.dankito.appdownloader.util.web.AndroidDownloadManager;
+import net.dankito.appdownloader.util.web.IDownloadManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.inject.Inject;
 
 /**
  * Created by ganymed on 06/11/16.
@@ -40,7 +43,8 @@ public class AppDetailsDialog extends FullscreenDialog {
 
   protected List<IAppDownloader> appDownloaders;
 
-  protected AndroidDownloadManager downloadManager;
+  @Inject
+  protected IDownloadManager downloadManager;
 
   protected WebView wbvwViewAppDetails;
 
@@ -53,8 +57,6 @@ public class AppDetailsDialog extends FullscreenDialog {
 
   public AppDetailsDialog(AppCompatActivity context) {
     super(context);
-
-    this.downloadManager = new AndroidDownloadManager(context);
   }
 
 
@@ -76,6 +78,8 @@ public class AppDetailsDialog extends FullscreenDialog {
 
   @Override
   protected void setupUi(View rootView) {
+    ((MainActivity)activity).getComponent().inject(this);
+
     setupWebView(rootView);
   }
 
