@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import net.dankito.appdownloader.R;
-import net.dankito.appdownloader.responses.AppSearchResult;
+import net.dankito.appdownloader.responses.AppInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ public class AppSearchResultsAdapter extends BaseAdapter {
 
   protected Activity activity;
 
-  protected List<AppSearchResult> appSearchResults = new ArrayList<>(0);
+  protected List<AppInfo> appInfos = new ArrayList<>(0);
 
 
   public AppSearchResultsAdapter(Activity activity) {
@@ -31,20 +31,20 @@ public class AppSearchResultsAdapter extends BaseAdapter {
   }
 
 
-  public void setAppSearchResults(List<AppSearchResult> appSearchResults) {
-    this.appSearchResults = appSearchResults;
+  public void setAppInfos(List<AppInfo> appInfos) {
+    this.appInfos = appInfos;
 
     notifyDataSetChanged();
   }
 
   @Override
   public int getCount() {
-    return appSearchResults.size();
+    return appInfos.size();
   }
 
   @Override
   public Object getItem(int index) {
-    return appSearchResults.get(index);
+    return appInfos.get(index);
   }
 
   @Override
@@ -58,42 +58,42 @@ public class AppSearchResultsAdapter extends BaseAdapter {
       convertView = activity.getLayoutInflater().inflate(R.layout.list_item_app_search_result, parent, false);
     }
 
-    AppSearchResult appSearchResult = (AppSearchResult)getItem(index);
+    AppInfo appInfo = (AppInfo)getItem(index);
 
     TextView txtvwAppTitle = (TextView)convertView.findViewById(R.id.txtvwAppTitle);
-    txtvwAppTitle.setText(appSearchResult.getTitle());
+    txtvwAppTitle.setText(appInfo.getTitle());
 
     TextView txtvwAppDeveloper = (TextView)convertView.findViewById(R.id.txtvwAppDeveloper);
-    txtvwAppDeveloper.setText(appSearchResult.getDeveloper());
+    txtvwAppDeveloper.setText(appInfo.getDeveloper());
 
     TextView txtvwRatings = (TextView)convertView.findViewById(R.id.txtvwAppRatings);
-    if(appSearchResult.areAppDetailsDownloaded()) {
-      txtvwRatings.setText(appSearchResult.getRating() + " (" + appSearchResult.getCountRatings() + ")");
+    if(appInfo.areAppDetailsDownloaded()) {
+      txtvwRatings.setText(appInfo.getRating() + " (" + appInfo.getCountRatings() + ")");
     }
     else {
       txtvwRatings.setText("");
     }
 
     TextView txtvwVersion = (TextView)convertView.findViewById(R.id.txtvwAppVersion);
-    if(appSearchResult.areAppDetailsDownloaded()) {
-      txtvwVersion.setText(appSearchResult.getVersion() + " (" + appSearchResult.getCountInstallations() + ")");
+    if(appInfo.areAppDetailsDownloaded()) {
+      txtvwVersion.setText(appInfo.getVersion() + " (" + appInfo.getCountInstallations() + ")");
     }
     else {
       txtvwVersion.setText("");
     }
 
     ImageView imgvwAppIcon = (ImageView)convertView.findViewById(R.id.imgvwAppIcon);
-    if(appSearchResult.hasSmallCoverImageUrl()) {
+    if(appInfo.hasSmallCoverImageUrl()) {
       imgvwAppIcon.setVisibility(View.VISIBLE);
       Picasso.with(activity)
-          .load(appSearchResult.getSmallCoverImageUrl())
+          .load(appInfo.getSmallCoverImageUrl())
           .into(imgvwAppIcon);
     }
     else {
       imgvwAppIcon.setVisibility(View.INVISIBLE);
     }
 
-    convertView.setTag(appSearchResult);
+    convertView.setTag(appInfo);
 
     return convertView;
   }

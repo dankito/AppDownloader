@@ -9,28 +9,28 @@ import java.util.List;
 
 public class SearchAppsResponse extends ResponseBase {
 
-  protected List<AppSearchResult> appSearchResults = new ArrayList<>(0);
+  protected List<AppInfo> appInfos = new ArrayList<>(0);
 
 
   public SearchAppsResponse(String error) {
     super(error);
   }
 
-  public SearchAppsResponse(List<AppSearchResult> appSearchResults) {
+  public SearchAppsResponse(List<AppInfo> appInfos) {
     super(true);
-    this.appSearchResults = appSearchResults;
+    this.appInfos = appInfos;
   }
 
 
-  public List<AppSearchResult> getAppSearchResults() {
-    return appSearchResults;
+  public List<AppInfo> getAppInfos() {
+    return appInfos;
   }
 
 
   @Override
   public String toString() {
     if(isSuccessful()) {
-      return "Found " + appSearchResults.size() + " Apps";
+      return "Found " + appInfos.size() + " Apps";
     }
 
     return super.toString();

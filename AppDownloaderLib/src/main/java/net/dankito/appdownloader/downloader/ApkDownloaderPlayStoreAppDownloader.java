@@ -1,6 +1,6 @@
 package net.dankito.appdownloader.downloader;
 
-import net.dankito.appdownloader.responses.AppSearchResult;
+import net.dankito.appdownloader.responses.AppInfo;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
 import net.dankito.appdownloader.util.IThreadPool;
@@ -34,7 +34,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
   }
 
 
-  public void getAppDownloadLinkAsync(final AppSearchResult appToDownload, final GetAppDownloadUrlResponseCallback callback) {
+  public void getAppDownloadLinkAsync(final AppInfo appToDownload, final GetAppDownloadUrlResponseCallback callback) {
     try {
       String url = APK_DOWNLOADER_APP_DETAILS_PAGE_URL + URLEncoder.encode(appToDownload.getPackageName(), "ASCII");
       RequestParameters parameters = createRequestParametersWithDefaultValues(url);
@@ -56,7 +56,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
     }
   }
 
-  protected void parseAppDetailsPage(AppSearchResult appToDownload, WebClientResponse response, GetAppDownloadUrlResponseCallback callback) {
+  protected void parseAppDetailsPage(AppInfo appToDownload, WebClientResponse response, GetAppDownloadUrlResponseCallback callback) {
     try {
       String responseBody = response.getBody();
       Document document = Jsoup.parse(responseBody);
@@ -83,7 +83,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
     }
   }
 
-  protected void downloadAndParseAppDownloadPage(final AppSearchResult appToDownload, final String appDownloadPageUrl, final GetAppDownloadUrlResponseCallback callback) {
+  protected void downloadAndParseAppDownloadPage(final AppInfo appToDownload, final String appDownloadPageUrl, final GetAppDownloadUrlResponseCallback callback) {
     RequestParameters parameters = createRequestParametersWithDefaultValues(appDownloadPageUrl);
 
     webClient.getAsync(parameters, new RequestCallback() {
@@ -99,7 +99,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
     });
   }
 
-  protected void parseAppDownloadPage(AppSearchResult appToDownload, WebClientResponse response, GetAppDownloadUrlResponseCallback callback) {
+  protected void parseAppDownloadPage(AppInfo appToDownload, WebClientResponse response, GetAppDownloadUrlResponseCallback callback) {
     try {
       Document document = Jsoup.parse(response.getBody());
 
@@ -121,7 +121,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
     }
   }
 
-  protected void downloadAndParseAppDetailDownloadPage(final AppSearchResult appToDownload, String appDetailDownloadPageUrl, final GetAppDownloadUrlResponseCallback callback) {
+  protected void downloadAndParseAppDetailDownloadPage(final AppInfo appToDownload, String appDetailDownloadPageUrl, final GetAppDownloadUrlResponseCallback callback) {
     RequestParameters parameters = createRequestParametersWithDefaultValues(appDetailDownloadPageUrl);
 
     webClient.getAsync(parameters, new RequestCallback() {
@@ -137,7 +137,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
     });
   }
 
-  protected void parseAppDetailDownloadPage(AppSearchResult appToDownload, WebClientResponse response, GetAppDownloadUrlResponseCallback callback) {
+  protected void parseAppDetailDownloadPage(AppInfo appToDownload, WebClientResponse response, GetAppDownloadUrlResponseCallback callback) {
     try {
       Document document = Jsoup.parse(response.getBody());
 

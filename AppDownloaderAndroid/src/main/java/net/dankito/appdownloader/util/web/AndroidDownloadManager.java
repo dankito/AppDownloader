@@ -14,7 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 
 import net.dankito.appdownloader.R;
-import net.dankito.appdownloader.responses.AppSearchResult;
+import net.dankito.appdownloader.responses.AppInfo;
 import net.dankito.appdownloader.responses.AppSearchResultState;
 
 import org.slf4j.Logger;
@@ -47,9 +47,9 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
   protected Activity context;
 
   // TODO: save currentDownloaded so that on an App restart aborted and on restart finished downloads can be handled
-  protected Map<Long, AppSearchResult> currentDownloads = new ConcurrentHashMap<>();
+  protected Map<Long, AppInfo> currentDownloads = new ConcurrentHashMap<>();
 
-  protected List<AppSearchResult> appsBeingInstalled = new CopyOnWriteArrayList<>();
+  protected List<AppInfo> appsBeingInstalled = new CopyOnWriteArrayList<>();
 
 
   public AndroidDownloadManager(Activity context) {
@@ -70,7 +70,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
 
 
   @Override
-  public void downloadUrlAsync(AppSearchResult appSearchResult, String url) {
+  public void downloadUrlAsync(AppInfo appInfo, String url) {
     try {
       Uri uri = Uri.parse(url);
       DownloadManager.Request request = new DownloadManager.Request(uri);
@@ -79,22 +79,22 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
       request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
       request.setAllowedOverRoaming(false);
 
-      request.setTitle(appSearchResult.getTitle());
-      request.setDescription(appSearchResult.getTitle());
+      request.setTitle(appInfo.getTitle());
+      request.setDescription(appInfo.getTitle());
 
-      String destinationFileName = getDestinationFilename(appSearchResult, url);
+      String destinationFileName = getDestinationFilename(appInfo, url);
       request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, destinationFileName);
 
       DownloadManager downloadManager = getDownloadManager();
-      currentDownloads.put(downloadManager.enqueue(request), appSearchResult);
+      currentDownloads.put(downloadManager.enqueue(request), appInfo);
     } catch(Exception e) {
-      log.error("Could not start Download for " + appSearchResult, e);
+      log.error("Could not start Download for " + appInfo, e);
     }
   }
 
   @NonNull
-  protected String getDestinationFilename(AppSearchResult appSearchResult, String url) {
-    return removeReservedCharacters(appSearchResult.getTitle()) + "_" +  DOWNLOAD_TIME_DATE_FORMAT.format(new Date()) + ".apk";
+  protected String getDestinationFilename(AppInfo appInfo, String url) {
+    return removeReservedCharacters(appInfo.getTitle()) + "_" +  DOWNLOAD_TIME_DATE_FORMAT.format(new Date()) + ".apk";
   }
 
   protected String removeReservedCharacters(String filename) {
@@ -128,7 +128,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
 
     if(currentDownloads.containsKey(downloadId)) { // yeah, we started this download
-      AppSearchResult appHavingDownloaded = currentDownloads.remove(downloadId);
+      AppInfo appHavingDownloaded = currentDownloads.remove(downloadId);
 
       try {
         EnqueuedDownload enqueuedDownload = getEnqueuedDownloadForId(downloadId);
@@ -189,7 +189,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     return result;
   }
 
-  protected void installApp(AppSearchResult appToInstall, String downloadLocation) {
+  protected void installApp(AppInfo appToInstall, String downloadLocation) {
     appToInstall.setState(AppSearchResultState.INSTALLING);
 
     Intent intent = new Intent();
@@ -210,7 +210,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
   }
 
   protected void askShouldDownloadGetCancelled(final long downloadId) {
-    AppSearchResult appToStop = currentDownloads.get(downloadId);
+    AppInfo appToStop = currentDownloads.get(downloadId);
     String appTitle = appToStop == null ? "" : appToStop.getTitle();
 
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -241,7 +241,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
       String dataString = intent.getDataString();
       String changedAppPackage = dataString.substring(dataString.indexOf(':') + 1); // remove scheme (= package:)
 
-      for(AppSearchResult appBeingInstalled : new ArrayList<>(appsBeingInstalled)) {
+      for(AppInfo appBeingInstalled : new ArrayList<>(appsBeingInstalled)) {
         if(appBeingInstalled.getPackageName().equals(changedAppPackage)) {
           deletedDownloadedApk(appBeingInstalled);
 
@@ -253,7 +253,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     }
   }
 
-  protected void deletedDownloadedApk(AppSearchResult appBeingInstalled) {
+  protected void deletedDownloadedApk(AppInfo appBeingInstalled) {
     try {
       URI uri = URI.create(appBeingInstalled.getDownloadLocationUri()); // get File from Uri
       File file = new File(uri.getPath());

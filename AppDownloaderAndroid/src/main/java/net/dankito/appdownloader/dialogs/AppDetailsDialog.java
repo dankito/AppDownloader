@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.downloader.IAppDownloader;
-import net.dankito.appdownloader.responses.AppSearchResult;
+import net.dankito.appdownloader.responses.AppInfo;
 import net.dankito.appdownloader.responses.AppSearchResultState;
 import net.dankito.appdownloader.responses.AppSearchResultStateListener;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
@@ -36,7 +36,7 @@ public class AppDetailsDialog extends FullscreenDialog {
   private static final Logger log = LoggerFactory.getLogger(AppDetailsDialog.class);
 
 
-  protected AppSearchResult appSearchResult;
+  protected AppInfo appInfo;
 
   protected List<IAppDownloader> appDownloaders;
 
@@ -58,10 +58,10 @@ public class AppDetailsDialog extends FullscreenDialog {
   }
 
 
-  public void setAppSearchResult(AppSearchResult appSearchResult) {
-    this.appSearchResult = appSearchResult;
+  public void setAppInfo(AppInfo appInfo) {
+    this.appInfo = appInfo;
 
-    appSearchResult.addStateListener(appSearchResultStateListener);
+    appInfo.addStateListener(appSearchResultStateListener);
   }
 
   public void setAppDownloaders(List<IAppDownloader> appDownloaders) {
@@ -104,9 +104,9 @@ public class AppDetailsDialog extends FullscreenDialog {
   }
 
   protected void setAppValues() {
-    toolbar.setTitle(appSearchResult.getTitle());
+    toolbar.setTitle(appInfo.getTitle());
 
-    wbvwViewAppDetails.loadUrl(appSearchResult.getAppDetailsPageUrl());
+    wbvwViewAppDetails.loadUrl(appInfo.getAppDetailsPageUrl());
 
     invalidateOptionsMenu();
 
@@ -167,28 +167,28 @@ public class AppDetailsDialog extends FullscreenDialog {
   }
 
   protected void installApp() {
-    if(appSearchResult.isAlreadyDownloaded() == false) {
-      if(appSearchResult.hasDownloadUrls()) {
-        downloadApp(appSearchResult, getBestAppDownloadUrl(appSearchResult));
+    if(appInfo.isAlreadyDownloaded() == false) {
+      if(appInfo.hasDownloadUrls()) {
+        downloadApp(appInfo, getBestAppDownloadUrl(appInfo));
       }
       else {
-        getAppDownloadLinkAndDownloadApp(appSearchResult);
+        getAppDownloadLinkAndDownloadApp(appInfo);
       }
     }
   }
 
-  protected String getBestAppDownloadUrl(AppSearchResult appSearchResult) {
-    if(appSearchResult.getDownloadUrls().size() == 1) {
-      return appSearchResult.getDownloadUrls().get(0);
+  protected String getBestAppDownloadUrl(AppInfo appInfo) {
+    if(appInfo.getDownloadUrls().size() == 1) {
+      return appInfo.getDownloadUrls().get(0);
     }
     else {
       // TODO: choose best one
-      return appSearchResult.getDownloadUrls().get(0);
+      return appInfo.getDownloadUrls().get(0);
     }
   }
 
-  protected void getAppDownloadLinkAndDownloadApp(final AppSearchResult clickedApp) {
-    appSearchResult.setState(AppSearchResultState.GETTING_DOWNLOAD_URL);
+  protected void getAppDownloadLinkAndDownloadApp(final AppInfo clickedApp) {
+    appInfo.setState(AppSearchResultState.GETTING_DOWNLOAD_URL);
 
     final AtomicBoolean hasDownloadUrlBeenRetrieved = new AtomicBoolean(false);
     final AtomicInteger countRequestsAppDownloadLinkCompleted = new AtomicInteger(0);
@@ -205,7 +205,7 @@ public class AppDetailsDialog extends FullscreenDialog {
     }
   }
 
-  protected void getAppDownloadLinkCompleted(AppSearchResult clickedApp, GetAppDownloadUrlResponse response, AtomicBoolean hasDownloadUrlBeenRetrieved, AtomicInteger countRequestsAppDownloadLinkCompleted) {
+  protected void getAppDownloadLinkCompleted(AppInfo clickedApp, GetAppDownloadUrlResponse response, AtomicBoolean hasDownloadUrlBeenRetrieved, AtomicInteger countRequestsAppDownloadLinkCompleted) {
     countRequestsAppDownloadLinkCompleted.incrementAndGet();
 
     if(response.isSuccessful()) {
@@ -228,15 +228,15 @@ public class AppDetailsDialog extends FullscreenDialog {
     }
   }
 
-  protected void downloadApp(AppSearchResult clickedApp, String appDownloadUrl) {
+  protected void downloadApp(AppInfo clickedApp, String appDownloadUrl) {
     log.info("Starting to download App " + clickedApp + " from " + appDownloadUrl + " ...");
 
-    appSearchResult.setState(AppSearchResultState.DOWNLOADING);
+    appInfo.setState(AppSearchResultState.DOWNLOADING);
 
     downloadAppViaAndroidDownloadManager(clickedApp, appDownloadUrl);
   }
 
-  protected void downloadAppViaAndroidDownloadManager(AppSearchResult clickedApp, String appDownloadUrl) {
+  protected void downloadAppViaAndroidDownloadManager(AppInfo clickedApp, String appDownloadUrl) {
     downloadManager.downloadUrlAsync(clickedApp, appDownloadUrl);
   }
 
@@ -251,19 +251,19 @@ public class AppDetailsDialog extends FullscreenDialog {
   }
 
   protected void setActionMenuInstallAppState() {
-    if(appSearchResult.getState() == AppSearchResultState.INSTALLABLE) {
+    if(appInfo.getState() == AppSearchResultState.INSTALLABLE) {
       setActionMenuInstallAppToStateInstallable();
     }
-    else if(appSearchResult.getState() == AppSearchResultState.UPDATABLE) {
+    else if(appInfo.getState() == AppSearchResultState.UPDATABLE) {
       setActionMenuInstallAppToStateUpdatable();
     }
-    else if(appSearchResult.getState() == AppSearchResultState.GETTING_DOWNLOAD_URL) {
+    else if(appInfo.getState() == AppSearchResultState.GETTING_DOWNLOAD_URL) {
       setActionMenuInstallAppToStateGettingDownloadUrl();
     }
-    else if(appSearchResult.getState() == AppSearchResultState.DOWNLOADING) {
+    else if(appInfo.getState() == AppSearchResultState.DOWNLOADING) {
       setActionMenuInstallAppToStateDownloading();
     }
-    else if(appSearchResult.getState() == AppSearchResultState.INSTALLING) {
+    else if(appInfo.getState() == AppSearchResultState.INSTALLING) {
       setActionMenuInstallAppToStateInstalling();
     }
   }

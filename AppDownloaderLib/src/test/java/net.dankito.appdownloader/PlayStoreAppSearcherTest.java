@@ -1,6 +1,6 @@
 package net.dankito.appdownloader;
 
-import net.dankito.appdownloader.responses.AppSearchResult;
+import net.dankito.appdownloader.responses.AppInfo;
 import net.dankito.appdownloader.responses.SearchAppsResponse;
 import net.dankito.appdownloader.responses.callbacks.SearchAppsResponseCallback;
 import net.dankito.appdownloader.util.StringUtils;
@@ -34,30 +34,30 @@ public class PlayStoreAppSearcherTest {
 
   @Test
   public void searchAsync() {
-    final List<AppSearchResult> appSearchResults = new ArrayList<>();
+    final List<AppInfo> appInfos = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
     underTest.searchAsync("ausgaben manager", new SearchAppsResponseCallback() {
       @Override
       public void completed(SearchAppsResponse response) {
-        appSearchResults.addAll(response.getAppSearchResults());
+        appInfos.addAll(response.getAppInfos());
         countDownLatch.countDown();
       }
     });
 
     try { countDownLatch.await(5, TimeUnit.SECONDS); } catch(Exception ignored) { }
 
-    Assert.assertTrue(appSearchResults.size() > 0);
+    Assert.assertTrue(appInfos.size() > 0);
 
-    for(AppSearchResult appSearchResult : appSearchResults) {
-      Assert.assertTrue(appSearchResult.areNecessaryInformationSet());
+    for(AppInfo appInfo : appInfos) {
+      Assert.assertTrue(appInfo.areNecessaryInformationSet());
 
-      Assert.assertTrue(StringUtils.isNotNullOrEmpty(appSearchResult.getAppUrl()));
-      Assert.assertTrue(StringUtils.isNotNullOrEmpty(appSearchResult.getPackageName()));
-      Assert.assertTrue(StringUtils.isNotNullOrEmpty(appSearchResult.getTitle()));
-      Assert.assertTrue(StringUtils.isNotNullOrEmpty(appSearchResult.getDeveloper()));
-      Assert.assertTrue(StringUtils.isNotNullOrEmpty(appSearchResult.getSmallCoverImageUrl()));
-      Assert.assertTrue(StringUtils.isNotNullOrEmpty(appSearchResult.getLargeCoverImageUrl()));
+      Assert.assertTrue(StringUtils.isNotNullOrEmpty(appInfo.getAppUrl()));
+      Assert.assertTrue(StringUtils.isNotNullOrEmpty(appInfo.getPackageName()));
+      Assert.assertTrue(StringUtils.isNotNullOrEmpty(appInfo.getTitle()));
+      Assert.assertTrue(StringUtils.isNotNullOrEmpty(appInfo.getDeveloper()));
+      Assert.assertTrue(StringUtils.isNotNullOrEmpty(appInfo.getSmallCoverImageUrl()));
+      Assert.assertTrue(StringUtils.isNotNullOrEmpty(appInfo.getLargeCoverImageUrl()));
     }
   }
 }

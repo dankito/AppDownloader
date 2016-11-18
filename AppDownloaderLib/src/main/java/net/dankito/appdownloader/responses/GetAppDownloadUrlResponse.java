@@ -7,30 +7,30 @@ package net.dankito.appdownloader.responses;
 public class GetAppDownloadUrlResponse extends ResponseBase {
 
 
-  protected AppSearchResult appToDownload;
+  protected AppInfo appToDownload;
 
   protected String url;
 
 
 
-  public GetAppDownloadUrlResponse(AppSearchResult appToDownload, String error) {
+  public GetAppDownloadUrlResponse(AppInfo appToDownload, String error) {
     super(error);
 
     this.appToDownload = appToDownload;
   }
 
-  protected GetAppDownloadUrlResponse(boolean isSuccessful, AppSearchResult appToDownload) {
+  protected GetAppDownloadUrlResponse(boolean isSuccessful, AppInfo appToDownload) {
     super(isSuccessful);
     this.appToDownload = appToDownload;
   }
 
-  public GetAppDownloadUrlResponse(boolean isSuccessful, AppSearchResult appToDownload, String url) {
+  public GetAppDownloadUrlResponse(boolean isSuccessful, AppInfo appToDownload, String url) {
     this(isSuccessful, appToDownload);
     this.url = url;
   }
 
 
-  public AppSearchResult getAppToDownload() {
+  public AppInfo getAppToDownload() {
     return appToDownload;
   }
 

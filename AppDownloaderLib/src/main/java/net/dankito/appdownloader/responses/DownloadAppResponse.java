@@ -8,7 +8,7 @@ import java.io.File;
 
 public class DownloadAppResponse extends ResponseBase {
 
-  protected AppSearchResult appToDownload;
+  protected AppInfo appToDownload;
 
   protected File downloadLocation;
 
@@ -17,14 +17,14 @@ public class DownloadAppResponse extends ResponseBase {
     super(error);
   }
 
-  public DownloadAppResponse(AppSearchResult appToDownload, File downloadLocation) {
+  public DownloadAppResponse(AppInfo appToDownload, File downloadLocation) {
     super(true);
     this.appToDownload = appToDownload;
     this.downloadLocation = downloadLocation;
   }
 
 
-  public AppSearchResult getAppToDownload() {
+  public AppInfo getAppToDownload() {
     return appToDownload;
   }
 

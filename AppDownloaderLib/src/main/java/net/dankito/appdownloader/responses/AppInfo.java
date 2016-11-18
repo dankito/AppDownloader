@@ -9,7 +9,7 @@ import java.util.List;
  * Created by ganymed on 02/11/16.
  */
 
-public class AppSearchResult {
+public class AppInfo {
 
   protected String packageName;
 
@@ -49,7 +49,7 @@ public class AppSearchResult {
   protected String downloadLocationUri = null;
 
 
-  public AppSearchResult(String packageName) {
+  public AppInfo(String packageName) {
     this.packageName = packageName;
   }
 

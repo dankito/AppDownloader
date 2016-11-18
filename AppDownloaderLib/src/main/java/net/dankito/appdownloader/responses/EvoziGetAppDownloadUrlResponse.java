@@ -33,7 +33,7 @@ public class EvoziGetAppDownloadUrlResponse extends GetAppDownloadUrlResponse {
     super(true, null);
   }
 
-  public EvoziGetAppDownloadUrlResponse(AppSearchResult appToDownload, String error) {
+  public EvoziGetAppDownloadUrlResponse(AppInfo appToDownload, String error) {
     super(appToDownload, error);
 
     this.packagename = appToDownload.getPackageName();

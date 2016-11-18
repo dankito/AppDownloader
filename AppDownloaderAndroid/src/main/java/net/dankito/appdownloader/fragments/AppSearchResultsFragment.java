@@ -24,7 +24,7 @@ import net.dankito.appdownloader.dialogs.AppDetailsDialog;
 import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.EvoziPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.IAppDownloader;
-import net.dankito.appdownloader.responses.AppSearchResult;
+import net.dankito.appdownloader.responses.AppInfo;
 import net.dankito.appdownloader.responses.GetAppDetailsResponse;
 import net.dankito.appdownloader.responses.SearchAppsResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDetailsCallback;
@@ -170,7 +170,7 @@ public class AppSearchResultsFragment extends Fragment {
       @Override
       public void completed(SearchAppsResponse response) {
         if(response.isSuccessful()) {
-          appSearchResultRetrieved(response.getAppSearchResults());
+          appSearchResultRetrieved(response.getAppInfos());
         }
         else {
           AlertHelper.showErrorMessageThreadSafe(getActivity(), getString(R.string.error_message_could_not_search_for_apps, response.getError()));
@@ -179,11 +179,11 @@ public class AppSearchResultsFragment extends Fragment {
     });
   }
 
-  protected void appSearchResultRetrieved(final List<AppSearchResult> appSearchResults) {
+  protected void appSearchResultRetrieved(final List<AppInfo> appInfos) {
     getActivity().runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        searchResultsAdapter.setAppSearchResults(appSearchResults);
+        searchResultsAdapter.setAppInfos(appInfos);
       }
     });
   }
@@ -192,16 +192,16 @@ public class AppSearchResultsFragment extends Fragment {
   protected AdapterView.OnItemClickListener lstvwAppSearchResultsItemClickListener = new AdapterView.OnItemClickListener() {
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-      final AppSearchResult clickedApp = (AppSearchResult)view.getTag();
+      final AppInfo clickedApp = (AppInfo)view.getTag();
 
       appSearchResultSelected(clickedApp);
     }
   };
 
-  protected void appSearchResultSelected(AppSearchResult clickedApp) {
+  protected void appSearchResultSelected(AppInfo clickedApp) {
     AppDetailsDialog appDetailsDialog = getAppDetailsDialog();
 
-    appDetailsDialog.setAppSearchResult(clickedApp);
+    appDetailsDialog.setAppInfo(clickedApp);
     appDetailsDialog.setAppDownloaders(appDownloaders);
 
     appDetailsDialog.show();

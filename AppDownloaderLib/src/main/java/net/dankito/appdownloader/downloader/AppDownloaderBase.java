@@ -1,6 +1,6 @@
 package net.dankito.appdownloader.downloader;
 
-import net.dankito.appdownloader.responses.AppSearchResult;
+import net.dankito.appdownloader.responses.AppInfo;
 import net.dankito.appdownloader.responses.DownloadAppResponse;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.DownloadAppCallback;
@@ -44,7 +44,7 @@ public abstract class AppDownloaderBase implements IAppDownloader {
   }
 
 
-  public void downloadAppAsync(final AppSearchResult appToDownload, final DownloadAppCallback callback) {
+  public void downloadAppAsync(final AppInfo appToDownload, final DownloadAppCallback callback) {
     threadPool.runAsync(new Runnable() {
       @Override
       public void run() {
@@ -63,7 +63,7 @@ public abstract class AppDownloaderBase implements IAppDownloader {
     });
   }
 
-  protected void saveAppToFile(final AppSearchResult appToDownload, GetAppDownloadUrlResponse response, final DownloadAppCallback callback) {
+  protected void saveAppToFile(final AppInfo appToDownload, GetAppDownloadUrlResponse response, final DownloadAppCallback callback) {
     log.info("Starting to download App ...");
 
     try {

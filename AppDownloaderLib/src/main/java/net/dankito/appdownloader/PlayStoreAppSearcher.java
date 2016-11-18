@@ -1,6 +1,6 @@
 package net.dankito.appdownloader;
 
-import net.dankito.appdownloader.responses.AppSearchResult;
+import net.dankito.appdownloader.responses.AppInfo;
 import net.dankito.appdownloader.responses.GetAppDetailsResponse;
 import net.dankito.appdownloader.responses.SearchAppsResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDetailsCallback;
@@ -77,7 +77,7 @@ public class PlayStoreAppSearcher {
 
   protected void parseSearchAppsResponse(WebClientResponse response, SearchAppsResponseCallback callback) {
     try {
-      List<AppSearchResult> appSearchResults = new ArrayList<>();
+      List<AppInfo> appInfos = new ArrayList<>();
 
       String responseBody = response.getBody();
 
@@ -88,23 +88,23 @@ public class PlayStoreAppSearcher {
       for(Element cardList : cardListElements) {
         for(Element cardListChild : cardList.children()) {
           if(cardListChild.hasClass("card") && cardListChild.hasClass("apps")) { // TODO: implement Option to not only filter Apps
-            AppSearchResult app = parseCardElement(cardListChild);
+            AppInfo app = parseCardElement(cardListChild);
             if(app != null) {
-              appSearchResults.add(app);
+              appInfos.add(app);
               getAppDetailsAsync(app);
             }
           }
         }
       }
 
-      callback.completed(new SearchAppsResponse(appSearchResults));
+      callback.completed(new SearchAppsResponse(appInfos));
     } catch(Exception e) {
       log.error("Could not parse Apps Search Response", e);
       callback.completed(new SearchAppsResponse(e.getLocalizedMessage()));
     }
   }
 
-  protected AppSearchResult parseCardElement(Element cardElement) {
+  protected AppInfo parseCardElement(Element cardElement) {
     for(Element cardElementChild : cardElement.children()) {
       if(cardElementChild.hasClass("card-content")) {
         return parseCardContentElement(cardElementChild);
@@ -114,62 +114,62 @@ public class PlayStoreAppSearcher {
     return null;
   }
 
-  protected AppSearchResult parseCardContentElement(Element cardContentElement) {
+  protected AppInfo parseCardContentElement(Element cardContentElement) {
     String packageName = cardContentElement.attr(PACKAGE_NAME_ATTRIBUTE_NAME);
     String cookie = cardContentElement.attr(COOKIE_ATTRIBUTE_NAME); // TODO: do we need this?
 
-    AppSearchResult appSearchResult = new AppSearchResult(packageName);
+    AppInfo appInfo = new AppInfo(packageName);
     try {
-      String appDetailsPageUrl = GET_APP_DETAIL_PAGE_URL + URLEncoder.encode(appSearchResult.getPackageName(), "ASCII");
-      appSearchResult.setAppDetailsPageUrl(appDetailsPageUrl);
-    } catch(Exception e) { log.error("Could not create App Details Page Url from Package Name " + appSearchResult.getPackageName(), e); }
+      String appDetailsPageUrl = GET_APP_DETAIL_PAGE_URL + URLEncoder.encode(appInfo.getPackageName(), "ASCII");
+      appInfo.setAppDetailsPageUrl(appDetailsPageUrl);
+    } catch(Exception e) { log.error("Could not create App Details Page Url from Package Name " + appInfo.getPackageName(), e); }
 
     for(Element child : cardContentElement.children()) {
       if("div".equals(child.nodeName())) {
         if(child.hasClass("details")) {
-          parseDetails(appSearchResult, child);
+          parseDetails(appInfo, child);
         }
         else if(child.hasClass("cover")) {
-          parseCover(appSearchResult, child);
+          parseCover(appInfo, child);
         }
       }
     }
 
-    if(appSearchResult.areNecessaryInformationSet()) {
-      return appSearchResult;
+    if(appInfo.areNecessaryInformationSet()) {
+      return appInfo;
     }
     return null;
   }
 
-  protected void parseDetails(AppSearchResult appSearchResult, Element cardDetailsElement) {
+  protected void parseDetails(AppInfo appInfo, Element cardDetailsElement) {
     for(Element child : cardDetailsElement.children()) {
       if("a".equals(child.nodeName()) && child.hasClass("title")) {
-        appSearchResult.setAppUrl(child.attr("href"));
-        appSearchResult.setTitle(child.attr("title"));
+        appInfo.setAppUrl(child.attr("href"));
+        appInfo.setTitle(child.attr("title"));
       }
       else if("div".equals(child.nodeName()) && child.hasClass("subtitle-container")) {
         for(Element containerChild : child.children()) {
           if("a".equals(containerChild.nodeName()) && containerChild.hasClass("subtitle")) {
-            appSearchResult.setDeveloper(containerChild.text());
+            appInfo.setDeveloper(containerChild.text());
           }
         }
       }
     }
   }
 
-  protected void parseCover(AppSearchResult appSearchResult, Element coverElement) {
+  protected void parseCover(AppInfo appInfo, Element coverElement) {
     Elements coverImageElements = coverElement.select(".cover-image"); // TODO: don't use queries, they are very slow on Android
     if(coverImageElements.size() == 1) {
       Element coverImageElement = coverImageElements.get(0);
 
-      appSearchResult.setSmallCoverImageUrl("http:" + coverImageElement.attr("data-cover-small"));
-      appSearchResult.setLargeCoverImageUrl("http:" + coverImageElement.attr("data-cover-large"));
+      appInfo.setSmallCoverImageUrl("http:" + coverImageElement.attr("data-cover-small"));
+      appInfo.setLargeCoverImageUrl("http:" + coverImageElement.attr("data-cover-large"));
     }
   }
 
 
-  protected void getAppDetailsAsync(AppSearchResult appSearchResult) {
-    getAppDetailsAsync(appSearchResult, new GetAppDetailsCallback() {
+  protected void getAppDetailsAsync(AppInfo appInfo) {
+    getAppDetailsAsync(appInfo, new GetAppDetailsCallback() {
       @Override
       public void completed(GetAppDetailsResponse response) {
         if(response.isSuccessful()) {
@@ -181,94 +181,94 @@ public class PlayStoreAppSearcher {
     });
   }
 
-  public void getAppDetailsAsync(final AppSearchResult appSearchResult, final GetAppDetailsCallback callback) {
+  public void getAppDetailsAsync(final AppInfo appInfo, final GetAppDetailsCallback callback) {
     try {
-      RequestParameters parameters = new RequestParameters(appSearchResult.getAppDetailsPageUrl());
+      RequestParameters parameters = new RequestParameters(appInfo.getAppDetailsPageUrl());
       parameters.setConnectionTimeoutMillis(CONNECTION_TIMEOUT_MILLIS);
       parameters.setCountConnectionRetries(COUNT_CONNECTION_RETRIES);
 
       webClient.getAsync(parameters, new RequestCallback() {
         @Override
         public void completed(WebClientResponse response) {
-          getAppDetailsCompleted(appSearchResult, response, callback);
+          getAppDetailsCompleted(appInfo, response, callback);
         }
       });
     } catch(Exception e) {
-      log.error("Could not get App Detail Page for App " + appSearchResult, e);
-      callback.completed(new GetAppDetailsResponse(appSearchResult, e.getLocalizedMessage()));
+      log.error("Could not get App Detail Page for App " + appInfo, e);
+      callback.completed(new GetAppDetailsResponse(appInfo, e.getLocalizedMessage()));
     }
   }
 
-  protected void getAppDetailsCompleted(AppSearchResult appSearchResult, WebClientResponse response, GetAppDetailsCallback callback) {
+  protected void getAppDetailsCompleted(AppInfo appInfo, WebClientResponse response, GetAppDetailsCallback callback) {
     try {
       String appDetailsPageHtml = response.getBody();
-      appSearchResult.setAppDetailsPageHtml(appDetailsPageHtml);
+      appInfo.setAppDetailsPageHtml(appDetailsPageHtml);
 
-      parseAppDetailsPage(appSearchResult, appDetailsPageHtml);
+      parseAppDetailsPage(appInfo, appDetailsPageHtml);
 
-      callback.completed(new GetAppDetailsResponse(appSearchResult, appSearchResult.areAppDetailsDownloaded()));
+      callback.completed(new GetAppDetailsResponse(appInfo, appInfo.areAppDetailsDownloaded()));
     } catch(Exception e) {
-      log.error("Could not get App Detail Page for App " + appSearchResult, e);
-      callback.completed(new GetAppDetailsResponse(appSearchResult, e.getLocalizedMessage()));
+      log.error("Could not get App Detail Page for App " + appInfo, e);
+      callback.completed(new GetAppDetailsResponse(appInfo, e.getLocalizedMessage()));
     }
   }
 
-  protected void parseAppDetailsPage(AppSearchResult appSearchResult, String appDetailsPageHtml) {
+  protected void parseAppDetailsPage(AppInfo appInfo, String appDetailsPageHtml) {
     Document document = Jsoup.parse(appDetailsPageHtml);
 
-    parseAppDetailsSection(appSearchResult, document);
+    parseAppDetailsSection(appInfo, document);
 
-    parseScoreContainer(appSearchResult, document);
+    parseScoreContainer(appInfo, document);
   }
 
-  protected void parseAppDetailsSection(AppSearchResult appSearchResult, Document document) {
+  protected void parseAppDetailsSection(AppInfo appInfo, Document document) {
     Elements reportElements = document.body().select("a[href='https://support.google.com/googleplay/?p=report_content']");
     if(reportElements.size() > 0) {
       Element detailsSectionElement = reportElements.get(0).parent().parent();
-      parseAppDetailsSection(appSearchResult, detailsSectionElement);
+      parseAppDetailsSection(appInfo, detailsSectionElement);
     }
   }
 
-  protected void parseAppDetailsSection(AppSearchResult appSearchResult, Element detailsSectionElement) {
+  protected void parseAppDetailsSection(AppInfo appInfo, Element detailsSectionElement) {
     for(Element child : detailsSectionElement.children()) {
       if("div".equals(child.nodeName()) && child.hasClass("meta-info")) {
-        parseAppDetailsInfo(appSearchResult, child);
+        parseAppDetailsInfo(appInfo, child);
       }
     }
   }
 
-  protected void parseAppDetailsInfo(AppSearchResult appSearchResult, Element detailInfoElement) {
+  protected void parseAppDetailsInfo(AppInfo appInfo, Element detailInfoElement) {
     for(Element child : detailInfoElement.children()) {
       if("div".equals(child.nodeName()) && child.hasAttr("itemprop")) {
         String detailName = child.attr("itemprop");
 
         if("numDownloads".equals(detailName)) {
-          appSearchResult.setCountInstallations(child.text());
+          appInfo.setCountInstallations(child.text());
         }
         else if("softwareVersion".equals(detailName)) {
-          appSearchResult.setVersion(child.text());
+          appInfo.setVersion(child.text());
         }
       }
     }
   }
 
-  protected void parseScoreContainer(AppSearchResult appSearchResult, Document document) {
+  protected void parseScoreContainer(AppInfo appInfo, Document document) {
     Elements scoreContainerElements = document.body().select(".score-container");
     if(scoreContainerElements.size() > 0) {
       Element scoreContainerElement = scoreContainerElements.get(0);
-      parseScoreContainer(appSearchResult, scoreContainerElement);
+      parseScoreContainer(appInfo, scoreContainerElement);
     }
   }
 
-  protected void parseScoreContainer(AppSearchResult appSearchResult, Element scoreContainerElement) {
+  protected void parseScoreContainer(AppInfo appInfo, Element scoreContainerElement) {
     for(Element child : scoreContainerElement.children()) {
       if(child.hasClass("score")) {
-        appSearchResult.setRating(child.text());
+        appInfo.setRating(child.text());
       }
       else if(child.hasClass("reviews-stats")) {
         for(Element reviewStatsChild : child.children()) {
           if(reviewStatsChild.hasClass("reviews-num")) {
-            appSearchResult.setCountRatings(reviewStatsChild.text());
+            appInfo.setCountRatings(reviewStatsChild.text());
             break;
           }
         }

@@ -6,17 +6,17 @@ package net.dankito.appdownloader.responses;
 
 public class GetAppDetailsResponse extends ResponseBase {
 
-  protected AppSearchResult appSearchResult;
+  protected AppInfo appInfo;
 
 
-  public GetAppDetailsResponse(AppSearchResult appSearchResult, String error) {
+  public GetAppDetailsResponse(AppInfo appInfo, String error) {
     super(error);
-    this.appSearchResult = appSearchResult;
+    this.appInfo = appInfo;
   }
 
-  public GetAppDetailsResponse(AppSearchResult appSearchResult, boolean isSuccessful) {
+  public GetAppDetailsResponse(AppInfo appInfo, boolean isSuccessful) {
     super(isSuccessful);
-    this.appSearchResult = appSearchResult;
+    this.appInfo = appInfo;
   }
 
 }

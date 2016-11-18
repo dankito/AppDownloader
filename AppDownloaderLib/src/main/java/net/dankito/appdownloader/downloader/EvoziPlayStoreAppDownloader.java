@@ -3,7 +3,7 @@ package net.dankito.appdownloader.downloader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.dankito.appdownloader.responses.AppDownloadRequestParameters;
-import net.dankito.appdownloader.responses.AppSearchResult;
+import net.dankito.appdownloader.responses.AppInfo;
 import net.dankito.appdownloader.responses.EvoziGetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadRequestParametersCallback;
@@ -39,7 +39,7 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
   }
 
 
-  public void getAppDownloadLinkAsync(final AppSearchResult appToDownload, final GetAppDownloadUrlResponseCallback callback) {
+  public void getAppDownloadLinkAsync(final AppInfo appToDownload, final GetAppDownloadUrlResponseCallback callback) {
     getAppDownloadRequestParametersAsync(appToDownload.getPackageName(), new GetAppDownloadRequestParametersCallback() {
       @Override
       public void completed(AppDownloadRequestParameters requestParameters) {
@@ -53,7 +53,7 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
     });
   }
 
-  protected void requestAppDownloadUrl(final AppSearchResult appToDownload, final AppDownloadRequestParameters requestParameters, final GetAppDownloadUrlResponseCallback callback) {
+  protected void requestAppDownloadUrl(final AppInfo appToDownload, final AppDownloadRequestParameters requestParameters, final GetAppDownloadUrlResponseCallback callback) {
     RequestParameters parameters = createRequestParametersWithDefaultValues(APPS_EVOZI_DOWNLOAD_APP_URL);
     parameters.setBody(requestParameters.getRequestBodyString());
 
@@ -70,7 +70,7 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
     });
   }
 
-  protected void receivedAppDownloadUrlResponse(AppSearchResult appToDownload, String getAppDownloadUrlResponseBody, final GetAppDownloadUrlResponseCallback callback) {
+  protected void receivedAppDownloadUrlResponse(AppInfo appToDownload, String getAppDownloadUrlResponseBody, final GetAppDownloadUrlResponseCallback callback) {
     try {
       EvoziGetAppDownloadUrlResponse appDownloadUrlResponse = mapper.readValue(getAppDownloadUrlResponseBody, EvoziGetAppDownloadUrlResponse.class);
       log.info("Retrieved Download Url for " + appToDownload + ": " + appDownloadUrlResponse.getUrl());

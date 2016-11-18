@@ -1,6 +1,6 @@
 package net.dankito.appdownloader.downloader;
 
-import net.dankito.appdownloader.responses.AppSearchResult;
+import net.dankito.appdownloader.responses.AppInfo;
 import net.dankito.appdownloader.responses.DownloadAppResponse;
 import net.dankito.appdownloader.responses.callbacks.DownloadAppCallback;
 import net.dankito.appdownloader.util.IThreadPool;
@@ -47,7 +47,7 @@ public abstract class AppDownloaderTestBase {
     final CountDownLatch countDownLatch = new CountDownLatch(1);
     final List<DownloadAppResponse> responseHolder = new ArrayList<>(1);
 
-    AppSearchResult appToDownload = new AppSearchResult(TEST_APP_PACKAGE_NAME);
+    AppInfo appToDownload = new AppInfo(TEST_APP_PACKAGE_NAME);
     appToDownload.setTitle(TEST_APP_TITLE);
     appToDownload.setDeveloper("");
 

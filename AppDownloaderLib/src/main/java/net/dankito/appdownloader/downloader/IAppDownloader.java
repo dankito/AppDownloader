@@ -1,6 +1,6 @@
 package net.dankito.appdownloader.downloader;
 
-import net.dankito.appdownloader.responses.AppSearchResult;
+import net.dankito.appdownloader.responses.AppInfo;
 import net.dankito.appdownloader.responses.callbacks.DownloadAppCallback;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
 
@@ -10,8 +10,8 @@ import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCa
 
 public interface IAppDownloader {
 
-  void downloadAppAsync(final AppSearchResult appToDownload, final DownloadAppCallback callback);
+  void downloadAppAsync(final AppInfo appToDownload, final DownloadAppCallback callback);
 
-  void getAppDownloadLinkAsync(AppSearchResult appToDownload, final GetAppDownloadUrlResponseCallback callback);
+  void getAppDownloadLinkAsync(AppInfo appToDownload, final GetAppDownloadUrlResponseCallback callback);
 
 }
