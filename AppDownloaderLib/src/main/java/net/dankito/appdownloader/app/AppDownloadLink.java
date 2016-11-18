@@ -10,7 +10,7 @@ public class AppDownloadLink {
 
   protected String fileSize;
 
-  protected String fileHash;
+  protected String fileHashSum;
 
   protected String apkSignature;
 
@@ -31,12 +31,12 @@ public class AppDownloadLink {
     this.fileSize = fileSize;
   }
 
-  public String getFileHash() {
-    return fileHash;
+  public String getFileHashSum() {
+    return fileHashSum;
   }
 
-  public void setFileHash(String fileHash) {
-    this.fileHash = fileHash;
+  public void setFileHashSum(String fileHashSum) {
+    this.fileHashSum = fileHashSum;
   }
 
   public String getApkSignature() {

@@ -100,7 +100,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
           appDownloadLink.setFileSize(downloadFileDetailsValue.trim());
         }
         else if(downloadFileDetailsName.startsWith("File Sha")) {
-          appDownloadLink.setFileHash(downloadFileDetailsValue.trim());
+          appDownloadLink.setFileHashSum(downloadFileDetailsValue.trim());
         }
         else if(downloadFileDetailsName.startsWith("APK Signature")) {
           appDownloadLink.setApkSignature(downloadFileDetailsValue.trim());
