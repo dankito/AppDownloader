@@ -1,5 +1,7 @@
 package net.dankito.appdownloader.di;
 
+import android.app.Activity;
+
 import net.dankito.appdownloader.PlayStoreAppSearcher;
 import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.EvoziPlayStoreAppDownloader;
@@ -18,6 +20,20 @@ import dagger.Provides;
  */
 @Module
 public class AndroidDiContainer {
+
+  protected final Activity activity;
+
+
+  public AndroidDiContainer (Activity activity) {
+    this.activity = activity;
+  }
+
+
+  @Provides //scope is not necessary for parameters stored within the module
+  public Activity activity() {
+    return activity;
+  }
+
 
   @Provides
   @Singleton

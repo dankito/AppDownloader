@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import net.dankito.appdownloader.di.AndroidDiComponent;
+import net.dankito.appdownloader.di.AndroidDiContainer;
 import net.dankito.appdownloader.di.DaggerAndroidDiComponent;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,7 +28,8 @@ public class MainActivity extends AppCompatActivity {
 
   protected void setupDependencyInjection() {
     component = DaggerAndroidDiComponent.builder()
-        .build();
+                .androidDiContainer(new AndroidDiContainer(this))
+                .build();
 
     component.inject(this);
   }
