@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import net.dankito.appdownloader.AppDownloaderApplication;
+import net.dankito.appdownloader.MainActivity;
 import net.dankito.appdownloader.PlayStoreAppSearcher;
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.adapter.AppSearchResultsAdapter;
@@ -100,7 +100,7 @@ public class AppSearchResultsFragment extends Fragment {
   }
 
   protected void injectComponents() {
-    ((AppDownloaderApplication) getActivity().getApplication()).getComponent().inject(this);
+    ((MainActivity) getActivity()).getComponent().inject(this);
 
     appSearcher.addRetrievedAppDetailsListener(appDetailsRetrievedListener);
 
