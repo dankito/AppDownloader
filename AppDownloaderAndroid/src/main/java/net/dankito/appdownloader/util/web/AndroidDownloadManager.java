@@ -136,12 +136,17 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
         EnqueuedDownload enqueuedDownload = getEnqueuedDownloadForId(downloadId);
 
         if(enqueuedDownload != null) {
+          AppDownloadLink downloadLink = currentDownload.getDownloadLink();
+
           if(enqueuedDownload.wasDownloadSuccessful()) {
             URI uri = URI.create(enqueuedDownload.getDownloadLocationUri()); // get File from Uri
             String downloadPath = new File(uri.getPath()).getAbsolutePath();
 
-            // TODO: call listener, installApp is not a task of DownloadManager
-            installApp(currentDownload.getDownloadLink().getAppInfo(), enqueuedDownload.getDownloadLocationUri(), downloadPath);
+            downloadLink.setDownloadLocationUri(enqueuedDownload.getDownloadLocationUri());
+            downloadLink.setDownloadLocationPath(downloadPath);
+
+            IDownloadCompletedCallback callback = currentDownload.getCallback();
+            callback.completed(new DownloadResult());
           }
         }
       } catch(Exception e) {
@@ -190,20 +195,6 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     result.setMediaProviderUri(cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_MEDIAPROVIDER_URI)));
 
     return result;
-  }
-
-  protected void installApp(AppInfo appToInstall, String downloadLocationUri, String downloadLocationPath) {
-    appToInstall.setDownloadLocationUri(downloadLocationUri);
-    appToInstall.setDownloadLocationPath(downloadLocationPath);
-
-    appToInstall.setState(AppState.INSTALLING);
-
-    Intent intent = new Intent();
-    intent.setAction(android.content.Intent.ACTION_VIEW);
-    intent.setDataAndType(Uri.parse(downloadLocationUri), "application/vnd.android.package-archive");
-    context.startActivityForResult(intent, -1);
-
-    appsBeingInstalled.add(appToInstall);
   }
 
 
