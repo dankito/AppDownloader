@@ -10,8 +10,8 @@ import android.webkit.WebView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import net.dankito.appdownloader.MainActivity;
 import net.dankito.appdownloader.R;
+import net.dankito.appdownloader.di.AndroidDiComponent;
 import net.dankito.appdownloader.downloader.IAppDownloader;
 import net.dankito.appdownloader.responses.AppInfo;
 import net.dankito.appdownloader.responses.AppState;
@@ -72,14 +72,19 @@ public class AppDetailsDialog extends FullscreenDialog {
 
 
   @Override
+  protected void injectComponents(AndroidDiComponent component) {
+    super.injectComponents(component);
+
+    component.inject(this);
+  }
+
+  @Override
   protected int getLayoutId() {
     return R.layout.fragment_app_details;
   }
 
   @Override
   protected void setupUi(View rootView) {
-    ((MainActivity)activity).getComponent().inject(this);
-
     setupWebView(rootView);
   }
 

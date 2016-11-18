@@ -11,7 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 
+import net.dankito.appdownloader.MainActivity;
 import net.dankito.appdownloader.R;
+import net.dankito.appdownloader.di.AndroidDiComponent;
 
 /**
  * Created by ganymed on 06/11/16.
@@ -31,6 +33,10 @@ public abstract class FullscreenDialog extends Dialog {
   }
 
 
+  protected void injectComponents(AndroidDiComponent component) {
+    // may be overwritten in sub class
+  }
+
   protected abstract int getLayoutId();
 
   protected abstract void setupUi(View rootView);
@@ -39,6 +45,8 @@ public abstract class FullscreenDialog extends Dialog {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
+    injectComponents(((MainActivity)activity).getComponent());
 
     requestWindowFeature(Window.FEATURE_ACTION_BAR);
     requestWindowFeature(Window.FEATURE_CONTEXT_MENU);
