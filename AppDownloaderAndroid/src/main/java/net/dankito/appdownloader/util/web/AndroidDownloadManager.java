@@ -137,6 +137,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
 
         if(enqueuedDownload != null) {
           AppDownloadLink downloadLink = currentDownload.getDownloadLink();
+          IDownloadCompletedCallback callback = currentDownload.getCallback();
 
           if(enqueuedDownload.wasDownloadSuccessful()) {
             URI uri = URI.create(enqueuedDownload.getDownloadLocationUri()); // get File from Uri
@@ -145,8 +146,10 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
             downloadLink.setDownloadLocationUri(enqueuedDownload.getDownloadLocationUri());
             downloadLink.setDownloadLocationPath(downloadPath);
 
-            IDownloadCompletedCallback callback = currentDownload.getCallback();
-            callback.completed(new DownloadResult());
+            callback.completed(new DownloadResult(downloadLink, true));
+          }
+          else {
+            callback.completed(new DownloadResult(downloadLink, enqueuedDownload.getReason()));
           }
         }
       } catch(Exception e) {
@@ -231,7 +234,11 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
 
     downloadManager.remove(downloadId);
 
-    currentDownloads.remove(downloadId);
+    CurrentDownload currentDownload = currentDownloads.remove(downloadId);
+
+    IDownloadCompletedCallback callback = currentDownload.getCallback();
+
+    callback.completed(new DownloadResult(downloadLink, false, true));
   }
 
 
