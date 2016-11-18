@@ -21,6 +21,7 @@ import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
 import net.dankito.appdownloader.util.AlertHelper;
 import net.dankito.appdownloader.util.app.IAppInstaller;
+import net.dankito.appdownloader.util.app.IAppVerifier;
 import net.dankito.appdownloader.util.web.DownloadResult;
 import net.dankito.appdownloader.util.web.IDownloadCompletedCallback;
 import net.dankito.appdownloader.util.web.IDownloadManager;
@@ -49,6 +50,9 @@ public class AppDetailsDialog extends FullscreenDialog {
 
   @Inject
   protected IDownloadManager downloadManager;
+
+  @Inject
+  protected IAppVerifier appVerifier;
 
   @Inject
   protected IAppInstaller appInstaller;
@@ -256,13 +260,19 @@ public class AppDetailsDialog extends FullscreenDialog {
     downloadManager.downloadUrlAsync(clickedApp, downloadLink, new IDownloadCompletedCallback() {
       @Override
       public void completed(DownloadResult result) {
-        AppDownloadLink downloadLink = result.getDownloadLink();
-
-        if(result.isSuccessful()) {
-          appInstaller.installApp(downloadLink);
-        }
+        appDownloadCompleted(result);
       }
     });
+  }
+
+  protected void appDownloadCompleted(DownloadResult result) {
+    AppDownloadLink downloadLink = result.getDownloadLink();
+
+    if(result.isSuccessful()) {
+      if(appVerifier.verifyDownloadedApk(downloadLink)) {
+        appInstaller.installApp(downloadLink);
+      }
+    }
   }
 
 

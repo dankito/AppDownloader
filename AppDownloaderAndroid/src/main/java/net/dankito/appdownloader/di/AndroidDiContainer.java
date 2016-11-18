@@ -12,7 +12,9 @@ import net.dankito.appdownloader.util.AndroidOnUiThreadRunner;
 import net.dankito.appdownloader.util.IOnUiThreadRunner;
 import net.dankito.appdownloader.util.IThreadPool;
 import net.dankito.appdownloader.util.ThreadPool;
+import net.dankito.appdownloader.util.app.AndroidAppPackageVerifier;
 import net.dankito.appdownloader.util.app.IAppInstaller;
+import net.dankito.appdownloader.util.app.IAppVerifier;
 import net.dankito.appdownloader.util.web.AndroidDownloadManager;
 import net.dankito.appdownloader.util.web.IDownloadManager;
 import net.dankito.appdownloader.util.web.IWebClient;
@@ -74,6 +76,12 @@ public class AndroidDiContainer {
     return new AppDetailsCache();
   }
 
+
+  @Provides
+  @Singleton
+  public IAppVerifier provideAppVerifier() {
+    return new AndroidAppPackageVerifier(getActivity());
+  }
 
   @Provides
   @Singleton
