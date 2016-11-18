@@ -2,6 +2,7 @@ package net.dankito.appdownloader.downloader;
 
 import net.dankito.appdownloader.app.AppDownloadLink;
 import net.dankito.appdownloader.app.AppInfo;
+import net.dankito.appdownloader.app.HashAlgorithm;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
 import net.dankito.appdownloader.util.IThreadPool;
@@ -100,6 +101,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
           appDownloadLink.setFileSize(downloadFileDetailsValue.trim());
         }
         else if(downloadFileDetailsName.startsWith("File Sha")) {
+          appDownloadLink.setHashAlgorithm(HashAlgorithm.SHA1);
           appDownloadLink.setFileHashSum(downloadFileDetailsValue.trim());
         }
         else if(downloadFileDetailsName.startsWith("APK Signature")) {

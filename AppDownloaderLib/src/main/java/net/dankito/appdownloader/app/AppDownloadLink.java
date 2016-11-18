@@ -10,6 +10,8 @@ public class AppDownloadLink {
 
   protected String fileSize;
 
+  protected HashAlgorithm hashAlgorithm;
+
   protected String fileHashSum;
 
   protected String apkSignature;
@@ -29,6 +31,14 @@ public class AppDownloadLink {
 
   public void setFileSize(String fileSize) {
     this.fileSize = fileSize;
+  }
+
+  public HashAlgorithm getHashAlgorithm() {
+    return hashAlgorithm;
+  }
+
+  public void setHashAlgorithm(HashAlgorithm hashAlgorithm) {
+    this.hashAlgorithm = hashAlgorithm;
   }
 
   public String getFileHashSum() {

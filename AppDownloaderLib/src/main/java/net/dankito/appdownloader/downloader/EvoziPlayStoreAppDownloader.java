@@ -3,6 +3,7 @@ package net.dankito.appdownloader.downloader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.dankito.appdownloader.app.AppDownloadLink;
+import net.dankito.appdownloader.app.HashAlgorithm;
 import net.dankito.appdownloader.responses.AppDownloadRequestParameters;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.responses.EvoziGetAppDownloadUrlResponse;
@@ -79,6 +80,7 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
       AppDownloadLink appDownloadLink = new AppDownloadLink();
       appDownloadLink.setUrl(evoziAppDownloadUrlResponse.getUrl());
       appDownloadLink.setFileSize(evoziAppDownloadUrlResponse.getFilesize());
+      appDownloadLink.setHashAlgorithm(HashAlgorithm.MD5);
       appDownloadLink.setFileHashSum(evoziAppDownloadUrlResponse.getMd5());
 
       GetAppDownloadUrlResponse appDownloadUrlResponse = new GetAppDownloadUrlResponse(true, appToDownload, appDownloadLink);
