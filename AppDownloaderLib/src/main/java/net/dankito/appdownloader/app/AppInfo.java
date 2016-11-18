@@ -214,6 +214,18 @@ public class AppInfo {
     this.downloadLocationPath = downloadLocationPath;
   }
 
+
+  public String getApkSignature() {
+    for(AppDownloadLink downloadLink : getDownloadLinks()) {
+      if(downloadLink.isApkSignatureSet()) {
+        return downloadLink.getApkSignature();
+      }
+    }
+
+    return null;
+  }
+
+
   @Override
   public String toString() {
     return getTitle() + " (" + getDeveloper() + "; " + getPackageName() + ")";
