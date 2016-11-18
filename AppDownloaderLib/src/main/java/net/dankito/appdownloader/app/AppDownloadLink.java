@@ -1,6 +1,7 @@
 package net.dankito.appdownloader.app;
 
 import net.dankito.appdownloader.downloader.IAppDownloader;
+import net.dankito.appdownloader.util.StringUtils;
 
 /**
  * Created by ganymed on 18/11/16.
@@ -73,6 +74,10 @@ public class AppDownloadLink {
 
   public void setFileHashSum(String fileHashSum) {
     this.fileHashSum = fileHashSum;
+  }
+
+  public boolean isApkSignatureSet() {
+    return StringUtils.isNotNullOrEmpty(getApkSignature());
   }
 
   public String getApkSignature() {
