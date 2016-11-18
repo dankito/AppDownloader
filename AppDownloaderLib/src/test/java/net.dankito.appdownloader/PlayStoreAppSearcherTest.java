@@ -1,5 +1,6 @@
 package net.dankito.appdownloader;
 
+import net.dankito.appdownloader.app.AppDetailsCache;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.responses.SearchAppsResponse;
 import net.dankito.appdownloader.responses.callbacks.SearchAppsResponseCallback;
@@ -28,7 +29,7 @@ public class PlayStoreAppSearcherTest {
   @Before
   public void setUp() {
     IWebClient webClient = new OkHttpWebClient();
-    underTest = new PlayStoreAppSearcher(webClient);
+    underTest = new PlayStoreAppSearcher(webClient, new AppDetailsCache());
   }
 
 

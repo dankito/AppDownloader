@@ -11,6 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import net.dankito.appdownloader.R;
+import net.dankito.appdownloader.app.AppDownloadLink;
 import net.dankito.appdownloader.di.AndroidDiComponent;
 import net.dankito.appdownloader.downloader.IAppDownloader;
 import net.dankito.appdownloader.app.AppInfo;
@@ -186,13 +187,13 @@ public class AppDetailsDialog extends FullscreenDialog {
     }
   }
 
-  protected String getBestAppDownloadUrl(AppInfo appInfo) {
-    if(appInfo.getDownloadUrls().size() == 1) {
-      return appInfo.getDownloadUrls().get(0);
+  protected AppDownloadLink getBestAppDownloadUrl(AppInfo appInfo) {
+    if(appInfo.getDownloadLinks().size() == 1) {
+      return appInfo.getDownloadLinks().get(0);
     }
     else {
       // TODO: choose best one
-      return appInfo.getDownloadUrls().get(0);
+      return appInfo.getDownloadLinks().get(0);
     }
   }
 
@@ -218,7 +219,7 @@ public class AppDetailsDialog extends FullscreenDialog {
     countRequestsAppDownloadLinkCompleted.incrementAndGet();
 
     if(response.isSuccessful()) {
-      clickedApp.addDownloadUrl(response.getUrl());
+      clickedApp.addDownloadUrl(response.getDownloadLink());
     }
 
     if(hasDownloadUrlBeenRetrieved.get() == false) {
@@ -228,7 +229,7 @@ public class AppDetailsDialog extends FullscreenDialog {
         }
       }
       else {
-        downloadApp(clickedApp, response.getUrl());
+        downloadApp(clickedApp, response.getDownloadLink());
       }
     }
 
@@ -237,16 +238,16 @@ public class AppDetailsDialog extends FullscreenDialog {
     }
   }
 
-  protected void downloadApp(AppInfo clickedApp, String appDownloadUrl) {
-    log.info("Starting to download App " + clickedApp + " from " + appDownloadUrl + " ...");
+  protected void downloadApp(AppInfo clickedApp, AppDownloadLink downloadLink) {
+    log.info("Starting to download App " + clickedApp + " from " + downloadLink + " ...");
 
     appInfo.setState(AppState.DOWNLOADING);
 
-    downloadAppViaAndroidDownloadManager(clickedApp, appDownloadUrl);
+    downloadAppViaAndroidDownloadManager(clickedApp, downloadLink);
   }
 
-  protected void downloadAppViaAndroidDownloadManager(AppInfo clickedApp, String appDownloadUrl) {
-    downloadManager.downloadUrlAsync(clickedApp, appDownloadUrl);
+  protected void downloadAppViaAndroidDownloadManager(AppInfo clickedApp, AppDownloadLink downloadLink) {
+    downloadManager.downloadUrlAsync(clickedApp, downloadLink);
   }
 
 

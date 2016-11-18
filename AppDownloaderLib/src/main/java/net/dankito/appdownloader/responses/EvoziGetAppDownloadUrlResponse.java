@@ -1,14 +1,17 @@
 package net.dankito.appdownloader.responses;
 
-import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.util.StringUtils;
 
 /**
  * Created by ganymed on 02/11/16.
  */
 
-public class EvoziGetAppDownloadUrlResponse extends GetAppDownloadUrlResponse {
+public class EvoziGetAppDownloadUrlResponse {
 
+
+  protected String url;
+
+  protected boolean isSuccessful = false;
 
   protected String status;
 
@@ -28,17 +31,6 @@ public class EvoziGetAppDownloadUrlResponse extends GetAppDownloadUrlResponse {
 
   protected String state;
 
-
-  // for Jackson
-  public EvoziGetAppDownloadUrlResponse() {
-    super(true, null);
-  }
-
-  public EvoziGetAppDownloadUrlResponse(AppInfo appToDownload, String error) {
-    super(appToDownload, error);
-
-    this.packagename = appToDownload.getPackageName();
-  }
 
 
   public String getStatus() {

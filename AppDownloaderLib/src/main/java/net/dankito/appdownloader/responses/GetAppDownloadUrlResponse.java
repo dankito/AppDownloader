@@ -1,5 +1,6 @@
 package net.dankito.appdownloader.responses;
 
+import net.dankito.appdownloader.app.AppDownloadLink;
 import net.dankito.appdownloader.app.AppInfo;
 
 /**
@@ -11,7 +12,7 @@ public class GetAppDownloadUrlResponse extends ResponseBase {
 
   protected AppInfo appToDownload;
 
-  protected String url;
+  protected AppDownloadLink downloadLink;
 
 
 
@@ -26,9 +27,9 @@ public class GetAppDownloadUrlResponse extends ResponseBase {
     this.appToDownload = appToDownload;
   }
 
-  public GetAppDownloadUrlResponse(boolean isSuccessful, AppInfo appToDownload, String url) {
+  public GetAppDownloadUrlResponse(boolean isSuccessful, AppInfo appToDownload, AppDownloadLink downloadLink) {
     this(isSuccessful, appToDownload);
-    this.url = url;
+    this.downloadLink = downloadLink;
   }
 
 
@@ -36,8 +37,8 @@ public class GetAppDownloadUrlResponse extends ResponseBase {
     return appToDownload;
   }
 
-  public String getUrl() {
-    return url;
+  public AppDownloadLink getDownloadLink() {
+    return downloadLink;
   }
 
 }

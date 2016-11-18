@@ -1,5 +1,6 @@
 package net.dankito.appdownloader.util.web;
 
+import net.dankito.appdownloader.app.AppDownloadLink;
 import net.dankito.appdownloader.app.AppInfo;
 
 /**
@@ -8,6 +9,6 @@ import net.dankito.appdownloader.app.AppInfo;
 
 public interface IDownloadManager {
 
-  void downloadUrlAsync(AppInfo appInfo, String url);
+  void downloadUrlAsync(AppInfo appInfo, AppDownloadLink downloadLink);
 
 }

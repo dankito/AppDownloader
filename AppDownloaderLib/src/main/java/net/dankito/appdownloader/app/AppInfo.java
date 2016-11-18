@@ -42,7 +42,7 @@ public class AppInfo {
 
   // download process
 
-  protected List<String> downloadUrls = new ArrayList<>();
+  protected List<AppDownloadLink> downloadLinks = new ArrayList<>();
 
   protected String downloadLocationUri = null;
 
@@ -183,15 +183,15 @@ public class AppInfo {
 
 
   public boolean hasDownloadUrls() {
-    return downloadUrls.size() > 0;
+    return downloadLinks.size() > 0;
   }
 
-  public boolean addDownloadUrl(String appDownloadUrl) {
-    return downloadUrls.add(appDownloadUrl);
+  public boolean addDownloadUrl(AppDownloadLink appDownloadLink) {
+    return downloadLinks.add(appDownloadLink);
   }
 
-  public List<String> getDownloadUrls() {
-    return downloadUrls;
+  public List<AppDownloadLink> getDownloadLinks() {
+    return downloadLinks;
   }
 
   public boolean isAlreadyDownloaded() {

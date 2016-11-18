@@ -1,5 +1,6 @@
 package net.dankito.appdownloader.downloader;
 
+import net.dankito.appdownloader.app.AppDownloadLink;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
@@ -61,17 +62,20 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
       String responseBody = response.getBody();
       Document document = Jsoup.parse(responseBody);
 
-      Elements downloadDivElements = document.body().select(".download-btn");
-      if (downloadDivElements.size() > 0) {
-        Element downloadDivElement = downloadDivElements.first();
 
-        Elements downloadAnchorElements = downloadDivElement.select("a.mdl-button");
+      Elements detailsElements = document.body().select(".details");
+      if(detailsElements.size() > 0) {
+        Element detailsElement = detailsElements.first();
+
+        AppDownloadLink appDownloadLink = parseAppDownloadFileDetails(detailsElement);
+
+        Elements downloadAnchorElements = detailsElement.select("a.mdl-button");
         if (downloadAnchorElements.size() > 0) {
           Element downloadAnchorElement = downloadAnchorElements.first();
           String appDownloadPageUrl = downloadAnchorElement.attr("href");
           appDownloadPageUrl = "https://apk-dl.com" + appDownloadPageUrl;
 
-          downloadAndParseAppDownloadPage(appToDownload, appDownloadPageUrl, callback);
+          downloadAndParseAppDownloadPage(appToDownload, appDownloadLink, appDownloadPageUrl, callback);
           return;
         }
       }
@@ -83,7 +87,31 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
     }
   }
 
-  protected void downloadAndParseAppDownloadPage(final AppInfo appToDownload, final String appDownloadPageUrl, final GetAppDownloadUrlResponseCallback callback) {
+  protected AppDownloadLink parseAppDownloadFileDetails(Element detailsElement) {
+    AppDownloadLink appDownloadLink = new AppDownloadLink();
+
+    for(Element detailChild : detailsElement.children()) {
+      if("div".equals(detailChild.nodeName()) && detailChild.children().size() > 0 && "span".equals(detailChild.child(0).nodeName())) {
+        Element detailsSpanElement = detailChild.child(0);
+        String downloadFileDetailsName = detailsSpanElement.text();
+        String downloadFileDetailsValue = detailsSpanElement.nextSibling().toString(); // second child node is the text node with details' value
+
+        if(downloadFileDetailsName.startsWith("File Size")) {
+          appDownloadLink.setFileSize(downloadFileDetailsValue.trim());
+        }
+        else if(downloadFileDetailsName.startsWith("File Sha")) {
+          appDownloadLink.setFileHash(downloadFileDetailsValue.trim());
+        }
+        else if(downloadFileDetailsName.startsWith("APK Signature")) {
+          appDownloadLink.setApkSignature(downloadFileDetailsValue.trim());
+        }
+      }
+    }
+
+    return appDownloadLink;
+  }
+
+  protected void downloadAndParseAppDownloadPage(final AppInfo appToDownload, final AppDownloadLink appDownloadLink, final String appDownloadPageUrl, final GetAppDownloadUrlResponseCallback callback) {
     RequestParameters parameters = createRequestParametersWithDefaultValues(appDownloadPageUrl);
 
     webClient.getAsync(parameters, new RequestCallback() {
@@ -93,13 +121,13 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
           callback.completed(new GetAppDownloadUrlResponse(appToDownload, response.getError()));
         }
         else {
-          parseAppDownloadPage(appToDownload, response, callback);
+          parseAppDownloadPage(appToDownload, appDownloadLink, response, callback);
         }
       }
     });
   }
 
-  protected void parseAppDownloadPage(AppInfo appToDownload, WebClientResponse response, GetAppDownloadUrlResponseCallback callback) {
+  protected void parseAppDownloadPage(AppInfo appToDownload, AppDownloadLink appDownloadLink, WebClientResponse response, GetAppDownloadUrlResponseCallback callback) {
     try {
       Document document = Jsoup.parse(response.getBody());
 
@@ -109,7 +137,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
 
         if("a".equals(downloadAnchor.nodeName())) {
           String appDetailDownloadPageUrl = downloadAnchor.attr("href");
-          downloadAndParseAppDetailDownloadPage(appToDownload, appDetailDownloadPageUrl, callback);
+          downloadAndParseAppDetailDownloadPage(appToDownload, appDownloadLink, appDetailDownloadPageUrl, callback);
           return;
         }
       }
@@ -121,7 +149,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
     }
   }
 
-  protected void downloadAndParseAppDetailDownloadPage(final AppInfo appToDownload, String appDetailDownloadPageUrl, final GetAppDownloadUrlResponseCallback callback) {
+  protected void downloadAndParseAppDetailDownloadPage(final AppInfo appToDownload, final AppDownloadLink appDownloadLink, String appDetailDownloadPageUrl, final GetAppDownloadUrlResponseCallback callback) {
     RequestParameters parameters = createRequestParametersWithDefaultValues(appDetailDownloadPageUrl);
 
     webClient.getAsync(parameters, new RequestCallback() {
@@ -131,13 +159,13 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
           callback.completed(new GetAppDownloadUrlResponse(appToDownload, response.getError()));
         }
         else {
-          parseAppDetailDownloadPage(appToDownload, response, callback);
+          parseAppDetailDownloadPage(appToDownload, appDownloadLink, response, callback);
         }
       }
     });
   }
 
-  protected void parseAppDetailDownloadPage(AppInfo appToDownload, WebClientResponse response, GetAppDownloadUrlResponseCallback callback) {
+  protected void parseAppDetailDownloadPage(AppInfo appToDownload, AppDownloadLink appDownloadLink, WebClientResponse response, GetAppDownloadUrlResponseCallback callback) {
     try {
       Document document = Jsoup.parse(response.getBody());
 
@@ -148,7 +176,9 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
         String appDownloadUrl = downloadAnchor.attr("href");
         appDownloadUrl = "http:" + appDownloadUrl;
 
-        callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, appDownloadUrl));
+        appDownloadLink.setUrl(appDownloadUrl);
+
+        callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, appDownloadLink));
         return;
       }
 

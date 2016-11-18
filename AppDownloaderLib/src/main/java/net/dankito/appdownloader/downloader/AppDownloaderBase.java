@@ -70,7 +70,7 @@ public abstract class AppDownloaderBase implements IAppDownloader {
       final File targetFile = File.createTempFile(appToDownload.getTitle(), ".apk");
       final OutputStream outStream = new FileOutputStream(targetFile);
 
-      RequestParameters parameters = createRequestParametersWithDefaultValues(response.getUrl());
+      RequestParameters parameters = createRequestParametersWithDefaultValues(response.getDownloadLink().getUrl());
       parameters.setHasStringResponse(false);
 
       parameters.setDownloadProgressListener(new DownloadProgressListener() {
@@ -102,7 +102,7 @@ public abstract class AppDownloaderBase implements IAppDownloader {
         }
       });
     } catch(Exception e) {
-      log.error("Could not download App from " + response.getUrl(), e);
+      log.error("Could not download App from " + response.getDownloadLink(), e);
       callback.completed(new DownloadAppResponse(e.getLocalizedMessage()));
     }
   }

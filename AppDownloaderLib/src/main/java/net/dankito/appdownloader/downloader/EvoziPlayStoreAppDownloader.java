@@ -2,6 +2,7 @@ package net.dankito.appdownloader.downloader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import net.dankito.appdownloader.app.AppDownloadLink;
 import net.dankito.appdownloader.responses.AppDownloadRequestParameters;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.responses.EvoziGetAppDownloadUrlResponse;
@@ -72,8 +73,13 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
 
   protected void receivedAppDownloadUrlResponse(AppInfo appToDownload, String getAppDownloadUrlResponseBody, final GetAppDownloadUrlResponseCallback callback) {
     try {
-      EvoziGetAppDownloadUrlResponse appDownloadUrlResponse = mapper.readValue(getAppDownloadUrlResponseBody, EvoziGetAppDownloadUrlResponse.class);
-      log.info("Retrieved Download Url for " + appToDownload + ": " + appDownloadUrlResponse.getUrl());
+      EvoziGetAppDownloadUrlResponse evoziAppDownloadUrlResponse = mapper.readValue(getAppDownloadUrlResponseBody, EvoziGetAppDownloadUrlResponse.class);
+      log.info("Retrieved Download Url for " + appToDownload + ": " + evoziAppDownloadUrlResponse.getUrl());
+
+      AppDownloadLink appDownloadLink = new AppDownloadLink();
+      appDownloadLink.setUrl(evoziAppDownloadUrlResponse.getUrl());
+
+      GetAppDownloadUrlResponse appDownloadUrlResponse = new GetAppDownloadUrlResponse(true, appToDownload, appDownloadLink);
 
       callback.completed(appDownloadUrlResponse);
     } catch(Exception e) {
