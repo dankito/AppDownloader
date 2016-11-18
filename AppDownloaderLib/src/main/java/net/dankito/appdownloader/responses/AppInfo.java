@@ -25,9 +25,9 @@ public class AppInfo {
 
   protected String appDetailsPageUrl;
 
-  protected AppSearchResultState state = AppSearchResultState.INSTALLABLE;
+  protected AppState state = AppState.INSTALLABLE;
 
-  protected List<AppSearchResultStateListener> stateListeners = new ArrayList<>();
+  protected List<AppStateListener> stateListeners = new ArrayList<>();
 
 
   // from App Details Page
@@ -111,28 +111,28 @@ public class AppInfo {
     this.appDetailsPageUrl = appDetailsPageUrl;
   }
 
-  public AppSearchResultState getState() {
+  public AppState getState() {
     return state;
   }
 
-  public void setState(AppSearchResultState state) {
-    AppSearchResultState previousState = this.state;
+  public void setState(AppState state) {
+    AppState previousState = this.state;
 
     this.state = state;
 
     callStateListeners(state, previousState);
   }
 
-  public boolean addStateListener(AppSearchResultStateListener listener) {
+  public boolean addStateListener(AppStateListener listener) {
     return stateListeners.add(listener);
   }
 
-  public boolean removeStateListener(AppSearchResultStateListener listener) {
+  public boolean removeStateListener(AppStateListener listener) {
     return stateListeners.remove(listener);
   }
 
-  protected void callStateListeners(AppSearchResultState newState, AppSearchResultState previousState) {
-    for(AppSearchResultStateListener listener : stateListeners) {
+  protected void callStateListeners(AppState newState, AppState previousState) {
+    for(AppStateListener listener : stateListeners) {
       listener.stateChanged(newState, previousState);
     }
   }

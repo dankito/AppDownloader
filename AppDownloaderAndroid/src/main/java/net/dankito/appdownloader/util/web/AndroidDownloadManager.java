@@ -15,7 +15,7 @@ import android.support.v7.app.AlertDialog;
 
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.responses.AppInfo;
-import net.dankito.appdownloader.responses.AppSearchResultState;
+import net.dankito.appdownloader.responses.AppState;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -190,7 +190,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
   }
 
   protected void installApp(AppInfo appToInstall, String downloadLocation) {
-    appToInstall.setState(AppSearchResultState.INSTALLING);
+    appToInstall.setState(AppState.INSTALLING);
 
     Intent intent = new Intent();
     intent.setAction(android.content.Intent.ACTION_VIEW);
@@ -246,7 +246,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
           deletedDownloadedApk(appBeingInstalled);
 
           appsBeingInstalled.remove(appBeingInstalled);
-          appBeingInstalled.setState(AppSearchResultState.UPDATABLE);
+          appBeingInstalled.setState(AppState.UPDATABLE);
           break;
         }
       }

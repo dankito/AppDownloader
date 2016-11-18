@@ -4,7 +4,7 @@ package net.dankito.appdownloader.responses;
  * Created by ganymed on 14/11/16.
  */
 
-public enum AppSearchResultState {
+public enum AppState {
 
   INSTALLABLE,
   UPDATABLE,
