@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by ganymed on 18/11/16.
@@ -25,12 +25,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class AndroidAppInstaller implements IAppInstaller {
 
+  public static final int APP_INSTALL_REQUEST_CODE = 2703;
+
+  protected static int CountInstalledApps = 0;
+
+
   private static final Logger log = LoggerFactory.getLogger(AndroidAppInstaller.class);
 
 
   protected Activity activity;
 
-  protected List<AppInfo> appsBeingInstalled = new CopyOnWriteArrayList<>();
+  protected Map<Integer, AppInfo> appsBeingInstalled = new ConcurrentHashMap<>();
 
 
   public AndroidAppInstaller(Activity activity) {
@@ -54,9 +59,11 @@ public class AndroidAppInstaller implements IAppInstaller {
     Intent intent = new Intent();
     intent.setAction(android.content.Intent.ACTION_VIEW);
     intent.setDataAndType(Uri.parse(downloadLink.getDownloadLocationUri()), "application/vnd.android.package-archive");
-    activity.startActivityForResult(intent, -1);
 
-    appsBeingInstalled.add(appToInstall);
+    int requestCode = APP_INSTALL_REQUEST_CODE + CountInstalledApps++;
+    activity.startActivityForResult(intent, requestCode);
+
+    appsBeingInstalled.put(requestCode, appToInstall);
   }
 
 
@@ -80,12 +87,14 @@ public class AndroidAppInstaller implements IAppInstaller {
       String dataString = intent.getDataString();
       String changedAppPackage = dataString.substring(dataString.indexOf(':') + 1); // remove scheme (= package:)
 
-      for(AppInfo appBeingInstalled : new ArrayList<>(appsBeingInstalled)) {
-        if(appBeingInstalled.getPackageName().equals(changedAppPackage)) {
-          deletedDownloadedApk(appBeingInstalled);
+      for(Map.Entry<Integer, AppInfo> appBeingInstalledEntry : new ArrayList<>(appsBeingInstalled.entrySet())) {
+        AppInfo appBeingInstalled = appBeingInstalledEntry.getValue();
 
-          appsBeingInstalled.remove(appBeingInstalled);
+        if(appBeingInstalled.getPackageName().equals(changedAppPackage)) {
+          appsBeingInstalled.remove(appBeingInstalledEntry.getKey());
           appBeingInstalled.setState(AppState.UPDATABLE);
+
+          deletedDownloadedApk(appBeingInstalled);
           break;
         }
       }
