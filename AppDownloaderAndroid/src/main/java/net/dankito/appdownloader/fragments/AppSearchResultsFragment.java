@@ -30,7 +30,6 @@ import net.dankito.appdownloader.responses.SearchAppsResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDetailsCallback;
 import net.dankito.appdownloader.responses.callbacks.SearchAppsResponseCallback;
 import net.dankito.appdownloader.util.AlertHelper;
-import net.dankito.appdownloader.util.AndroidOnUiThreadRunner;
 import net.dankito.appdownloader.util.IOnUiThreadRunner;
 import net.dankito.appdownloader.util.web.IWebClient;
 
@@ -50,6 +49,7 @@ public class AppSearchResultsFragment extends Fragment {
   private static final Logger log = LoggerFactory.getLogger(AppSearchResultsFragment.class);
 
 
+  @Inject
   protected IOnUiThreadRunner uiThreadRunner;
 
   @Inject
@@ -74,8 +74,6 @@ public class AppSearchResultsFragment extends Fragment {
 
 
   public AppSearchResultsFragment() {
-    this.uiThreadRunner = new AndroidOnUiThreadRunner(getActivity());
-
     setHasOptionsMenu(true);
   }
 

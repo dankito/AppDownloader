@@ -5,6 +5,8 @@ import android.app.Activity;
 import net.dankito.appdownloader.PlayStoreAppSearcher;
 import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.EvoziPlayStoreAppDownloader;
+import net.dankito.appdownloader.util.AndroidOnUiThreadRunner;
+import net.dankito.appdownloader.util.IOnUiThreadRunner;
 import net.dankito.appdownloader.util.IThreadPool;
 import net.dankito.appdownloader.util.ThreadPool;
 import net.dankito.appdownloader.util.web.IWebClient;
@@ -30,7 +32,7 @@ public class AndroidDiContainer {
 
 
   @Provides //scope is not necessary for parameters stored within the module
-  public Activity activity() {
+  public Activity getActivity() {
     return activity;
   }
 
@@ -39,6 +41,12 @@ public class AndroidDiContainer {
   @Singleton
   public IThreadPool provideThreadPool() {
     return new ThreadPool();
+  }
+
+  @Provides
+  @Singleton
+  public IOnUiThreadRunner provideOnUiThreadRunner() {
+    return new AndroidOnUiThreadRunner(getActivity());
   }
 
   @Provides
