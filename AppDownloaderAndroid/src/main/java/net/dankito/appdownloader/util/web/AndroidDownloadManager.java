@@ -71,7 +71,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
 
 
   @Override
-  public void downloadUrlAsync(AppInfo appInfo, AppDownloadLink downloadLink) {
+  public void downloadUrlAsync(AppInfo appInfo, AppDownloadLink downloadLink, IDownloadCompletedCallback callback) {
     try {
       Uri uri = Uri.parse(downloadLink.getUrl());
       DownloadManager.Request request = new DownloadManager.Request(uri);
@@ -87,7 +87,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
       request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, destinationFileName);
 
       DownloadManager downloadManager = getDownloadManager();
-      CurrentDownload currentDownload = new CurrentDownload(downloadLink);
+      CurrentDownload currentDownload = new CurrentDownload(downloadLink, callback);
       currentDownloads.put(downloadManager.enqueue(request), currentDownload);
     } catch(Exception e) {
       log.error("Could not start Download for " + appInfo, e);

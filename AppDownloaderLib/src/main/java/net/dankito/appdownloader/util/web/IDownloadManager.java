@@ -9,6 +9,6 @@ import net.dankito.appdownloader.app.AppInfo;
 
 public interface IDownloadManager {
 
-  void downloadUrlAsync(AppInfo appInfo, AppDownloadLink downloadLink);
+  void downloadUrlAsync(AppInfo appInfo, AppDownloadLink downloadLink, IDownloadCompletedCallback callback);
 
 }

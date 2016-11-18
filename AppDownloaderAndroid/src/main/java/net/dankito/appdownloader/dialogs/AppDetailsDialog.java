@@ -20,6 +20,8 @@ import net.dankito.appdownloader.app.AppStateListener;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
 import net.dankito.appdownloader.util.AlertHelper;
+import net.dankito.appdownloader.util.web.DownloadResult;
+import net.dankito.appdownloader.util.web.IDownloadCompletedCallback;
 import net.dankito.appdownloader.util.web.IDownloadManager;
 
 import org.slf4j.Logger;
@@ -247,7 +249,12 @@ public class AppDetailsDialog extends FullscreenDialog {
   }
 
   protected void downloadAppViaAndroidDownloadManager(AppInfo clickedApp, AppDownloadLink downloadLink) {
-    downloadManager.downloadUrlAsync(clickedApp, downloadLink);
+    downloadManager.downloadUrlAsync(clickedApp, downloadLink, new IDownloadCompletedCallback() {
+      @Override
+      public void completed(DownloadResult result) {
+
+      }
+    });
   }
 
 
