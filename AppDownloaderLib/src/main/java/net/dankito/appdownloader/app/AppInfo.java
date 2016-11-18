@@ -46,6 +46,8 @@ public class AppInfo {
 
   protected String downloadLocationUri = null;
 
+  protected String downloadLocationPath = null;
+
 
   public AppInfo(String packageName) {
     this.packageName = packageName;
@@ -202,6 +204,14 @@ public class AppInfo {
 
   public void setDownloadLocationUri(String downloadLocationUri) {
     this.downloadLocationUri = downloadLocationUri;
+  }
+
+  public String getDownloadLocationPath() {
+    return downloadLocationPath;
+  }
+
+  public void setDownloadLocationPath(String downloadLocationPath) {
+    this.downloadLocationPath = downloadLocationPath;
   }
 
   @Override
