@@ -6,6 +6,8 @@ package net.dankito.appdownloader.app;
 
 public class AppDownloadLink {
 
+  protected AppInfo appInfo;
+
   protected String url;
 
   protected String fileSize;
@@ -16,6 +18,15 @@ public class AppDownloadLink {
 
   protected String apkSignature;
 
+
+  public AppDownloadLink(AppInfo appInfo) {
+    this.appInfo = appInfo;
+  }
+
+
+  public AppInfo getAppInfo() {
+    return appInfo;
+  }
 
   public String getUrl() {
     return url;

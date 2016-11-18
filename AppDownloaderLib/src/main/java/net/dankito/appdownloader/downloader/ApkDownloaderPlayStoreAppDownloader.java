@@ -68,7 +68,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
       if(detailsElements.size() > 0) {
         Element detailsElement = detailsElements.first();
 
-        AppDownloadLink appDownloadLink = parseAppDownloadFileDetails(detailsElement);
+        AppDownloadLink appDownloadLink = parseAppDownloadFileDetails(appToDownload, detailsElement);
 
         Elements downloadAnchorElements = detailsElement.select("a.mdl-button");
         if (downloadAnchorElements.size() > 0) {
@@ -88,8 +88,8 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
     }
   }
 
-  protected AppDownloadLink parseAppDownloadFileDetails(Element detailsElement) {
-    AppDownloadLink appDownloadLink = new AppDownloadLink();
+  protected AppDownloadLink parseAppDownloadFileDetails(AppInfo appToDownload, Element detailsElement) {
+    AppDownloadLink appDownloadLink = new AppDownloadLink(appToDownload);
 
     for(Element detailChild : detailsElement.children()) {
       if("div".equals(detailChild.nodeName()) && detailChild.children().size() > 0 && "span".equals(detailChild.child(0).nodeName())) {
