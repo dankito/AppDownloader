@@ -6,7 +6,20 @@ package net.dankito.appdownloader.app;
 
 public enum HashAlgorithm {
 
-  MD5,
-  SHA1
+  MD5("MD5"),
+  SHA1("SHA");
+
+
+  private String algorithmName;
+
+
+  HashAlgorithm(String algorithmName) {
+    this.algorithmName = algorithmName;
+  }
+
+
+  public String getAlgorithmName() {
+    return algorithmName;
+  }
 
 }
