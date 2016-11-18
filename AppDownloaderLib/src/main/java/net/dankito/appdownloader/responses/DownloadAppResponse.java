@@ -1,5 +1,7 @@
 package net.dankito.appdownloader.responses;
 
+import net.dankito.appdownloader.app.AppInfo;
+
 import java.io.File;
 
 /**

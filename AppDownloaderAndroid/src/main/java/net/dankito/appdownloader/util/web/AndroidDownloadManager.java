@@ -14,8 +14,8 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 
 import net.dankito.appdownloader.R;
-import net.dankito.appdownloader.responses.AppInfo;
-import net.dankito.appdownloader.responses.AppState;
+import net.dankito.appdownloader.app.AppInfo;
+import net.dankito.appdownloader.app.AppState;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

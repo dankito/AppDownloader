@@ -1,4 +1,4 @@
-package net.dankito.appdownloader.responses;
+package net.dankito.appdownloader.app;
 
 import net.dankito.appdownloader.util.StringUtils;
 

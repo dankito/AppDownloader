@@ -1,5 +1,6 @@
 package net.dankito.appdownloader.responses;
 
+import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.util.StringUtils;
 
 /**

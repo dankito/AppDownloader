@@ -3,7 +3,7 @@ package net.dankito.appdownloader.downloader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.dankito.appdownloader.responses.AppDownloadRequestParameters;
-import net.dankito.appdownloader.responses.AppInfo;
+import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.responses.EvoziGetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadRequestParametersCallback;

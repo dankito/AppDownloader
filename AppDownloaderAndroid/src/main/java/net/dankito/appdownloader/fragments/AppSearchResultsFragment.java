@@ -24,7 +24,7 @@ import net.dankito.appdownloader.dialogs.AppDetailsDialog;
 import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.EvoziPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.IAppDownloader;
-import net.dankito.appdownloader.responses.AppInfo;
+import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.responses.GetAppDetailsResponse;
 import net.dankito.appdownloader.responses.SearchAppsResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDetailsCallback;

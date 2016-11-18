@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import net.dankito.appdownloader.R;
-import net.dankito.appdownloader.responses.AppInfo;
+import net.dankito.appdownloader.app.AppInfo;
 
 import java.util.ArrayList;
 import java.util.List;
