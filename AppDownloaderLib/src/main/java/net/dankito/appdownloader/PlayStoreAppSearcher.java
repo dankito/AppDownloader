@@ -202,7 +202,6 @@ public class PlayStoreAppSearcher {
   protected void getAppDetailsCompleted(AppInfo appInfo, WebClientResponse response, GetAppDetailsCallback callback) {
     try {
       String appDetailsPageHtml = response.getBody();
-      appInfo.setAppDetailsPageHtml(appDetailsPageHtml);
 
       parseAppDetailsPage(appInfo, appDetailsPageHtml);
 

@@ -32,8 +32,6 @@ public class AppInfo {
 
   // from App Details Page
 
-  protected String appDetailsPageHtml;
-
   protected String version;
 
   protected String rating;
@@ -143,14 +141,6 @@ public class AppInfo {
   }
 
 
-  public String getAppDetailsPageHtml() {
-    return appDetailsPageHtml;
-  }
-
-  public void setAppDetailsPageHtml(String appDetailsPageHtml) {
-    this.appDetailsPageHtml = appDetailsPageHtml;
-  }
-
   public String getVersion() {
     return version;
   }
@@ -185,8 +175,8 @@ public class AppInfo {
 
 
   public boolean areAppDetailsDownloaded() {
-    return StringUtils.isNotNullOrEmpty(getAppDetailsPageHtml()) && StringUtils.isNotNullOrEmpty(getRating()) &&
-        StringUtils.isNotNullOrEmpty(getVersion()) && StringUtils.isNotNullOrEmpty(getCountRatings()) && StringUtils.isNotNullOrEmpty(getCountInstallations());
+    return StringUtils.isNotNullOrEmpty(getVersion()) && StringUtils.isNotNullOrEmpty(getRating()) &&
+        StringUtils.isNotNullOrEmpty(getCountRatings()) && StringUtils.isNotNullOrEmpty(getCountInstallations());
   }
 
 
