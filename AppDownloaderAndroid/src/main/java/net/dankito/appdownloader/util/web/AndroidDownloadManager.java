@@ -16,7 +16,6 @@ import android.support.v7.app.AlertDialog;
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.app.AppDownloadLink;
 import net.dankito.appdownloader.app.AppInfo;
-import net.dankito.appdownloader.app.AppState;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +24,9 @@ import java.io.File;
 import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by ganymed on 05/11/16.
@@ -50,8 +46,6 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
   // TODO: save currentDownloaded so that on an App restart aborted and on restart finished downloads can be handled
   protected Map<Long, CurrentDownload> currentDownloads = new ConcurrentHashMap<>();
 
-  protected List<AppInfo> appsBeingInstalled = new CopyOnWriteArrayList<>();
-
 
   public AndroidDownloadManager(Activity context) {
     this.context = context;
@@ -59,14 +53,10 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     registerBroadcastReceivers(context);
   }
 
-  private void registerBroadcastReceivers(Activity context) {
+  protected void registerBroadcastReceivers(Activity context) {
     context.registerReceiver(this, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
     context.registerReceiver(this, new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));
-
-    IntentFilter packageAddedIntentFilter = new IntentFilter(Intent.ACTION_PACKAGE_ADDED);
-    packageAddedIntentFilter.addDataScheme("package"); // this seems to be absolutely necessary for PACKAGE_ADDED, see https://stackoverflow.com/questions/11246326/how-to-receiving-broadcast-when-application-installed-or-removed
-    context.registerReceiver(this, packageAddedIntentFilter);
   }
 
 
@@ -118,10 +108,6 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
         break;
       case DownloadManager.ACTION_NOTIFICATION_CLICKED:
         handleNotificationClickedBroadcast(intent);
-        break;
-      case Intent.ACTION_PACKAGE_ADDED:
-      case Intent.ACTION_PACKAGE_CHANGED:
-        handlePackageAddedOrChanged(intent);
         break;
     }
   }
@@ -239,36 +225,6 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     IDownloadCompletedCallback callback = currentDownload.getCallback();
 
     callback.completed(new DownloadResult(downloadLink, false, true));
-  }
-
-
-  protected void handlePackageAddedOrChanged(Intent intent) {
-    if(appsBeingInstalled.size() > 0) {
-      String dataString = intent.getDataString();
-      String changedAppPackage = dataString.substring(dataString.indexOf(':') + 1); // remove scheme (= package:)
-
-      for(AppInfo appBeingInstalled : new ArrayList<>(appsBeingInstalled)) {
-        if(appBeingInstalled.getPackageName().equals(changedAppPackage)) {
-          deletedDownloadedApk(appBeingInstalled);
-
-          appsBeingInstalled.remove(appBeingInstalled);
-          appBeingInstalled.setState(AppState.UPDATABLE);
-          break;
-        }
-      }
-    }
-  }
-
-  protected void deletedDownloadedApk(AppInfo appBeingInstalled) {
-    try {
-      File file = new File(appBeingInstalled.getDownloadLocationPath());
-      if(file.exists()) {
-        log.info("Deleting installed Apk file " + file.getAbsolutePath());
-        file.delete();
-      }
-    } catch(Exception e) {
-      log.error("Could not deleted installed Apk file " + appBeingInstalled.getDownloadLocationPath(), e);
-    }
   }
 
 
