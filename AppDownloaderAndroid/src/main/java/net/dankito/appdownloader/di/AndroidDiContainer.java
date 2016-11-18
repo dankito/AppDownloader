@@ -7,10 +7,12 @@ import net.dankito.appdownloader.app.AppDetailsCache;
 import net.dankito.appdownloader.app.IAppDetailsCache;
 import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.EvoziPlayStoreAppDownloader;
+import net.dankito.appdownloader.util.AndroidAppInstaller;
 import net.dankito.appdownloader.util.AndroidOnUiThreadRunner;
 import net.dankito.appdownloader.util.IOnUiThreadRunner;
 import net.dankito.appdownloader.util.IThreadPool;
 import net.dankito.appdownloader.util.ThreadPool;
+import net.dankito.appdownloader.util.app.IAppInstaller;
 import net.dankito.appdownloader.util.web.AndroidDownloadManager;
 import net.dankito.appdownloader.util.web.IDownloadManager;
 import net.dankito.appdownloader.util.web.IWebClient;
@@ -70,6 +72,13 @@ public class AndroidDiContainer {
   @Singleton
   public IAppDetailsCache provideAppDetailsCache() {
     return new AppDetailsCache();
+  }
+
+
+  @Provides
+  @Singleton
+  public IAppInstaller provideAppInstaller() {
+    return new AndroidAppInstaller(getActivity());
   }
 
 
