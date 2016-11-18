@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -77,9 +78,7 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
 //      String certificateDisplayInfo = getCertificateDisplayInfo(signatureBytes);
 
       try {
-        MessageDigest messageDigest = MessageDigest.getInstance("SHA");
-        messageDigest.update(signatureBytes);
-        byte[] digest = messageDigest.digest();
+        byte[] digest = calculateCheckSum("SHA", signatureBytes);
         String digestHex = bytesToHex(digest);
 
         return digestHex.equals(downloadLink.getAppInfo().getApkSignature());
@@ -89,6 +88,12 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
     }
 
     return false;
+  }
+
+  protected byte[] calculateCheckSum(String algorithmName, byte[] signatureBytes) throws NoSuchAlgorithmException {
+    MessageDigest messageDigest = MessageDigest.getInstance(algorithmName);
+    messageDigest.update(signatureBytes);
+    return messageDigest.digest();
   }
 
   private String getCertificateDisplayInfo(byte[] signatureBytes) {
