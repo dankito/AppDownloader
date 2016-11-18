@@ -15,6 +15,7 @@ public class DownloadResult extends ResponseBase {
 
   public DownloadResult(AppDownloadLink downloadLink, boolean successful) {
     super(successful);
+    this.downloadLink = downloadLink;
   }
 
   public DownloadResult(AppDownloadLink downloadLink, boolean isSuccessful, boolean isUserCancelled) {
