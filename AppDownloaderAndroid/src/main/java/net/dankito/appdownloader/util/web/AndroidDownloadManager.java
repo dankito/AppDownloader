@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 
 import net.dankito.appdownloader.R;
+import net.dankito.appdownloader.app.AppDownloadLink;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.app.AppState;
 
@@ -47,7 +48,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
   protected Activity context;
 
   // TODO: save currentDownloaded so that on an App restart aborted and on restart finished downloads can be handled
-  protected Map<Long, AppInfo> currentDownloads = new ConcurrentHashMap<>();
+  protected Map<Long, CurrentDownload> currentDownloads = new ConcurrentHashMap<>();
 
   protected List<AppInfo> appsBeingInstalled = new CopyOnWriteArrayList<>();
 
@@ -70,9 +71,9 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
 
 
   @Override
-  public void downloadUrlAsync(AppInfo appInfo, String url) {
+  public void downloadUrlAsync(AppInfo appInfo, AppDownloadLink downloadLink) {
     try {
-      Uri uri = Uri.parse(url);
+      Uri uri = Uri.parse(downloadLink.getUrl());
       DownloadManager.Request request = new DownloadManager.Request(uri);
 
       // TODO: make configurable if allowed to download over cellular network and on roaming
@@ -82,11 +83,12 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
       request.setTitle(appInfo.getTitle());
       request.setDescription(appInfo.getTitle());
 
-      String destinationFileName = getDestinationFilename(appInfo, url);
+      String destinationFileName = getDestinationFilename(appInfo, downloadLink.getUrl());
       request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, destinationFileName);
 
       DownloadManager downloadManager = getDownloadManager();
-      currentDownloads.put(downloadManager.enqueue(request), appInfo);
+      CurrentDownload currentDownload = new CurrentDownload(downloadLink);
+      currentDownloads.put(downloadManager.enqueue(request), currentDownload);
     } catch(Exception e) {
       log.error("Could not start Download for " + appInfo, e);
     }
@@ -128,17 +130,18 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
 
     if(currentDownloads.containsKey(downloadId)) { // yeah, we started this download
-      AppInfo appHavingDownloaded = currentDownloads.remove(downloadId);
+      CurrentDownload currentDownload = currentDownloads.remove(downloadId);
 
       try {
         EnqueuedDownload enqueuedDownload = getEnqueuedDownloadForId(downloadId);
 
         if(enqueuedDownload != null) {
           if(enqueuedDownload.wasDownloadSuccessful()) {
-            appHavingDownloaded.setDownloadLocationUri(enqueuedDownload.getDownloadLocationUri());
+            URI uri = URI.create(enqueuedDownload.getDownloadLocationUri()); // get File from Uri
+            String downloadPath = new File(uri.getPath()).getAbsolutePath();
 
             // TODO: call listener, installApp is not a task of DownloadManager
-            installApp(appHavingDownloaded, enqueuedDownload.getDownloadLocationUri());
+            installApp(currentDownload.getDownloadLink().getAppInfo(), enqueuedDownload.getDownloadLocationUri(), downloadPath);
           }
         }
       } catch(Exception e) {
@@ -189,12 +192,15 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     return result;
   }
 
-  protected void installApp(AppInfo appToInstall, String downloadLocation) {
+  protected void installApp(AppInfo appToInstall, String downloadLocationUri, String downloadLocationPath) {
+    appToInstall.setDownloadLocationUri(downloadLocationUri);
+    appToInstall.setDownloadLocationPath(downloadLocationPath);
+
     appToInstall.setState(AppState.INSTALLING);
 
     Intent intent = new Intent();
     intent.setAction(android.content.Intent.ACTION_VIEW);
-    intent.setDataAndType(Uri.parse(downloadLocation), "application/vnd.android.package-archive");
+    intent.setDataAndType(Uri.parse(downloadLocationUri), "application/vnd.android.package-archive");
     context.startActivityForResult(intent, -1);
 
     appsBeingInstalled.add(appToInstall);
@@ -210,7 +216,9 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
   }
 
   protected void askShouldDownloadGetCancelled(final long downloadId) {
-    AppInfo appToStop = currentDownloads.get(downloadId);
+    CurrentDownload currentDownload = currentDownloads.get(downloadId);
+    final AppDownloadLink downloadLink = currentDownload.getDownloadLink();
+    AppInfo appToStop = downloadLink.getAppInfo();
     String appTitle = appToStop == null ? "" : appToStop.getTitle();
 
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -220,14 +228,14 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialogInterface, int i) {
-        cancelDownload(downloadId);
+        cancelDownload(downloadId, downloadLink);
       }
     });
 
     builder.create().show();
   }
 
-  protected void cancelDownload(long downloadId) {
+  protected void cancelDownload(long downloadId, AppDownloadLink downloadLink) {
     DownloadManager downloadManager = getDownloadManager();
 
     downloadManager.remove(downloadId);
@@ -255,14 +263,13 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
 
   protected void deletedDownloadedApk(AppInfo appBeingInstalled) {
     try {
-      URI uri = URI.create(appBeingInstalled.getDownloadLocationUri()); // get File from Uri
-      File file = new File(uri.getPath());
+      File file = new File(appBeingInstalled.getDownloadLocationPath());
       if(file.exists()) {
         log.info("Deleting installed Apk file " + file.getAbsolutePath());
         file.delete();
       }
     } catch(Exception e) {
-      log.error("Could not deleted installed Apk file " + appBeingInstalled.getDownloadLocationUri(), e);
+      log.error("Could not deleted installed Apk file " + appBeingInstalled.getDownloadLocationPath(), e);
     }
   }
 

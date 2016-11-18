@@ -34,6 +34,10 @@ public class AppDownloadLink {
     return appInfo;
   }
 
+  public IAppDownloader getAppDownloader() {
+    return appDownloader;
+  }
+
   public String getUrl() {
     return url;
   }
