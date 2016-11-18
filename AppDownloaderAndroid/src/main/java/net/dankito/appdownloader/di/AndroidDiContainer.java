@@ -7,7 +7,7 @@ import net.dankito.appdownloader.app.AppDetailsCache;
 import net.dankito.appdownloader.app.IAppDetailsCache;
 import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.EvoziPlayStoreAppDownloader;
-import net.dankito.appdownloader.util.AndroidAppInstaller;
+import net.dankito.appdownloader.util.app.AndroidAppInstaller;
 import net.dankito.appdownloader.util.AndroidOnUiThreadRunner;
 import net.dankito.appdownloader.util.IOnUiThreadRunner;
 import net.dankito.appdownloader.util.IThreadPool;

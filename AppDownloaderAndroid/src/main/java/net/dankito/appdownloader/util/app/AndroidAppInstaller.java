@@ -1,4 +1,4 @@
-package net.dankito.appdownloader.util;
+package net.dankito.appdownloader.util.app;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -10,7 +10,6 @@ import android.net.Uri;
 import net.dankito.appdownloader.app.AppDownloadLink;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.app.AppState;
-import net.dankito.appdownloader.util.app.IAppInstaller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
