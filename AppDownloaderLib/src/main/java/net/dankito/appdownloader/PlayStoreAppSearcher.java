@@ -1,6 +1,7 @@
 package net.dankito.appdownloader;
 
 import net.dankito.appdownloader.app.AppInfo;
+import net.dankito.appdownloader.app.IAppDetailsCache;
 import net.dankito.appdownloader.responses.GetAppDetailsResponse;
 import net.dankito.appdownloader.responses.SearchAppsResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDetailsCallback;
@@ -42,12 +43,15 @@ public class PlayStoreAppSearcher {
 
   protected IWebClient webClient;
 
+  protected IAppDetailsCache appDetailsCache;
+
   protected List<GetAppDetailsCallback> appDetailsListeners = new ArrayList<>();
 
 
   @Inject
-  public PlayStoreAppSearcher(IWebClient webClient) {
+  public PlayStoreAppSearcher(IWebClient webClient, IAppDetailsCache appDetailsCache) {
     this.webClient = webClient;
+    this.appDetailsCache = appDetailsCache;
   }
 
 
@@ -91,7 +95,7 @@ public class PlayStoreAppSearcher {
             AppInfo app = parseCardElement(cardListChild);
             if(app != null) {
               searchResults.add(app);
-              getAppDetailsAsync(app);
+              setAppDetails(app);
             }
           }
         }
@@ -168,6 +172,15 @@ public class PlayStoreAppSearcher {
   }
 
 
+  protected void setAppDetails(AppInfo appInfo) {
+    if(appDetailsCache.hasAppDetailsRetrievedForApp(appInfo)) {
+      appDetailsCache.setAppDetailsForApp(appInfo);
+    }
+    else {
+      getAppDetailsAsync(appInfo);
+    }
+  }
+
   protected void getAppDetailsAsync(AppInfo appInfo) {
     getAppDetailsAsync(appInfo, new GetAppDetailsCallback() {
       @Override
@@ -204,6 +217,8 @@ public class PlayStoreAppSearcher {
       String appDetailsPageHtml = response.getBody();
 
       parseAppDetailsPage(appInfo, appDetailsPageHtml);
+
+      appDetailsCache.cacheAppDetails(appInfo);
 
       callback.completed(new GetAppDetailsResponse(appInfo, appInfo.areAppDetailsDownloaded()));
     } catch(Exception e) {

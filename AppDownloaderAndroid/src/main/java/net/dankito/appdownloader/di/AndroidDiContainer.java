@@ -3,6 +3,8 @@ package net.dankito.appdownloader.di;
 import android.app.Activity;
 
 import net.dankito.appdownloader.PlayStoreAppSearcher;
+import net.dankito.appdownloader.app.AppDetailsCache;
+import net.dankito.appdownloader.app.IAppDetailsCache;
 import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.EvoziPlayStoreAppDownloader;
 import net.dankito.appdownloader.util.AndroidOnUiThreadRunner;
@@ -64,6 +66,12 @@ public class AndroidDiContainer {
     return new AndroidDownloadManager(getActivity());
   }
 
+  @Provides
+  @Singleton
+  public IAppDetailsCache provideAppDetailsCache() {
+    return new AppDetailsCache();
+  }
+
 
   @Provides
   @Singleton
@@ -79,8 +87,8 @@ public class AndroidDiContainer {
 
   @Provides
   @Singleton
-  public PlayStoreAppSearcher providePlayStoreAppSearcher(IWebClient webClient) {
-    return new PlayStoreAppSearcher(webClient);
+  public PlayStoreAppSearcher providePlayStoreAppSearcher(IWebClient webClient, IAppDetailsCache appDetailsCache) {
+    return new PlayStoreAppSearcher(webClient, appDetailsCache);
   }
 
 }
