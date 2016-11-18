@@ -78,6 +78,8 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
 
       AppDownloadLink appDownloadLink = new AppDownloadLink();
       appDownloadLink.setUrl(evoziAppDownloadUrlResponse.getUrl());
+      appDownloadLink.setFileSize(evoziAppDownloadUrlResponse.getFilesize());
+      appDownloadLink.setFileHash(evoziAppDownloadUrlResponse.getMd5());
 
       GetAppDownloadUrlResponse appDownloadUrlResponse = new GetAppDownloadUrlResponse(true, appToDownload, appDownloadLink);
 
