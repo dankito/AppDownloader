@@ -24,6 +24,11 @@ public class AppDownloadLink {
   protected String apkSignature;
 
 
+  protected String downloadLocationUri = null;
+
+  protected String downloadLocationPath = null;
+
+
   public AppDownloadLink(AppInfo appInfo, IAppDownloader appDownloader) {
     this.appInfo = appInfo;
     this.appDownloader = appDownloader;
@@ -76,6 +81,23 @@ public class AppDownloadLink {
 
   public void setApkSignature(String apkSignature) {
     this.apkSignature = apkSignature;
+  }
+
+
+  public String getDownloadLocationUri() {
+    return downloadLocationUri;
+  }
+
+  public void setDownloadLocationUri(String downloadLocationUri) {
+    this.downloadLocationUri = downloadLocationUri;
+  }
+
+  public String getDownloadLocationPath() {
+    return downloadLocationPath;
+  }
+
+  public void setDownloadLocationPath(String downloadLocationPath) {
+    this.downloadLocationPath = downloadLocationPath;
   }
 
 
