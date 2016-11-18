@@ -23,7 +23,7 @@ public class AppSearchResultsAdapter extends BaseAdapter {
 
   protected Activity activity;
 
-  protected List<AppInfo> appInfos = new ArrayList<>(0);
+  protected List<AppInfo> searchResults = new ArrayList<>(0);
 
 
   public AppSearchResultsAdapter(Activity activity) {
@@ -31,20 +31,20 @@ public class AppSearchResultsAdapter extends BaseAdapter {
   }
 
 
-  public void setAppInfos(List<AppInfo> appInfos) {
-    this.appInfos = appInfos;
+  public void setSearchResults(List<AppInfo> searchResults) {
+    this.searchResults = searchResults;
 
     notifyDataSetChanged();
   }
 
   @Override
   public int getCount() {
-    return appInfos.size();
+    return searchResults.size();
   }
 
   @Override
   public Object getItem(int index) {
-    return appInfos.get(index);
+    return searchResults.get(index);
   }
 
   @Override

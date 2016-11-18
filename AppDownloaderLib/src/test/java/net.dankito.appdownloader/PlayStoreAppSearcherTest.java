@@ -34,22 +34,22 @@ public class PlayStoreAppSearcherTest {
 
   @Test
   public void searchAsync() {
-    final List<AppInfo> appInfos = new ArrayList<>();
+    final List<AppInfo> searchResults = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
     underTest.searchAsync("ausgaben manager", new SearchAppsResponseCallback() {
       @Override
       public void completed(SearchAppsResponse response) {
-        appInfos.addAll(response.getAppInfos());
+        searchResults.addAll(response.getSearchResults());
         countDownLatch.countDown();
       }
     });
 
     try { countDownLatch.await(5, TimeUnit.SECONDS); } catch(Exception ignored) { }
 
-    Assert.assertTrue(appInfos.size() > 0);
+    Assert.assertTrue(searchResults.size() > 0);
 
-    for(AppInfo appInfo : appInfos) {
+    for(AppInfo appInfo : searchResults) {
       Assert.assertTrue(appInfo.areNecessaryInformationSet());
 
       Assert.assertTrue(StringUtils.isNotNullOrEmpty(appInfo.getAppUrl()));

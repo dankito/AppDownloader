@@ -170,7 +170,7 @@ public class AppSearchResultsFragment extends Fragment {
       @Override
       public void completed(SearchAppsResponse response) {
         if(response.isSuccessful()) {
-          appSearchResultRetrieved(response.getAppInfos());
+          appSearchResultRetrieved(response.getSearchResults());
         }
         else {
           AlertHelper.showErrorMessageThreadSafe(getActivity(), getString(R.string.error_message_could_not_search_for_apps, response.getError()));
@@ -179,11 +179,11 @@ public class AppSearchResultsFragment extends Fragment {
     });
   }
 
-  protected void appSearchResultRetrieved(final List<AppInfo> appInfos) {
+  protected void appSearchResultRetrieved(final List<AppInfo> searchResults) {
     getActivity().runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        searchResultsAdapter.setAppInfos(appInfos);
+        searchResultsAdapter.setSearchResults(searchResults);
       }
     });
   }

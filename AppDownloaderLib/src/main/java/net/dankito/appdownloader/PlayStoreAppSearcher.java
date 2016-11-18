@@ -77,7 +77,7 @@ public class PlayStoreAppSearcher {
 
   protected void parseSearchAppsResponse(WebClientResponse response, SearchAppsResponseCallback callback) {
     try {
-      List<AppInfo> appInfos = new ArrayList<>();
+      List<AppInfo> searchResults = new ArrayList<>();
 
       String responseBody = response.getBody();
 
@@ -90,14 +90,14 @@ public class PlayStoreAppSearcher {
           if(cardListChild.hasClass("card") && cardListChild.hasClass("apps")) { // TODO: implement Option to not only filter Apps
             AppInfo app = parseCardElement(cardListChild);
             if(app != null) {
-              appInfos.add(app);
+              searchResults.add(app);
               getAppDetailsAsync(app);
             }
           }
         }
       }
 
-      callback.completed(new SearchAppsResponse(appInfos));
+      callback.completed(new SearchAppsResponse(searchResults));
     } catch(Exception e) {
       log.error("Could not parse Apps Search Response", e);
       callback.completed(new SearchAppsResponse(e.getLocalizedMessage()));
