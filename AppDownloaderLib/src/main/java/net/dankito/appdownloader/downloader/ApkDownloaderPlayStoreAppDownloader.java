@@ -89,7 +89,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
   }
 
   protected AppDownloadLink parseAppDownloadFileDetails(AppInfo appToDownload, Element detailsElement) {
-    AppDownloadLink appDownloadLink = new AppDownloadLink(appToDownload);
+    AppDownloadLink appDownloadLink = new AppDownloadLink(appToDownload, this);
 
     for(Element detailChild : detailsElement.children()) {
       if("div".equals(detailChild.nodeName()) && detailChild.children().size() > 0 && "span".equals(detailChild.child(0).nodeName())) {

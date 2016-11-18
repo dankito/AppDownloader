@@ -1,5 +1,7 @@
 package net.dankito.appdownloader.app;
 
+import net.dankito.appdownloader.downloader.IAppDownloader;
+
 /**
  * Created by ganymed on 18/11/16.
  */
@@ -7,6 +9,9 @@ package net.dankito.appdownloader.app;
 public class AppDownloadLink {
 
   protected AppInfo appInfo;
+
+  protected IAppDownloader appDownloader;
+
 
   protected String url;
 
@@ -19,8 +24,9 @@ public class AppDownloadLink {
   protected String apkSignature;
 
 
-  public AppDownloadLink(AppInfo appInfo) {
+  public AppDownloadLink(AppInfo appInfo, IAppDownloader appDownloader) {
     this.appInfo = appInfo;
+    this.appDownloader = appDownloader;
   }
 
 
