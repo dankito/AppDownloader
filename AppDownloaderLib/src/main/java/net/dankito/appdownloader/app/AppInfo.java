@@ -23,6 +23,8 @@ public class AppInfo {
 
   protected String largeCoverImageUrl;
 
+  protected Object iconImage;
+
   protected String appDetailsPageUrl;
 
   protected boolean isAlreadyInstalled = false;
@@ -101,6 +103,14 @@ public class AppInfo {
 
   public void setLargeCoverImageUrl(String largeCoverImageUrl) {
     this.largeCoverImageUrl = largeCoverImageUrl;
+  }
+
+  public Object getIconImage() {
+    return iconImage;
+  }
+
+  public void setIconImage(Object iconImage) {
+    this.iconImage = iconImage;
   }
 
   public String getAppDetailsPageUrl() {
