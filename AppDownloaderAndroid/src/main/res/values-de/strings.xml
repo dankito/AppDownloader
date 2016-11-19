@@ -20,6 +20,8 @@
     <string name="verifying_downloaded_apk">Überprüfen der heruntergeladenen .apk</string>
     <string name="installing">Installiere</string>
 
+    <string name="updatable_app_version_comparison" formatted="false">%s -> %s</string>
+
     <string name="error_message_could_not_search_for_apps">Konnte nicht nach Apps suchen: %s</string>
     <string name="error_message_could_not_download_app">App konnte nicht gedownloaded werden: %s</string>
     <string name="error_message_app_file_not_valid">Keine gültige App Datei</string>
