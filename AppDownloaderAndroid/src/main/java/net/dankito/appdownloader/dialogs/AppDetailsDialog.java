@@ -24,6 +24,7 @@ import net.dankito.appdownloader.util.AlertHelper;
 import net.dankito.appdownloader.util.IOnUiThreadRunner;
 import net.dankito.appdownloader.util.app.IAppInstaller;
 import net.dankito.appdownloader.util.app.IAppVerifier;
+import net.dankito.appdownloader.util.app.AppPackageVerificationResult;
 import net.dankito.appdownloader.util.web.DownloadResult;
 import net.dankito.appdownloader.util.web.IDownloadCompletedCallback;
 import net.dankito.appdownloader.util.web.IDownloadManager;
@@ -272,13 +273,14 @@ public class AppDetailsDialog extends FullscreenDialog {
     AppInfo appInfo = downloadInfo.getAppInfo();
 
     if(result.isSuccessful()) {
-      if(appVerifier.verifyDownloadedApk(downloadInfo)) {
+      AppPackageVerificationResult verificationResult = appVerifier.verifyDownloadedApk(downloadInfo);
+      if(verificationResult.wasVerificationSuccessful()) {
         appInstaller.installApp(downloadInfo);
       }
       else {
         Resources resources = activity.getResources();
         String errorMessageTitle = resources.getString(R.string.error_message_title_could_not_verify_app_package, appInfo.getTitle());
-        showErrorMessageThreadSafe(errorMessageTitle, null);
+        showErrorMessageThreadSafe(verificationResult.getErrorMessage(), errorMessageTitle);
       }
     }
     else if(result.isUserCancelled() == false) {

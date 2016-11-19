@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.content.res.Resources;
 
+import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.app.AppDownloadInfo;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.app.AppState;
@@ -41,28 +43,75 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
   }
 
 
-  public boolean verifyDownloadedApk(AppDownloadInfo downloadInfo) {
+  public AppPackageVerificationResult verifyDownloadedApk(AppDownloadInfo downloadInfo) {
     AppInfo appToInstall = downloadInfo.getAppInfo();
     appToInstall.setState(AppState.VERIFYING_SIGNATURE);
 
-    PackageManager packageManager = context.getPackageManager();
+    AppPackageVerificationResult result = new AppPackageVerificationResult(downloadInfo);
+    Resources resources = context.getResources();
 
+    PackageManager packageManager = context.getPackageManager();
     PackageInfo packageInfo = packageManager.getPackageArchiveInfo(downloadInfo.getDownloadLocationPath(), PackageManager.GET_PERMISSIONS | PackageManager.GET_META_DATA);
 
+    boolean appPackageCouldBeVerified = false;
+
     if(packageInfo != null) {
-      return isPackageNameCorrect(appToInstall, packageInfo) && isVersionCorrect(appToInstall, packageInfo) &&
-          isFileCheckSumCorrect(downloadInfo) && verifyApkSignature(downloadInfo, packageManager);
+      result.setCompletelyDownloaded(true);
+
+      appPackageCouldBeVerified = verifyPackageNameIsCorrect(appToInstall, packageInfo, result, resources)
+          && verifyVersionIsCorrect(appToInstall, packageInfo, result, resources)
+          && verifyFileCheckSumIsCorrect(downloadInfo, result, resources)
+          && verifyApkSignatureIsCorrect(downloadInfo, packageManager, result, resources);
+    }
+    else {
+      setErrorMessage(result, resources, R.string.error_message_app_file_not_valid);
     }
 
-    return true;
+    return result;
+  }
+
+  protected boolean verifyPackageNameIsCorrect(AppInfo appToInstall, PackageInfo packageInfo, AppPackageVerificationResult result, Resources resources) {
+    if(isPackageNameCorrect(appToInstall, packageInfo)) {
+      result.setPackageNameCorrect(true);
+      return true;
+    }
+    else {
+      result.setPackageNameCorrect(false);
+      setErrorMessage(result, resources, R.string.error_message_app_package_not_correct);
+      return false;
+    }
   }
 
   protected boolean isPackageNameCorrect(AppInfo appToInstall, PackageInfo packageInfo) {
     return appToInstall.getPackageName().equals(packageInfo.packageName);
   }
 
+  protected boolean verifyVersionIsCorrect(AppInfo appToInstall, PackageInfo packageInfo, AppPackageVerificationResult result, Resources resources) {
+    if(isVersionCorrect(appToInstall, packageInfo)) {
+      result.setVersionCorrect(true);
+      return true;
+    }
+    else {
+      result.setVersionCorrect(false);
+      setErrorMessage(result, resources, R.string.error_message_app_version_not_correct);
+      return false;
+    }
+  }
+
   protected boolean isVersionCorrect(AppInfo appToInstall, PackageInfo packageInfo) {
     return packageInfo.versionName.equals(appToInstall.getVersion());
+  }
+
+  protected boolean verifyFileCheckSumIsCorrect(AppDownloadInfo downloadInfo, AppPackageVerificationResult result, Resources resources) {
+    if(isFileCheckSumCorrect(downloadInfo)) {
+      result.setFileChecksumCorrect(true);
+      return true;
+    }
+    else {
+      result.setFileChecksumCorrect(false);
+      setErrorMessage(result, resources, R.string.error_message_app_file_checksum_not_correct);
+      return false;
+    }
   }
 
   protected boolean isFileCheckSumCorrect(AppDownloadInfo downloadInfo) {
@@ -86,6 +135,18 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
     }
 
     return false;
+  }
+
+  protected boolean verifyApkSignatureIsCorrect(AppDownloadInfo downloadInfo, PackageManager packageManager, AppPackageVerificationResult result, Resources resources) {
+    if(verifyApkSignature(downloadInfo, packageManager)) {
+      result.setAppSignatureCorrect(true);
+      return true;
+    }
+    else {
+      result.setAppSignatureCorrect(false);
+      setErrorMessage(result, resources, R.string.error_message_app_signature_invalid);
+      return false;
+    }
   }
 
   protected boolean verifyApkSignature(AppDownloadInfo downloadInfo, PackageManager packageManager) {
@@ -162,6 +223,11 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
     }
 
     return sb.toString();
+  }
+
+
+  protected void setErrorMessage(AppPackageVerificationResult result, Resources resources, int errorMessageStringId) {
+    result.setErrorMessage(resources.getString(errorMessageStringId));
   }
 
 }

@@ -27,11 +27,6 @@ public class AppPackageVerificationResult {
     this.downloadInfo = downloadInfo;
   }
 
-  public AppPackageVerificationResult(AppDownloadInfo downloadInfo, String errorMessage) {
-    this(downloadInfo);
-    this.errorMessage = errorMessage;
-  }
-
 
   public boolean wasVerificationSuccessful() {
     return isCompletelyDownloaded() && isPackageNameCorrect() && isVersionCorrect() &&
