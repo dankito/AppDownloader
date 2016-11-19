@@ -88,7 +88,6 @@ public class AppSearchResultsFragment extends Fragment {
     lstvwAppSearchResults.setAdapter(searchResultsAdapter);
     lstvwAppSearchResults.setOnItemClickListener(lstvwAppSearchResultsItemClickListener);
 
-
     FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fabSearchApps);
     fab.setOnClickListener(floatingActionButtonSearchOnClickListener);
 
