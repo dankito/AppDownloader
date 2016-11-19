@@ -7,7 +7,6 @@ import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.GetUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
 import net.dankito.appdownloader.responses.callbacks.GetUrlCallback;
-import net.dankito.appdownloader.util.IThreadPool;
 import net.dankito.appdownloader.util.web.IWebClient;
 import net.dankito.appdownloader.util.web.RequestCallback;
 import net.dankito.appdownloader.util.web.RequestParameters;
@@ -36,8 +35,8 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
   private static final Logger log = LoggerFactory.getLogger(ApkMirrorPlayStoreAppDownloader.class);
 
 
-  public ApkMirrorPlayStoreAppDownloader(IWebClient webClient, IThreadPool threadPool) {
-    super(webClient, threadPool);
+  public ApkMirrorPlayStoreAppDownloader(IWebClient webClient) {
+    super(webClient);
   }
 
 

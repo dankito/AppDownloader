@@ -1,11 +1,7 @@
 package net.dankito.appdownloader.downloader;
 
-import net.dankito.appdownloader.util.IThreadPool;
 import net.dankito.appdownloader.util.web.IWebClient;
 import net.dankito.appdownloader.util.web.RequestParameters;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Created by ganymed on 04/11/16.
@@ -18,17 +14,11 @@ public abstract class AppDownloaderBase implements IAppDownloader {
   public static final int COUNT_CONNECTION_RETRIES = 2;
 
 
-  private static final Logger log = LoggerFactory.getLogger(AppDownloaderBase.class);
-
-
   protected IWebClient webClient;
 
-  protected IThreadPool threadPool;
 
-
-  public AppDownloaderBase(IWebClient webClient, IThreadPool threadPool) {
+  public AppDownloaderBase(IWebClient webClient) {
     this.webClient = webClient;
-    this.threadPool = threadPool;
   }
 
 

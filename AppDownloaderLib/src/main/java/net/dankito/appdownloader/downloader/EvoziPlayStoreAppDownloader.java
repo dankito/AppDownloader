@@ -3,14 +3,13 @@ package net.dankito.appdownloader.downloader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.dankito.appdownloader.app.AppDownloadLink;
+import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.app.HashAlgorithm;
 import net.dankito.appdownloader.responses.AppDownloadRequestParameters;
-import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.responses.EvoziGetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadRequestParametersCallback;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
-import net.dankito.appdownloader.util.IThreadPool;
 import net.dankito.appdownloader.util.web.IWebClient;
 import net.dankito.appdownloader.util.web.RequestCallback;
 import net.dankito.appdownloader.util.web.RequestParameters;
@@ -36,8 +35,8 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
   protected ObjectMapper mapper = new ObjectMapper();
 
 
-  public EvoziPlayStoreAppDownloader(IWebClient webClient, IThreadPool threadPool) {
-    super(webClient, threadPool);
+  public EvoziPlayStoreAppDownloader(IWebClient webClient) {
+    super(webClient);
   }
 
 

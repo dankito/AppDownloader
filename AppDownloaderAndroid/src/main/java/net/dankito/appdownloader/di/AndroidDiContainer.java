@@ -92,14 +92,14 @@ public class AndroidDiContainer {
 
   @Provides
   @Singleton
-  public ApkDownloaderPlayStoreAppDownloader provideApkDownloaderPlayStoreAppDownloader(IThreadPool threadPool, IWebClient webClient) {
-    return new ApkDownloaderPlayStoreAppDownloader(webClient, threadPool);
+  public ApkDownloaderPlayStoreAppDownloader provideApkDownloaderPlayStoreAppDownloader(IWebClient webClient) {
+    return new ApkDownloaderPlayStoreAppDownloader(webClient);
   }
 
   @Provides
   @Singleton
-  public EvoziPlayStoreAppDownloader provideEvoziPlayStoreAppDownloader(IThreadPool threadPool, IWebClient webClient) {
-    return new EvoziPlayStoreAppDownloader(webClient, threadPool);
+  public EvoziPlayStoreAppDownloader provideEvoziPlayStoreAppDownloader(IWebClient webClient) {
+    return new EvoziPlayStoreAppDownloader(webClient);
   }
 
   @Provides
