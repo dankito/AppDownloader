@@ -4,8 +4,6 @@ import net.dankito.appdownloader.app.AppDownloadInfo;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
-import net.dankito.appdownloader.util.IThreadPool;
-import net.dankito.appdownloader.util.ThreadPool;
 import net.dankito.appdownloader.util.web.IWebClient;
 import net.dankito.appdownloader.util.web.OkHttpWebClient;
 
@@ -35,12 +33,11 @@ public abstract class AppDownloaderTestBase {
   @Before
   public void setUp() {
     IWebClient webClient = new OkHttpWebClient();
-    IThreadPool threadPool = new ThreadPool();
 
-    underTest = createAppDownloader(webClient, threadPool);
+    underTest = createAppDownloader(webClient);
   }
 
-  protected abstract IAppDownloader createAppDownloader(IWebClient webClient, IThreadPool threadPool);
+  protected abstract IAppDownloader createAppDownloader(IWebClient webClient);
 
 
   @Test

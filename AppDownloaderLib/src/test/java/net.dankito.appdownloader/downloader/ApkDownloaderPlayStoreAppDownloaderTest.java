@@ -1,6 +1,5 @@
 package net.dankito.appdownloader.downloader;
 
-import net.dankito.appdownloader.util.IThreadPool;
 import net.dankito.appdownloader.util.web.IWebClient;
 
 /**
@@ -10,8 +9,8 @@ import net.dankito.appdownloader.util.web.IWebClient;
 public class ApkDownloaderPlayStoreAppDownloaderTest extends AppDownloaderTestBase {
 
   @Override
-  protected IAppDownloader createAppDownloader(IWebClient webClient, IThreadPool threadPool) {
-    return new ApkDownloaderPlayStoreAppDownloader(webClient, threadPool);
+  protected IAppDownloader createAppDownloader(IWebClient webClient) {
+    return new ApkDownloaderPlayStoreAppDownloader(webClient);
   }
 
 }
