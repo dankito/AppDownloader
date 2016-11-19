@@ -44,8 +44,8 @@ public class InstalledAppsFragment extends Fragment {
     installedAppsAdapter = new InstalledAppsAdapter(getActivity());
     installedAppsAdapter.setInstalledAppsManager(installedAppsManager);
 
-    ListView lstvwAppSearchResults = (ListView)view.findViewById(R.id.lstvwInstalledApps);
-    lstvwAppSearchResults.setAdapter(installedAppsAdapter);
+    ListView lstvwInstalledApps = (ListView)view.findViewById(R.id.lstvwInstalledApps);
+    lstvwInstalledApps.setAdapter(installedAppsAdapter);
 
     return view;
   }
