@@ -76,17 +76,22 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
       EvoziGetAppDownloadUrlResponse evoziAppDownloadUrlResponse = mapper.readValue(getAppDownloadUrlResponseBody, EvoziGetAppDownloadUrlResponse.class);
       log.info("Retrieved Download Url for " + appToDownload + ": " + evoziAppDownloadUrlResponse.getUrl());
 
-      AppDownloadLink appDownloadLink = new AppDownloadLink(appToDownload, this);
-      appDownloadLink.setUrl(evoziAppDownloadUrlResponse.getUrl());
-      appDownloadLink.setFileSize(evoziAppDownloadUrlResponse.getFilesize());
-      appDownloadLink.setHashAlgorithm(HashAlgorithm.MD5);
-      appDownloadLink.setFileHashSum(evoziAppDownloadUrlResponse.getMd5());
+      if(evoziAppDownloadUrlResponse.hasErrorOccurred()) {
+        callback.completed(new GetAppDownloadUrlResponse(appToDownload, evoziAppDownloadUrlResponse.getData()));
+      }
+      else {
+        AppDownloadLink appDownloadLink = new AppDownloadLink(appToDownload, this);
+        appDownloadLink.setUrl(evoziAppDownloadUrlResponse.getUrl());
+        appDownloadLink.setFileSize(evoziAppDownloadUrlResponse.getFilesize());
+        appDownloadLink.setHashAlgorithm(HashAlgorithm.MD5);
+        appDownloadLink.setFileHashSum(evoziAppDownloadUrlResponse.getMd5());
 
-      appToDownload.addDownloadUrl(appDownloadLink);
+        appToDownload.addDownloadUrl(appDownloadLink);
 
-      GetAppDownloadUrlResponse appDownloadUrlResponse = new GetAppDownloadUrlResponse(true, appToDownload, appDownloadLink);
+        GetAppDownloadUrlResponse appDownloadUrlResponse = new GetAppDownloadUrlResponse(true, appToDownload, appDownloadLink);
 
-      callback.completed(appDownloadUrlResponse);
+        callback.completed(appDownloadUrlResponse);
+      }
     } catch(Exception e) {
       log.error("Could not parse GetAppDownloadUrlResponse for App Package " + appToDownload, e);
       callback.completed(new GetAppDownloadUrlResponse(appToDownload, e.getLocalizedMessage()));

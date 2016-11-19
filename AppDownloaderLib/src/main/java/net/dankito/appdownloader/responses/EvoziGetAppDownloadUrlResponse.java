@@ -32,6 +32,13 @@ public class EvoziGetAppDownloadUrlResponse {
   protected String state;
 
 
+  // in error cases
+
+  protected String data;
+
+  protected String http_code;
+
+
 
   public String getStatus() {
     return status;
@@ -117,6 +124,27 @@ public class EvoziGetAppDownloadUrlResponse {
 
   public void setState(String state) {
     this.state = state;
+  }
+
+
+  public boolean hasErrorOccurred() {
+    return "error".equals(getStatus()) || StringUtils.isNotNullOrEmpty(getData());
+  }
+
+  public String getData() {
+    return data;
+  }
+
+  public void setData(String data) {
+    this.data = data;
+  }
+
+  public String getHttp_code() {
+    return http_code;
+  }
+
+  public void setHttp_code(String http_code) {
+    this.http_code = http_code;
   }
 
 }
