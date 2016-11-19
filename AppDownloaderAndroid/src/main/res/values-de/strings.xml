@@ -17,6 +17,7 @@
 
     <string name="error_message_could_not_search_for_apps">Konnte nicht nach Apps suchen: %s</string>
     <string name="error_message_could_not_download_app">App konnte nicht gedownloaded werden: %s</string>
+    <string name="error_message_title_could_not_verify_app_package">Sicherheitsprüfung für App %s ist fehlgeschlagen</string>
 
     <string name="alert_message_cancel_download">Download von %s abbrechen?</string>
 </resources>

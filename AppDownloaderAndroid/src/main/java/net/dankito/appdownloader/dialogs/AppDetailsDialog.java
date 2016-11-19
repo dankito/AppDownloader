@@ -1,5 +1,6 @@
 package net.dankito.appdownloader.dialogs;
 
+import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +21,7 @@ import net.dankito.appdownloader.downloader.IAppDownloader;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
 import net.dankito.appdownloader.util.AlertHelper;
+import net.dankito.appdownloader.util.IOnUiThreadRunner;
 import net.dankito.appdownloader.util.app.IAppInstaller;
 import net.dankito.appdownloader.util.app.IAppVerifier;
 import net.dankito.appdownloader.util.web.DownloadResult;
@@ -56,6 +58,9 @@ public class AppDetailsDialog extends FullscreenDialog {
 
   @Inject
   protected IAppInstaller appInstaller;
+
+  @Inject
+  protected IOnUiThreadRunner onUiThreadRunner;
 
   protected WebView wbvwViewAppDetails;
 
@@ -267,11 +272,20 @@ public class AppDetailsDialog extends FullscreenDialog {
 
   protected void appDownloadCompleted(DownloadResult result) {
     AppDownloadLink downloadLink = result.getDownloadLink();
+    AppInfo appInfo = downloadLink.getAppInfo();
 
     if(result.isSuccessful()) {
       if(appVerifier.verifyDownloadedApk(downloadLink)) {
         appInstaller.installApp(downloadLink);
       }
+      else {
+        Resources resources = activity.getResources();
+        String errorMessageTitle = resources.getString(R.string.error_message_title_could_not_verify_app_package, appInfo.getTitle());
+        showErrorMessageThreadSafe(errorMessageTitle, null);
+      }
+    }
+    else if(result.isUserCancelled() == false) {
+      showErrorMessageThreadSafe(result.getError(), activity.getResources().getString(R.string.error_message_could_not_download_app, appInfo.getTitle()));
     }
   }
 
@@ -356,6 +370,11 @@ public class AppDetailsDialog extends FullscreenDialog {
     prgbrInstallationProgress.setVisibility(View.VISIBLE);
 
     installAppActionView.setEnabled(false);
+  }
+
+
+  protected void showErrorMessageThreadSafe(String error, String title) {
+    AlertHelper.showErrorMessageThreadSafe(activity, error, title);
   }
 
 
