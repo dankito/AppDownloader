@@ -99,7 +99,13 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
       callback.completed(new GetAppDownloadUrlResponse(appToDownload, "Could not find App Download Page Url")); // TODO: translate
     }
     else {
-      getAppDownloadPageUrl(appToDownload, downloadInfo, appDownloadPageUrl, callback);
+      if(appDownloadPageUrl.contains("/download.php?id=")) { // this is already the download link
+        appDownloadUrlExtracted(appToDownload, downloadInfo, appDownloadPageUrl);
+        callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, downloadInfo));
+      }
+      else {
+        getAppDownloadPageUrl(appToDownload, downloadInfo, appDownloadPageUrl, callback);
+      }
     }
   }
 
@@ -188,15 +194,20 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
     if(clickHereElements.size() > 0) {
       Element clickHereElement = clickHereElements.first();
       String appDownloadUrl = DETAILS_PAGE_URL_PREFIX + clickHereElement.attr("href");
-      downloadInfo.setUrl(appDownloadUrl);
 
-      appToDownload.addDownloadUrl(downloadInfo);
+      appDownloadUrlExtracted(appToDownload, downloadInfo, appDownloadUrl);
 
       callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, downloadInfo));
       return;
     }
 
     callback.completed(new GetAppDownloadUrlResponse(appToDownload, "Could not find App Download Url")); // TODO: translate
+  }
+
+  protected void appDownloadUrlExtracted(AppInfo appToDownload, AppDownloadInfo downloadInfo, String appDownloadUrl) {
+    downloadInfo.setUrl(appDownloadUrl);
+
+    appToDownload.addDownloadUrl(downloadInfo);
   }
 
 
