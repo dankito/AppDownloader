@@ -158,8 +158,6 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
       sb.append(String.format("%02x", b & 0xff));
     }
 
-    sb.delete(sb.length() - 2, sb.length() -1);
-
     return sb.toString();
   }
 
