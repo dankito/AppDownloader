@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by ganymed on 19/11/16.
@@ -32,6 +33,8 @@ public class AndroidInstalledAppsManager implements IInstalledAppsManager {
   protected Map<String, AppInfo> allInstalledApps = new ConcurrentHashMap<>();
 
   protected Map<String, AppInfo> launchableApps = new ConcurrentHashMap<>();
+
+  protected List<InstalledAppsListener> installedAppsListeners = new CopyOnWriteArrayList<>();
 
 
   public AndroidInstalledAppsManager(Activity activity) {
@@ -212,16 +215,37 @@ public class AndroidInstalledAppsManager implements IInstalledAppsManager {
   }
 
 
-  protected void callAppInstalledListeners(AppInfo newlyInstalledApp, boolean isLaunchable) {
-
+  public boolean addInstalledAppsListener(InstalledAppsListener listener) {
+    return installedAppsListeners.add(listener);
   }
 
-  protected void callAppUpdatedListeners(AppInfo updatedApp, boolean launchableApp) {
+  public boolean removeInstalledAppsListener(InstalledAppsListener listener) {
+    return installedAppsListeners.remove(listener);
+  }
 
+  protected void callAppInstalledListeners(AppInfo newlyInstalledApp, boolean isLaunchable) {
+    for(InstalledAppsListener listener : installedAppsListeners) {
+      listener.appInstalled(createInstalledAppListenerInfo(newlyInstalledApp, isLaunchable));
+    }
+  }
+
+  protected void callAppUpdatedListeners(AppInfo updatedApp, boolean isLaunchable) {
+    for(InstalledAppsListener listener : installedAppsListeners) {
+      listener.appUpdated(createInstalledAppListenerInfo(updatedApp, isLaunchable));
+    }
   }
 
   protected void callAppRemovedListeners(AppInfo removedApp, boolean isLaunchable) {
+    for(InstalledAppsListener listener : installedAppsListeners) {
+      listener.appRemoved(createInstalledAppListenerInfo(removedApp, isLaunchable));
+    }
+  }
 
+  protected InstalledAppListenerInfo createInstalledAppListenerInfo(AppInfo installedApp, boolean isLaunchable) {
+    List<AppInfo> allInstalledApps = new ArrayList<AppInfo>(this.allInstalledApps.values());
+    List<AppInfo> launchableApps = new ArrayList<AppInfo>(this.launchableApps.values());
+
+    return new InstalledAppListenerInfo(installedApp, isLaunchable, allInstalledApps, launchableApps);
   }
 
 }
