@@ -1,6 +1,6 @@
 package net.dankito.appdownloader.downloader;
 
-import net.dankito.appdownloader.app.AppDownloadLink;
+import net.dankito.appdownloader.app.AppDownloadInfo;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.app.HashAlgorithm;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
@@ -84,7 +84,7 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
   }
 
   protected void parseAppDetailsPage(AppInfo appToDownload, Document document, GetAppDownloadUrlResponseCallback callback) {
-    AppDownloadLink downloadLink = new AppDownloadLink(appToDownload, this);
+    AppDownloadInfo downloadInfo = new AppDownloadInfo(appToDownload, this);
     String appDownloadPageUrl = null;
 
     Elements downloadButtonElements = document.body().select(".downloadButton");
@@ -98,33 +98,33 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
       Element fingerprintElement = fingerprintElements.first();
       String apkSignature = fingerprintElement.text().replace(":", "");
 
-      downloadLink.setApkSignature(apkSignature);
+      downloadInfo.setApkSignature(apkSignature);
     }
 
-    parseApkDetailTable(downloadLink, document);
+    parseApkDetailTable(downloadInfo, document);
 
     if(appDownloadPageUrl == null) {
       callback.completed(new GetAppDownloadUrlResponse(appToDownload, "Could not find App Download Page Url")); // TODO: translate
     }
     else {
-      getAppDownloadPageUrl(appToDownload, downloadLink, appDownloadPageUrl, callback);
+      getAppDownloadPageUrl(appToDownload, downloadInfo, appDownloadPageUrl, callback);
     }
   }
 
-  protected void parseApkDetailTable(AppDownloadLink downloadLink, Document document) {
+  protected void parseApkDetailTable(AppDownloadInfo downloadInfo, Document document) {
     Elements appDetailTableElements = document.body().select(".apk-detail-table");
     if(appDetailTableElements.size() > 0) {
       Element appDetailTableElement = appDetailTableElements.first();
 
       for(Element child : appDetailTableElement.children()) {
         if(child.hasClass("appspec-row")) {
-          parseAppSpecRowElement(downloadLink, child);
+          parseAppSpecRowElement(downloadInfo, child);
         }
       }
     }
   }
 
-  protected void parseAppSpecRowElement(AppDownloadLink downloadLink, Element appSpecRowElement) {
+  protected void parseAppSpecRowElement(AppDownloadInfo downloadInfo, Element appSpecRowElement) {
     Element appSpecTitleElement = appSpecRowElement.select(".appspec-icon").first();
     Element appSpecValueElement = appSpecRowElement.select(".appspec-value").first();
 
@@ -133,11 +133,11 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
       String appSpecificationValue = appSpecValueElement.text();
 
       if("APK file size".equals(appSpecificationTitle)) {
-        downloadLink.setFileSize(appSpecificationValue);
+        downloadInfo.setFileSize(appSpecificationValue);
       }
       else if("MD5 signature".equals(appSpecificationTitle)) {
-        downloadLink.setHashAlgorithm(HashAlgorithm.MD5);
-        downloadLink.setFileHashSum(appSpecificationValue);
+        downloadInfo.setHashAlgorithm(HashAlgorithm.MD5);
+        downloadInfo.setFileHashSum(appSpecificationValue);
       }
     }
   }
@@ -161,7 +161,7 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
   }
 
 
-  protected void getAppDownloadPageUrl(final AppInfo appToDownload, final AppDownloadLink downloadLink, final String appDownloadPageUrl, final GetAppDownloadUrlResponseCallback callback) {
+  protected void getAppDownloadPageUrl(final AppInfo appToDownload, final AppDownloadInfo downloadInfo, final String appDownloadPageUrl, final GetAppDownloadUrlResponseCallback callback) {
     RequestParameters parameters = new RequestParameters(appDownloadPageUrl);
 
     webClient.getAsync(parameters, new RequestCallback() {
@@ -171,24 +171,24 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
           callback.completed(new GetAppDownloadUrlResponse(appToDownload, response.getError()));
         }
         else {
-          parseAppDownloadPage(appToDownload, downloadLink, response, callback);
+          parseAppDownloadPage(appToDownload, downloadInfo, response, callback);
         }
       }
     });
   }
 
-  protected void parseAppDownloadPage(AppInfo appToDownload, AppDownloadLink downloadLink, WebClientResponse response, GetAppDownloadUrlResponseCallback callback) {
+  protected void parseAppDownloadPage(AppInfo appToDownload, AppDownloadInfo downloadInfo, WebClientResponse response, GetAppDownloadUrlResponseCallback callback) {
     Document document = Jsoup.parse(response.getBody());
 
     Elements clickHereElements = document.body().select("a[data-google-vignette]");
     if(clickHereElements.size() > 0) {
       Element clickHereElement = clickHereElements.first();
       String appDownloadUrl = DETAILS_PAGE_URL_PREFIX + clickHereElement.attr("href");
-      downloadLink.setUrl(appDownloadUrl);
+      downloadInfo.setUrl(appDownloadUrl);
 
-      appToDownload.addDownloadUrl(downloadLink);
+      appToDownload.addDownloadUrl(downloadInfo);
 
-      callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, downloadLink));
+      callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, downloadInfo));
       return;
     }
 

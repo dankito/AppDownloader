@@ -1,6 +1,6 @@
 package net.dankito.appdownloader.util.app;
 
-import net.dankito.appdownloader.app.AppDownloadLink;
+import net.dankito.appdownloader.app.AppDownloadInfo;
 
 /**
  * Created by ganymed on 19/11/16.
@@ -8,6 +8,6 @@ import net.dankito.appdownloader.app.AppDownloadLink;
 
 public interface IAppVerifier {
 
-  boolean verifyDownloadedApk(AppDownloadLink downloadLink);
+  boolean verifyDownloadedApk(AppDownloadInfo downloadInfo);
 
 }

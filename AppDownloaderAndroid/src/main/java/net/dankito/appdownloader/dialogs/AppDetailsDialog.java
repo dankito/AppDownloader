@@ -12,7 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import net.dankito.appdownloader.R;
-import net.dankito.appdownloader.app.AppDownloadLink;
+import net.dankito.appdownloader.app.AppDownloadInfo;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.app.AppState;
 import net.dankito.appdownloader.app.AppStateListener;
@@ -202,13 +202,13 @@ public class AppDetailsDialog extends FullscreenDialog {
     }
   }
 
-  protected AppDownloadLink getBestAppDownloadUrl(AppInfo appInfo) {
-    if(appInfo.getDownloadLinks().size() == 1) {
-      return appInfo.getDownloadLinks().get(0);
+  protected AppDownloadInfo getBestAppDownloadUrl(AppInfo appInfo) {
+    if(appInfo.getDownloadInfos().size() == 1) {
+      return appInfo.getDownloadInfos().get(0);
     }
     else {
       // TODO: choose best one
-      return appInfo.getDownloadLinks().get(0);
+      return appInfo.getDownloadInfos().get(0);
     }
   }
 
@@ -241,7 +241,7 @@ public class AppDetailsDialog extends FullscreenDialog {
         }
       }
       else {
-        downloadApp(clickedApp, response.getDownloadLink());
+        downloadApp(clickedApp, response.getDownloadInfo());
       }
     }
 
@@ -250,16 +250,16 @@ public class AppDetailsDialog extends FullscreenDialog {
     }
   }
 
-  protected void downloadApp(AppInfo clickedApp, AppDownloadLink downloadLink) {
-    log.info("Starting to download App " + clickedApp + " from " + downloadLink + " ...");
+  protected void downloadApp(AppInfo clickedApp, AppDownloadInfo downloadInfo) {
+    log.info("Starting to download App " + clickedApp + " from " + downloadInfo + " ...");
 
     appInfo.setState(AppState.DOWNLOADING);
 
-    downloadAppViaAndroidDownloadManager(clickedApp, downloadLink);
+    downloadAppViaAndroidDownloadManager(clickedApp, downloadInfo);
   }
 
-  protected void downloadAppViaAndroidDownloadManager(AppInfo clickedApp, AppDownloadLink downloadLink) {
-    downloadManager.downloadUrlAsync(clickedApp, downloadLink, new IDownloadCompletedCallback() {
+  protected void downloadAppViaAndroidDownloadManager(AppInfo clickedApp, AppDownloadInfo downloadInfo) {
+    downloadManager.downloadUrlAsync(clickedApp, downloadInfo, new IDownloadCompletedCallback() {
       @Override
       public void completed(DownloadResult result) {
         appDownloadCompleted(result);
@@ -268,12 +268,12 @@ public class AppDetailsDialog extends FullscreenDialog {
   }
 
   protected void appDownloadCompleted(DownloadResult result) {
-    AppDownloadLink downloadLink = result.getDownloadLink();
-    AppInfo appInfo = downloadLink.getAppInfo();
+    AppDownloadInfo downloadInfo = result.getDownloadInfo();
+    AppInfo appInfo = downloadInfo.getAppInfo();
 
     if(result.isSuccessful()) {
-      if(appVerifier.verifyDownloadedApk(downloadLink)) {
-        appInstaller.installApp(downloadLink);
+      if(appVerifier.verifyDownloadedApk(downloadInfo)) {
+        appInstaller.installApp(downloadInfo);
       }
       else {
         Resources resources = activity.getResources();

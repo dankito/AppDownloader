@@ -7,7 +7,7 @@ import net.dankito.appdownloader.util.StringUtils;
  * Created by ganymed on 18/11/16.
  */
 
-public class AppDownloadLink {
+public class AppDownloadInfo {
 
   protected AppInfo appInfo;
 
@@ -30,7 +30,7 @@ public class AppDownloadLink {
   protected String downloadLocationPath = null;
 
 
-  public AppDownloadLink(AppInfo appInfo, IAppDownloader appDownloader) {
+  public AppDownloadInfo(AppInfo appInfo, IAppDownloader appDownloader) {
     this.appInfo = appInfo;
     this.appDownloader = appDownloader;
   }

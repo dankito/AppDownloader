@@ -2,7 +2,7 @@ package net.dankito.appdownloader.downloader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import net.dankito.appdownloader.app.AppDownloadLink;
+import net.dankito.appdownloader.app.AppDownloadInfo;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.app.HashAlgorithm;
 import net.dankito.appdownloader.responses.AppDownloadRequestParameters;
@@ -89,15 +89,15 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
   }
 
   protected void appDownloadLinkSuccessfullyDownloaded(AppInfo appToDownload, GetAppDownloadUrlResponseCallback callback, EvoziGetAppDownloadUrlResponse evoziAppDownloadUrlResponse) {
-    AppDownloadLink appDownloadLink = new AppDownloadLink(appToDownload, this);
-    appDownloadLink.setUrl(evoziAppDownloadUrlResponse.getUrl());
-    appDownloadLink.setFileSize(evoziAppDownloadUrlResponse.getFilesize());
-    appDownloadLink.setHashAlgorithm(HashAlgorithm.MD5);
-    appDownloadLink.setFileHashSum(evoziAppDownloadUrlResponse.getMd5());
+    AppDownloadInfo appDownloadInfo = new AppDownloadInfo(appToDownload, this);
+    appDownloadInfo.setUrl(evoziAppDownloadUrlResponse.getUrl());
+    appDownloadInfo.setFileSize(evoziAppDownloadUrlResponse.getFilesize());
+    appDownloadInfo.setHashAlgorithm(HashAlgorithm.MD5);
+    appDownloadInfo.setFileHashSum(evoziAppDownloadUrlResponse.getMd5());
 
-    appToDownload.addDownloadUrl(appDownloadLink);
+    appToDownload.addDownloadUrl(appDownloadInfo);
 
-    GetAppDownloadUrlResponse appDownloadUrlResponse = new GetAppDownloadUrlResponse(true, appToDownload, appDownloadLink);
+    GetAppDownloadUrlResponse appDownloadUrlResponse = new GetAppDownloadUrlResponse(true, appToDownload, appDownloadInfo);
 
     callback.completed(appDownloadUrlResponse);
   }

@@ -1,6 +1,6 @@
 package net.dankito.appdownloader.downloader;
 
-import net.dankito.appdownloader.app.AppDownloadLink;
+import net.dankito.appdownloader.app.AppDownloadInfo;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
@@ -72,15 +72,15 @@ public abstract class AppDownloaderTestBase {
     AppInfo appToDownloadFromResponse = response.getAppToDownload();
     Assert.assertEquals(TEST_APP_PACKAGE_NAME, appToDownloadFromResponse.getPackageName());
 
-    List<AppDownloadLink> downloadLinks = appToDownloadFromResponse.getDownloadLinks();
-    Assert.assertEquals(1, downloadLinks.size());
+    List<AppDownloadInfo> downloadInfos = appToDownloadFromResponse.getDownloadInfos();
+    Assert.assertEquals(1, downloadInfos.size());
 
-    AppDownloadLink downloadLink = downloadLinks.get(0);
-    Assert.assertNotNull(downloadLink.getAppDownloader());
-    Assert.assertNotNull(downloadLink.getAppInfo());
-    Assert.assertNotNull(downloadLink.getUrl());
-    Assert.assertNotNull(downloadLink.getFileSize());
-    Assert.assertNotNull(downloadLink.getFileHashSum());
-    Assert.assertNotNull(downloadLink.getHashAlgorithm());
+    AppDownloadInfo downloadInfo = downloadInfos.get(0);
+    Assert.assertNotNull(downloadInfo.getAppDownloader());
+    Assert.assertNotNull(downloadInfo.getAppInfo());
+    Assert.assertNotNull(downloadInfo.getUrl());
+    Assert.assertNotNull(downloadInfo.getFileSize());
+    Assert.assertNotNull(downloadInfo.getFileHashSum());
+    Assert.assertNotNull(downloadInfo.getHashAlgorithm());
   }
 }

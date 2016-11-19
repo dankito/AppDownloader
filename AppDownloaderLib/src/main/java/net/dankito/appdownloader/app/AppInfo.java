@@ -46,7 +46,7 @@ public class AppInfo {
 
   // download process
 
-  protected List<AppDownloadLink> downloadLinks = new ArrayList<>();
+  protected List<AppDownloadInfo> downloadInfos = new ArrayList<>();
 
 
   public AppInfo(String packageName) {
@@ -201,15 +201,15 @@ public class AppInfo {
 
 
   public boolean hasDownloadUrls() {
-    return downloadLinks.size() > 0;
+    return downloadInfos.size() > 0; // TODO: also check if they really contain a download url
   }
 
-  public boolean addDownloadUrl(AppDownloadLink appDownloadLink) {
-    return downloadLinks.add(appDownloadLink);
+  public boolean addDownloadUrl(AppDownloadInfo appDownloadInfo) {
+    return downloadInfos.add(appDownloadInfo);
   }
 
-  public List<AppDownloadLink> getDownloadLinks() {
-    return downloadLinks;
+  public List<AppDownloadInfo> getDownloadInfos() {
+    return downloadInfos;
   }
 
   public boolean isAlreadyDownloaded() {
@@ -217,9 +217,9 @@ public class AppInfo {
   }
 
   public String getDownloadLocationPath() {
-    for(AppDownloadLink downloadLink : getDownloadLinks()) {
-      if(downloadLink.isDownloaded()) {
-        return downloadLink.getDownloadLocationPath();
+    for(AppDownloadInfo downloadInfo : getDownloadInfos()) {
+      if(downloadInfo.isDownloaded()) {
+        return downloadInfo.getDownloadLocationPath();
       }
     }
 
@@ -228,9 +228,9 @@ public class AppInfo {
 
 
   public String getApkSignature() {
-    for(AppDownloadLink downloadLink : getDownloadLinks()) {
-      if(downloadLink.isApkSignatureSet()) {
-        return downloadLink.getApkSignature();
+    for(AppDownloadInfo downloadInfo : getDownloadInfos()) {
+      if(downloadInfo.isApkSignatureSet()) {
+        return downloadInfo.getApkSignature();
       }
     }
 

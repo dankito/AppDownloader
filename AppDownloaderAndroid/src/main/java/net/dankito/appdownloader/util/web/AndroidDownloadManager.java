@@ -14,7 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 
 import net.dankito.appdownloader.R;
-import net.dankito.appdownloader.app.AppDownloadLink;
+import net.dankito.appdownloader.app.AppDownloadInfo;
 import net.dankito.appdownloader.app.AppInfo;
 
 import org.slf4j.Logger;
@@ -61,9 +61,9 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
 
 
   @Override
-  public void downloadUrlAsync(AppInfo appInfo, AppDownloadLink downloadLink, IDownloadCompletedCallback callback) {
+  public void downloadUrlAsync(AppInfo appInfo, AppDownloadInfo downloadInfo, IDownloadCompletedCallback callback) {
     try {
-      Uri uri = Uri.parse(downloadLink.getUrl());
+      Uri uri = Uri.parse(downloadInfo.getUrl());
       DownloadManager.Request request = new DownloadManager.Request(uri);
 
       // TODO: make configurable if allowed to download over cellular network and on roaming
@@ -73,11 +73,11 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
       request.setTitle(appInfo.getTitle());
       request.setDescription(appInfo.getTitle());
 
-      String destinationFileName = getDestinationFilename(appInfo, downloadLink.getUrl());
+      String destinationFileName = getDestinationFilename(appInfo, downloadInfo.getUrl());
       request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, destinationFileName);
 
       DownloadManager downloadManager = getDownloadManager();
-      CurrentDownload currentDownload = new CurrentDownload(downloadLink, callback);
+      CurrentDownload currentDownload = new CurrentDownload(downloadInfo, callback);
       currentDownloads.put(downloadManager.enqueue(request), currentDownload);
     } catch(Exception e) {
       log.error("Could not start Download for " + appInfo, e);
@@ -122,20 +122,20 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
         EnqueuedDownload enqueuedDownload = getEnqueuedDownloadForId(downloadId);
 
         if(enqueuedDownload != null) {
-          AppDownloadLink downloadLink = currentDownload.getDownloadLink();
+          AppDownloadInfo downloadInfo = currentDownload.getDownloadInfo();
           IDownloadCompletedCallback callback = currentDownload.getCallback();
 
           if(enqueuedDownload.wasDownloadSuccessful()) {
             URI uri = URI.create(enqueuedDownload.getDownloadLocationUri()); // get File from Uri
             String downloadPath = new File(uri.getPath()).getAbsolutePath();
 
-            downloadLink.setDownloadLocationUri(enqueuedDownload.getDownloadLocationUri());
-            downloadLink.setDownloadLocationPath(downloadPath);
+            downloadInfo.setDownloadLocationUri(enqueuedDownload.getDownloadLocationUri());
+            downloadInfo.setDownloadLocationPath(downloadPath);
 
-            callback.completed(new DownloadResult(downloadLink, true));
+            callback.completed(new DownloadResult(downloadInfo, true));
           }
           else {
-            callback.completed(new DownloadResult(downloadLink, enqueuedDownload.getReason()));
+            callback.completed(new DownloadResult(downloadInfo, enqueuedDownload.getReason()));
           }
         }
       } catch(Exception e) {
@@ -197,8 +197,8 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
 
   protected void askShouldDownloadGetCancelled(final long downloadId) {
     CurrentDownload currentDownload = currentDownloads.get(downloadId);
-    final AppDownloadLink downloadLink = currentDownload.getDownloadLink();
-    AppInfo appToStop = downloadLink.getAppInfo();
+    final AppDownloadInfo downloadInfo = currentDownload.getDownloadInfo();
+    AppInfo appToStop = downloadInfo.getAppInfo();
     String appTitle = appToStop == null ? "" : appToStop.getTitle();
 
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -208,14 +208,14 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
     builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialogInterface, int i) {
-        cancelDownload(downloadId, downloadLink);
+        cancelDownload(downloadId, downloadInfo);
       }
     });
 
     builder.create().show();
   }
 
-  protected void cancelDownload(long downloadId, AppDownloadLink downloadLink) {
+  protected void cancelDownload(long downloadId, AppDownloadInfo downloadInfo) {
     DownloadManager downloadManager = getDownloadManager();
 
     downloadManager.remove(downloadId);
@@ -224,7 +224,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
 
     IDownloadCompletedCallback callback = currentDownload.getCallback();
 
-    callback.completed(new DownloadResult(downloadLink, false, true));
+    callback.completed(new DownloadResult(downloadInfo, false, true));
   }
 
 

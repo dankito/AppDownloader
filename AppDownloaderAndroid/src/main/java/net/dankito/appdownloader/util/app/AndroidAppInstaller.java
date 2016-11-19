@@ -8,7 +8,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 
 import net.dankito.appdownloader.MainActivity;
-import net.dankito.appdownloader.app.AppDownloadLink;
+import net.dankito.appdownloader.app.AppDownloadInfo;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.app.AppState;
 import net.dankito.appdownloader.util.android.IActivityResultListener;
@@ -37,7 +37,7 @@ public class AndroidAppInstaller implements IAppInstaller {
 
   protected Activity activity;
 
-  protected Map<Integer, AppDownloadLink> appsBeingInstalled = new ConcurrentHashMap<>();
+  protected Map<Integer, AppDownloadInfo> appsBeingInstalled = new ConcurrentHashMap<>();
 
 
   public AndroidAppInstaller(Activity activity) {
@@ -56,18 +56,18 @@ public class AndroidAppInstaller implements IAppInstaller {
   }
 
 
-  public void installApp(AppDownloadLink downloadLink) {
-    AppInfo appToInstall = downloadLink.getAppInfo();
+  public void installApp(AppDownloadInfo downloadInfo) {
+    AppInfo appToInstall = downloadInfo.getAppInfo();
     appToInstall.setState(AppState.INSTALLING);
 
     Intent intent = new Intent();
     intent.setAction(android.content.Intent.ACTION_VIEW);
-    intent.setDataAndType(Uri.parse(downloadLink.getDownloadLocationUri()), "application/vnd.android.package-archive");
+    intent.setDataAndType(Uri.parse(downloadInfo.getDownloadLocationUri()), "application/vnd.android.package-archive");
 
     int requestCode = APP_INSTALL_REQUEST_CODE + CountInstalledApps++;
     activity.startActivityForResult(intent, requestCode);
 
-    appsBeingInstalled.put(requestCode, downloadLink);
+    appsBeingInstalled.put(requestCode, downloadInfo);
   }
 
 
@@ -91,19 +91,19 @@ public class AndroidAppInstaller implements IAppInstaller {
       String dataString = intent.getDataString();
       String changedAppPackage = dataString.substring(dataString.indexOf(':') + 1); // remove scheme (= package:)
 
-      for(Map.Entry<Integer, AppDownloadLink> appBeingInstalledEntry : new ArrayList<>(appsBeingInstalled.entrySet())) {
-        AppDownloadLink downloadLink = appBeingInstalledEntry.getValue();
-        AppInfo appBeingInstalled = downloadLink.getAppInfo();
+      for(Map.Entry<Integer, AppDownloadInfo> appBeingInstalledEntry : new ArrayList<>(appsBeingInstalled.entrySet())) {
+        AppDownloadInfo downloadInfo = appBeingInstalledEntry.getValue();
+        AppInfo appBeingInstalled = downloadInfo.getAppInfo();
 
         if(appBeingInstalled.getPackageName().equals(changedAppPackage)) {
-          appSuccessfullyInstalled(appBeingInstalledEntry.getKey(), appBeingInstalled, downloadLink);
+          appSuccessfullyInstalled(appBeingInstalledEntry.getKey(), appBeingInstalled, downloadInfo);
           break;
         }
       }
     }
   }
 
-  protected void appSuccessfullyInstalled(Integer appRequestCode, AppInfo appBeingInstalled, AppDownloadLink downloadLink) {
+  protected void appSuccessfullyInstalled(Integer appRequestCode, AppInfo appBeingInstalled, AppDownloadInfo downloadInfo) {
     appsBeingInstalled.remove(appRequestCode);
 
     appBeingInstalled.setAlreadyInstalled(true);
@@ -111,18 +111,18 @@ public class AndroidAppInstaller implements IAppInstaller {
 
     appBeingInstalled.setToItsDefaultState();
 
-    deletedDownloadedApk(downloadLink);
+    deletedDownloadedApk(downloadInfo);
   }
 
-  protected void deletedDownloadedApk(AppDownloadLink downloadLink) {
+  protected void deletedDownloadedApk(AppDownloadInfo downloadInfo) {
     try {
-      File file = new File(downloadLink.getDownloadLocationPath());
+      File file = new File(downloadInfo.getDownloadLocationPath());
       if(file.exists()) {
         log.info("Deleting installed Apk file " + file.getAbsolutePath());
         file.delete();
       }
     } catch(Exception e) {
-      log.error("Could not deleted installed Apk file " + downloadLink.getDownloadLocationPath(), e);
+      log.error("Could not deleted installed Apk file " + downloadInfo.getDownloadLocationPath(), e);
     }
   }
 
@@ -135,13 +135,13 @@ public class AndroidAppInstaller implements IAppInstaller {
   };
 
   protected void doneInstallingApp(int requestCode, int resultCode, Intent data) {
-    AppDownloadLink downloadLink = appsBeingInstalled.remove(requestCode);
-    AppInfo appBeingInstalled = downloadLink.getAppInfo();
+    AppDownloadInfo downloadInfo = appsBeingInstalled.remove(requestCode);
+    AppInfo appBeingInstalled = downloadInfo.getAppInfo();
 
     if(appBeingInstalled != null) { // it may has already been removed by handlePackageAddedOrChanged()
       appBeingInstalled.setToItsDefaultState();
 
-      deletedDownloadedApk(downloadLink);
+      deletedDownloadedApk(downloadInfo);
     }
   }
 

@@ -1,6 +1,6 @@
 package net.dankito.appdownloader.util.web;
 
-import net.dankito.appdownloader.app.AppDownloadLink;
+import net.dankito.appdownloader.app.AppDownloadInfo;
 import net.dankito.appdownloader.responses.ResponseBase;
 
 /**
@@ -8,30 +8,30 @@ import net.dankito.appdownloader.responses.ResponseBase;
  */
 public class DownloadResult extends ResponseBase {
 
-  protected AppDownloadLink downloadLink;
+  protected AppDownloadInfo downloadInfo;
 
   protected boolean isUserCancelled;
 
 
-  public DownloadResult(AppDownloadLink downloadLink, boolean successful) {
+  public DownloadResult(AppDownloadInfo downloadInfo, boolean successful) {
     super(successful);
-    this.downloadLink = downloadLink;
+    this.downloadInfo = downloadInfo;
   }
 
-  public DownloadResult(AppDownloadLink downloadLink, boolean isSuccessful, boolean isUserCancelled) {
+  public DownloadResult(AppDownloadInfo downloadInfo, boolean isSuccessful, boolean isUserCancelled) {
     super(isSuccessful);
-    this.downloadLink = downloadLink;
+    this.downloadInfo = downloadInfo;
     this.isUserCancelled = isUserCancelled;
   }
 
-  public DownloadResult(AppDownloadLink downloadLink, String error) {
+  public DownloadResult(AppDownloadInfo downloadInfo, String error) {
     super(error);
-    this.downloadLink = downloadLink;
+    this.downloadInfo = downloadInfo;
   }
 
 
-  public AppDownloadLink getDownloadLink() {
-    return downloadLink;
+  public AppDownloadInfo getDownloadInfo() {
+    return downloadInfo;
   }
 
   public boolean isUserCancelled() {

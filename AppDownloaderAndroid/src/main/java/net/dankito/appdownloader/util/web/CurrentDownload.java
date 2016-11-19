@@ -1,6 +1,6 @@
 package net.dankito.appdownloader.util.web;
 
-import net.dankito.appdownloader.app.AppDownloadLink;
+import net.dankito.appdownloader.app.AppDownloadInfo;
 
 /**
  * Created by ganymed on 18/11/16.
@@ -8,19 +8,19 @@ import net.dankito.appdownloader.app.AppDownloadLink;
 
 public class CurrentDownload {
 
-  protected AppDownloadLink downloadLink;
+  protected AppDownloadInfo downloadInfo;
 
   protected IDownloadCompletedCallback callback;
 
 
-  public CurrentDownload(AppDownloadLink downloadLink, IDownloadCompletedCallback callback) {
-    this.downloadLink = downloadLink;
+  public CurrentDownload(AppDownloadInfo downloadInfo, IDownloadCompletedCallback callback) {
+    this.downloadInfo = downloadInfo;
     this.callback = callback;
   }
 
 
-  public AppDownloadLink getDownloadLink() {
-    return downloadLink;
+  public AppDownloadInfo getDownloadInfo() {
+    return downloadInfo;
   }
 
   public IDownloadCompletedCallback getCallback() {
@@ -30,7 +30,7 @@ public class CurrentDownload {
 
   @Override
   public String toString() {
-    return "" + downloadLink;
+    return "" + downloadInfo;
   }
 
 }

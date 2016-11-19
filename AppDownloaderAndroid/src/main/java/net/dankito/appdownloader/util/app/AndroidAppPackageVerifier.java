@@ -5,7 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 
-import net.dankito.appdownloader.app.AppDownloadLink;
+import net.dankito.appdownloader.app.AppDownloadInfo;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.app.AppState;
 
@@ -41,17 +41,17 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
   }
 
 
-  public boolean verifyDownloadedApk(AppDownloadLink downloadLink) {
-    AppInfo appToInstall = downloadLink.getAppInfo();
+  public boolean verifyDownloadedApk(AppDownloadInfo downloadInfo) {
+    AppInfo appToInstall = downloadInfo.getAppInfo();
     appToInstall.setState(AppState.VERIFYING_SIGNATURE);
 
     PackageManager packageManager = context.getPackageManager();
 
-    PackageInfo packageInfo = packageManager.getPackageArchiveInfo(downloadLink.getDownloadLocationPath(), PackageManager.GET_PERMISSIONS | PackageManager.GET_META_DATA);
+    PackageInfo packageInfo = packageManager.getPackageArchiveInfo(downloadInfo.getDownloadLocationPath(), PackageManager.GET_PERMISSIONS | PackageManager.GET_META_DATA);
 
     if(packageInfo != null) {
       return isPackageNameCorrect(appToInstall, packageInfo) && isVersionCorrect(appToInstall, packageInfo) &&
-          isFileCheckSumCorrect(downloadLink) && verifyApkSignature(downloadLink, packageManager);
+          isFileCheckSumCorrect(downloadInfo) && verifyApkSignature(downloadInfo, packageManager);
     }
 
     return true;
@@ -65,8 +65,8 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
     return packageInfo.versionName.equals(appToInstall.getVersion());
   }
 
-  protected boolean isFileCheckSumCorrect(AppDownloadLink downloadLink) {
-    File file = new File(downloadLink.getDownloadLocationPath());
+  protected boolean isFileCheckSumCorrect(AppDownloadInfo downloadInfo) {
+    File file = new File(downloadInfo.getDownloadLocationPath());
     if(file.exists()) {
       try {
         FileInputStream fileInputStream = new FileInputStream(file);
@@ -75,11 +75,11 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
         ByteBuffer buffer = ByteBuffer.allocate((int)file.length());
         dataInputStream.read(buffer.array());
 
-        byte[] fileCheckSum = calculateCheckSum(downloadLink.getHashAlgorithm().getAlgorithmName(), buffer);
+        byte[] fileCheckSum = calculateCheckSum(downloadInfo.getHashAlgorithm().getAlgorithmName(), buffer);
 
         dataInputStream.close();
 
-        return verifyCheckSumsEqual(downloadLink.getFileHashSum(), fileCheckSum);
+        return verifyCheckSumsEqual(downloadInfo.getFileHashSum(), fileCheckSum);
       } catch(Exception e) {
         log.error("Could not verify file check sum");
       }
@@ -88,11 +88,11 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
     return false;
   }
 
-  protected boolean verifyApkSignature(AppDownloadLink downloadLink, PackageManager packageManager) {
+  protected boolean verifyApkSignature(AppDownloadInfo downloadInfo, PackageManager packageManager) {
     // So, you call that, passing in the path to the APK, along with PackageManager.GET_SIGNATURES.
     // If you get null back, the APK was tampered with and does not have valid digital signature.
     // If you get a PackageInfo back, it will have the "signatures", which you can use for comparison purposes.
-    PackageInfo packageInfo = packageManager.getPackageArchiveInfo(downloadLink.getDownloadLocationPath(), PackageManager.GET_SIGNATURES);
+    PackageInfo packageInfo = packageManager.getPackageArchiveInfo(downloadInfo.getDownloadLocationPath(), PackageManager.GET_SIGNATURES);
     if(packageInfo == null) {
       return false;
     }
@@ -110,7 +110,7 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
       try {
         byte[] digest = calculateCheckSum("SHA", signatureBytes);
 
-        return verifyCheckSumsEqual(downloadLink.getAppInfo().getApkSignature(), digest);
+        return verifyCheckSumsEqual(downloadInfo.getAppInfo().getApkSignature(), digest);
       } catch(Exception e) {
         log.error("Could not validate Certificate signature", e);
       }
