@@ -69,12 +69,18 @@ public class AndroidUpdatableAppsManager implements IUpdatableAppsManager {
     CountDownLatch countDownLatch = new CountDownLatch(installedApps.size());
 
     for(AppInfo app : installedApps) {
-      getAppDetailsAsync(app, countDownLatch);
+      setAppDetails(app, countDownLatch);
     }
 
     try { countDownLatch.await(3, TimeUnit.MINUTES); } catch(Exception ignored) { }
 
     initializationDone();
+  }
+
+  protected void setAppDetails(AppInfo app, CountDownLatch countDownLatch) {
+    if(appDetailsCache.setAppDetailsForApp(app) == false) {
+      getAppDetailsAsync(app, countDownLatch);
+    }
   }
 
   protected void getAppDetailsAsync(final AppInfo app, final CountDownLatch countDownLatch) {
