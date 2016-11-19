@@ -299,7 +299,8 @@ public class AppInfo {
     if(availableVersion != null && installedVersion != null) {
       return availableVersion.compareTo(installedVersion) > 0;
     }
-    return true;
+
+    return false; // either availableVersion or installedVersion is null -> we cannot decide if updatable or not
   }
 
 
