@@ -6,6 +6,7 @@ import net.dankito.appdownloader.PlayStoreAppSearcher;
 import net.dankito.appdownloader.app.AppDetailsCache;
 import net.dankito.appdownloader.app.IAppDetailsCache;
 import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
+import net.dankito.appdownloader.downloader.ApkMirrorPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.EvoziPlayStoreAppDownloader;
 import net.dankito.appdownloader.util.app.AndroidAppInstaller;
 import net.dankito.appdownloader.util.AndroidOnUiThreadRunner;
@@ -89,6 +90,12 @@ public class AndroidDiContainer {
     return new AndroidAppInstaller(getActivity());
   }
 
+
+  @Provides
+  @Singleton
+  public ApkMirrorPlayStoreAppDownloader provideApkMirrorPlayStoreAppDownloader(IWebClient webClient) {
+    return new ApkMirrorPlayStoreAppDownloader(webClient);
+  }
 
   @Provides
   @Singleton

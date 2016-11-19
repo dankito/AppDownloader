@@ -22,6 +22,7 @@ import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.adapter.AppSearchResultsAdapter;
 import net.dankito.appdownloader.dialogs.AppDetailsDialog;
 import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
+import net.dankito.appdownloader.downloader.ApkMirrorPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.EvoziPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.IAppDownloader;
 import net.dankito.appdownloader.app.AppInfo;
@@ -54,6 +55,9 @@ public class AppSearchResultsFragment extends Fragment {
 
   @Inject
   protected PlayStoreAppSearcher appSearcher;
+
+  @Inject
+  protected ApkMirrorPlayStoreAppDownloader apkMirrorPlayStoreAppDownloader;
 
   @Inject
   protected ApkDownloaderPlayStoreAppDownloader apkDownloaderPlayStoreAppDownloader;
@@ -102,6 +106,7 @@ public class AppSearchResultsFragment extends Fragment {
 
     appSearcher.addRetrievedAppDetailsListener(appDetailsRetrievedListener);
 
+    appDownloaders.add(apkMirrorPlayStoreAppDownloader);
     appDownloaders.add(apkDownloaderPlayStoreAppDownloader);
     appDownloaders.add(evoziPlayStoreAppDownloader);
   }
