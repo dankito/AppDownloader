@@ -80,22 +80,26 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
         callback.completed(new GetAppDownloadUrlResponse(appToDownload, evoziAppDownloadUrlResponse.getData()));
       }
       else {
-        AppDownloadLink appDownloadLink = new AppDownloadLink(appToDownload, this);
-        appDownloadLink.setUrl(evoziAppDownloadUrlResponse.getUrl());
-        appDownloadLink.setFileSize(evoziAppDownloadUrlResponse.getFilesize());
-        appDownloadLink.setHashAlgorithm(HashAlgorithm.MD5);
-        appDownloadLink.setFileHashSum(evoziAppDownloadUrlResponse.getMd5());
-
-        appToDownload.addDownloadUrl(appDownloadLink);
-
-        GetAppDownloadUrlResponse appDownloadUrlResponse = new GetAppDownloadUrlResponse(true, appToDownload, appDownloadLink);
-
-        callback.completed(appDownloadUrlResponse);
+        appDownloadLinkSuccessfullyDownloaded(appToDownload, callback, evoziAppDownloadUrlResponse);
       }
     } catch(Exception e) {
       log.error("Could not parse GetAppDownloadUrlResponse for App Package " + appToDownload, e);
       callback.completed(new GetAppDownloadUrlResponse(appToDownload, e.getLocalizedMessage()));
     }
+  }
+
+  protected void appDownloadLinkSuccessfullyDownloaded(AppInfo appToDownload, GetAppDownloadUrlResponseCallback callback, EvoziGetAppDownloadUrlResponse evoziAppDownloadUrlResponse) {
+    AppDownloadLink appDownloadLink = new AppDownloadLink(appToDownload, this);
+    appDownloadLink.setUrl(evoziAppDownloadUrlResponse.getUrl());
+    appDownloadLink.setFileSize(evoziAppDownloadUrlResponse.getFilesize());
+    appDownloadLink.setHashAlgorithm(HashAlgorithm.MD5);
+    appDownloadLink.setFileHashSum(evoziAppDownloadUrlResponse.getMd5());
+
+    appToDownload.addDownloadUrl(appDownloadLink);
+
+    GetAppDownloadUrlResponse appDownloadUrlResponse = new GetAppDownloadUrlResponse(true, appToDownload, appDownloadLink);
+
+    callback.completed(appDownloadUrlResponse);
   }
 
   protected void getAppDownloadRequestParametersAsync(final String appPackageName, final GetAppDownloadRequestParametersCallback callback) {
