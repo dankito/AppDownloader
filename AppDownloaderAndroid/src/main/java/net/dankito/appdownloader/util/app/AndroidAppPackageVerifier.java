@@ -12,7 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -44,7 +48,7 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
 
     if(packageInfo != null) {
       return isPackageNameCorrect(appToInstall, packageInfo) && isVersionCorrect(appToInstall, packageInfo) &&
-          verifyApkSignature(downloadLink, packageManager);
+          isFileCheckSumCorrect(downloadLink) && verifyApkSignature(downloadLink, packageManager);
     }
 
     return true;
@@ -56,6 +60,29 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
 
   protected boolean isVersionCorrect(AppInfo appToInstall, PackageInfo packageInfo) {
     return packageInfo.versionName.equals(appToInstall.getVersion());
+  }
+
+  protected boolean isFileCheckSumCorrect(AppDownloadLink downloadLink) {
+    File file = new File(downloadLink.getDownloadLocationPath());
+    if(file.exists()) {
+      try {
+        FileInputStream fileInputStream = new FileInputStream(file);
+        DataInputStream dataInputStream = new DataInputStream(fileInputStream);
+
+        ByteBuffer buffer = ByteBuffer.allocate((int)file.length());
+        dataInputStream.read(buffer.array());
+
+        byte[] fileCheckSum = calculateCheckSum(downloadLink.getHashAlgorithm().getAlgorithmName(), buffer);
+
+        dataInputStream.close();
+
+        return verifyCheckSumsEqual(downloadLink.getFileHashSum(), fileCheckSum);
+      } catch(Exception e) {
+        log.error("Could not verify file check sum");
+      }
+    }
+
+    return false;
   }
 
   protected boolean verifyApkSignature(AppDownloadLink downloadLink, PackageManager packageManager) {
@@ -79,21 +106,14 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
 
       try {
         byte[] digest = calculateCheckSum("SHA", signatureBytes);
-        String digestHex = bytesToHex(digest);
 
-        return digestHex.equals(downloadLink.getAppInfo().getApkSignature());
+        return verifyCheckSumsEqual(downloadLink.getAppInfo().getApkSignature(), digest);
       } catch(Exception e) {
         log.error("Could not validate Certificate signature", e);
       }
     }
 
     return false;
-  }
-
-  protected byte[] calculateCheckSum(String algorithmName, byte[] signatureBytes) throws NoSuchAlgorithmException {
-    MessageDigest messageDigest = MessageDigest.getInstance(algorithmName);
-    messageDigest.update(signatureBytes);
-    return messageDigest.digest();
   }
 
   private String getCertificateDisplayInfo(byte[] signatureBytes) {
@@ -110,6 +130,26 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
     }
 
     return null;
+  }
+
+  protected byte[] calculateCheckSum(String algorithmName, byte[] signatureBytes) throws NoSuchAlgorithmException {
+    MessageDigest messageDigest = MessageDigest.getInstance(algorithmName);
+    messageDigest.update(signatureBytes);
+
+    return messageDigest.digest();
+  }
+
+  protected byte[] calculateCheckSum(String algorithmName, ByteBuffer signatureBytes) throws NoSuchAlgorithmException {
+    MessageDigest messageDigest = MessageDigest.getInstance(algorithmName);
+    messageDigest.update(signatureBytes);
+
+    return messageDigest.digest();
+  }
+
+  protected boolean verifyCheckSumsEqual(String hexCheckSum, byte[] checkSumBytes) {
+    String hexConvertedCheckSumBytes = bytesToHex(checkSumBytes);
+
+    return hexCheckSum.equals(hexConvertedCheckSumBytes);
   }
 
   protected String bytesToHex(byte[] bytes) {
