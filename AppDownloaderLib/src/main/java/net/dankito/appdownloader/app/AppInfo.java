@@ -27,7 +27,7 @@ public class AppInfo {
 
   protected boolean isAlreadyInstalled = false;
 
-  protected String installedVersion = null;
+  protected String installedVersionString = null;
 
   protected AppState state = AppState.INSTALLABLE;
 
@@ -36,7 +36,7 @@ public class AppInfo {
 
   // from App Details Page
 
-  protected String version;
+  protected String versionString;
 
   protected String rating;
 
@@ -123,12 +123,12 @@ public class AppInfo {
     }
   }
 
-  public String getInstalledVersion() {
-    return installedVersion;
+  public String getInstalledVersionString() {
+    return installedVersionString;
   }
 
-  public void setInstalledVersion(String installedVersion) {
-    this.installedVersion = installedVersion;
+  public void setInstalledVersionString(String installedVersionString) {
+    this.installedVersionString = installedVersionString;
   }
 
   public AppState getState() {
@@ -163,12 +163,12 @@ public class AppInfo {
   }
 
 
-  public String getVersion() {
-    return version;
+  public String getVersionString() {
+    return versionString;
   }
 
-  public void setVersion(String version) {
-    this.version = version;
+  public void setVersionString(String versionString) {
+    this.versionString = versionString;
   }
 
   public String getRating() {
@@ -197,7 +197,7 @@ public class AppInfo {
 
 
   public boolean areAppDetailsDownloaded() {
-    return StringUtils.isNotNullOrEmpty(getVersion()) && StringUtils.isNotNullOrEmpty(getRating()) &&
+    return StringUtils.isNotNullOrEmpty(getVersionString()) && StringUtils.isNotNullOrEmpty(getRating()) &&
         StringUtils.isNotNullOrEmpty(getCountRatings()) && StringUtils.isNotNullOrEmpty(getCountInstallations());
   }
 
@@ -255,7 +255,7 @@ public class AppInfo {
   }
 
   protected boolean isUpdatable() {
-    return isNewerVersion(getVersion(), getInstalledVersion());
+    return isNewerVersion(getVersionString(), getInstalledVersionString());
   }
 
   protected boolean isNewerVersion(String version1, String version2) {

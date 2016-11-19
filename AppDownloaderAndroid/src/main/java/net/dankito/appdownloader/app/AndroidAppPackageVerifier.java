@@ -100,7 +100,7 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
   }
 
   protected boolean isVersionCorrect(AppInfo appToInstall, PackageInfo packageInfo) {
-    return packageInfo.versionName.equals(appToInstall.getVersion());
+    return packageInfo.versionName.equals(appToInstall.getVersionString());
   }
 
   protected boolean verifyFileCheckSumIsCorrect(AppDownloadInfo downloadInfo, AppPackageVerificationResult result, Resources resources) {

@@ -77,7 +77,7 @@ public class AppSearchResultsAdapter extends BaseAdapter {
 
     TextView txtvwVersion = (TextView)convertView.findViewById(R.id.txtvwAppVersion);
     if(appInfo.areAppDetailsDownloaded()) {
-      txtvwVersion.setText(appInfo.getVersion() + " (" + appInfo.getCountInstallations() + ")");
+      txtvwVersion.setText(appInfo.getVersionString() + " (" + appInfo.getCountInstallations() + ")");
     }
     else {
       txtvwVersion.setText("");

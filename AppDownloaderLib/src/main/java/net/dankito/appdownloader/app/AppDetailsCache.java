@@ -30,7 +30,7 @@ public class AppDetailsCache implements IAppDetailsCache {
   }
 
   protected void setAppDetailsForApp(AppInfo cachedAppDetails, AppInfo app) {
-    app.setVersion(cachedAppDetails.getVersion());
+    app.setVersionString(cachedAppDetails.getVersionString());
 
     app.setRating(cachedAppDetails.getRating());
     app.setCountRatings(cachedAppDetails.getCountRatings());

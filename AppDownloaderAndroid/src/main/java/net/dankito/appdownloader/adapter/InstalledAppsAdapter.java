@@ -89,7 +89,7 @@ public class InstalledAppsAdapter extends BaseAdapter {
     txtvwAppTitle.setText(appInfo.getTitle());
 
     TextView txtvwVersion = (TextView)convertView.findViewById(R.id.txtvwAppVersion);
-    txtvwVersion.setText(appInfo.getInstalledVersion());
+    txtvwVersion.setText(appInfo.getInstalledVersionString());
 
     ImageView imgvwAppIcon = (ImageView)convertView.findViewById(R.id.imgvwAppIcon);
     if(appInfo.getIconImage() instanceof Drawable) {

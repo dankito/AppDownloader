@@ -189,7 +189,7 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
     else {
       app.setIconImage(installedAppInfo.getIconImage());
       app.setAlreadyInstalled(true);
-      app.setInstalledVersion(installedAppInfo.getInstalledVersion());
+      app.setInstalledVersionString(installedAppInfo.getInstalledVersionString());
     }
   }
 
@@ -282,7 +282,7 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
           appInfo.setCountInstallations(child.text());
         }
         else if("softwareVersion".equals(detailName)) {
-          appInfo.setVersion(child.text());
+          appInfo.setVersionString(child.text());
         }
       }
     }

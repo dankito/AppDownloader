@@ -134,7 +134,7 @@ public class AndroidInstalledAppsManager implements IInstalledAppsManager {
     app.setTitle((String)packageInfo.applicationInfo.loadLabel(packageManager));
     app.setIconImage(packageInfo.applicationInfo.loadIcon(packageManager));
     app.setAlreadyInstalled(true);
-    app.setInstalledVersion(packageInfo.versionName);
+    app.setInstalledVersionString(packageInfo.versionName);
 
     return app;
   }
@@ -217,7 +217,7 @@ public class AndroidInstalledAppsManager implements IInstalledAppsManager {
   protected boolean hasAppBeenUpdated(AppInfo cachedInstalledApp, PackageManager packageManager) {
     AppInfo newAppInfo = getAppInstallationInfo(cachedInstalledApp.getPackageName());
 
-    return cachedInstalledApp.getInstalledVersion().equals(newAppInfo.getInstalledVersion()) == false; // TODO: really check if App has been updated
+    return cachedInstalledApp.getInstalledVersionString().equals(newAppInfo.getInstalledVersionString()) == false; // TODO: really check if App has been updated
   }
 
 

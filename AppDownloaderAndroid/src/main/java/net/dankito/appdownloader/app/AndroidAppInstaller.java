@@ -103,7 +103,7 @@ public class AndroidAppInstaller implements IAppInstaller {
     appsBeingInstalled.remove(appRequestCode);
 
     appBeingInstalled.setAlreadyInstalled(true);
-    appBeingInstalled.setInstalledVersion(appBeingInstalled.getVersion());
+    appBeingInstalled.setInstalledVersionString(appBeingInstalled.getVersionString());
 
     appBeingInstalled.setToItsDefaultState();
 
