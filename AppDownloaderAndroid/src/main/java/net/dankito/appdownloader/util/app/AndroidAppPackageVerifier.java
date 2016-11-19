@@ -7,6 +7,7 @@ import android.content.pm.Signature;
 
 import net.dankito.appdownloader.app.AppDownloadLink;
 import net.dankito.appdownloader.app.AppInfo;
+import net.dankito.appdownloader.app.AppState;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,8 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
 
   public boolean verifyDownloadedApk(AppDownloadLink downloadLink) {
     AppInfo appToInstall = downloadLink.getAppInfo();
+    appToInstall.setState(AppState.VERIFYING_SIGNATURE);
+
     PackageManager packageManager = context.getPackageManager();
 
     PackageInfo packageInfo = packageManager.getPackageArchiveInfo(downloadLink.getDownloadLocationPath(), PackageManager.GET_PERMISSIONS | PackageManager.GET_META_DATA);
