@@ -34,7 +34,6 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
   protected static final String BASE_URL = "https://play.google.com";
 
   protected static final String PACKAGE_NAME_ATTRIBUTE_NAME = "data-docid";
-  protected static final String COOKIE_ATTRIBUTE_NAME = "data-server-cookie";
 
   protected static final int CONNECTION_TIMEOUT_MILLIS = 2000;
   protected static final int COUNT_CONNECTION_RETRIES = 2;
