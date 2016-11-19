@@ -12,17 +12,29 @@ import net.dankito.appdownloader.R;
 public class AlertHelper {
 
   public static void showErrorMessageThreadSafe(final Activity activity, final String errorMessage) {
+    showErrorMessageThreadSafe(activity, errorMessage, null);
+  }
+
+  public static void showErrorMessageThreadSafe(final Activity activity, final String errorMessage, final String alertTitle) {
     activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        showErrorMessage(activity, errorMessage);
+        showErrorMessage(activity, errorMessage, alertTitle);
       }
     });
   }
 
   public static void showErrorMessage(Activity activity, String errorMessage) {
+    showErrorMessage(activity, errorMessage, null);
+  }
+
+  public static void showErrorMessage(Activity activity, String errorMessage, final String alertTitle) {
     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
     builder = builder.setMessage(errorMessage);
+
+    if(alertTitle != null) {
+      builder = builder.setTitle(alertTitle);
+    }
 
     builder.setNegativeButton(R.string.ok, null);
 
