@@ -2,9 +2,12 @@ package net.dankito.appdownloader;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import net.dankito.appdownloader.adapter.ActivityMainTabsAdapter;
 import net.dankito.appdownloader.di.AndroidDiComponent;
 import net.dankito.appdownloader.di.AndroidDiContainer;
 import net.dankito.appdownloader.di.DaggerAndroidDiComponent;
@@ -20,6 +23,12 @@ public class MainActivity extends AppCompatActivity {
 
   protected Map<Integer, IActivityResultListener> activityResultListeners = new ConcurrentHashMap<>();
 
+  protected ViewPager viewPager;
+
+  protected TabLayout tabLayout;
+
+  protected ActivityMainTabsAdapter tabsAdapter;
+
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -27,10 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     setupDependencyInjection();
 
-    setContentView(R.layout.activity_main);
-
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
+    setupUi();
   }
 
   protected void setupDependencyInjection() {
@@ -39,6 +45,21 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
     component.inject(this);
+  }
+
+  protected void setupUi() {
+    setContentView(R.layout.activity_main);
+
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+
+    tabsAdapter = new ActivityMainTabsAdapter(this);
+
+    viewPager = (ViewPager) findViewById(R.id.pager);
+    viewPager.setAdapter(tabsAdapter);
+
+    tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+    tabLayout.setupWithViewPager(viewPager);
   }
 
   @Override
