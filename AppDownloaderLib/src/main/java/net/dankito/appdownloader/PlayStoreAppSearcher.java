@@ -128,7 +128,6 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
 
   protected AppInfo parseCardContentElement(Element cardContentElement) {
     String packageName = cardContentElement.attr(PACKAGE_NAME_ATTRIBUTE_NAME);
-    String cookie = cardContentElement.attr(COOKIE_ATTRIBUTE_NAME); // TODO: do we need this?
 
     AppInfo appInfo = new AppInfo(packageName);
     try {
