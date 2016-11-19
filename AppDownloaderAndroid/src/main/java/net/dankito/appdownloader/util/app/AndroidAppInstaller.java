@@ -95,14 +95,22 @@ public class AndroidAppInstaller implements IAppInstaller {
         AppInfo appBeingInstalled = appBeingInstalledEntry.getValue();
 
         if(appBeingInstalled.getPackageName().equals(changedAppPackage)) {
-          appsBeingInstalled.remove(appBeingInstalledEntry.getKey());
-          appBeingInstalled.setState(AppState.UPDATABLE);
-
-          deletedDownloadedApk(appBeingInstalled);
+          appSuccessfullyInstalled(appBeingInstalledEntry.getKey(), appBeingInstalled);
           break;
         }
       }
     }
+  }
+
+  protected void appSuccessfullyInstalled(Integer appRequestCode, AppInfo appBeingInstalled) {
+    appsBeingInstalled.remove(appRequestCode);
+
+    appBeingInstalled.setAlreadyInstalled(true);
+    appBeingInstalled.setInstalledVersion(appBeingInstalled.getVersion());
+
+    appBeingInstalled.setToItsDefaultState();
+
+    deletedDownloadedApk(appBeingInstalled);
   }
 
   protected void deletedDownloadedApk(AppInfo appBeingInstalled) {
