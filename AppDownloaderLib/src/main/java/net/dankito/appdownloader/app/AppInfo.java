@@ -13,8 +13,6 @@ public class AppInfo {
 
   protected String packageName;
 
-  protected String appUrl;
-
   protected String title;
 
   protected String developer;
@@ -58,14 +56,6 @@ public class AppInfo {
 
   public String getPackageName() {
     return packageName;
-  }
-
-  public String getAppUrl() {
-    return appUrl;
-  }
-
-  public void setAppUrl(String appUrl) {
-    this.appUrl = appUrl;
   }
 
   public String getTitle() {
@@ -169,7 +159,7 @@ public class AppInfo {
 
 
   public boolean areNecessaryInformationSet() {
-    return StringUtils.isNotNullOrEmpty(packageName) && StringUtils.isNotNullOrEmpty(appUrl) && StringUtils.isNotNullOrEmpty(title);
+    return StringUtils.isNotNullOrEmpty(packageName) && StringUtils.isNotNullOrEmpty(title) && StringUtils.isNotNullOrEmpty(appDetailsPageUrl);
   }
 
 

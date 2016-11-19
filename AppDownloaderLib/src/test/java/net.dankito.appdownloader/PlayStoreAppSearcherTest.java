@@ -53,12 +53,12 @@ public class PlayStoreAppSearcherTest {
     for(AppInfo appInfo : searchResults) {
       Assert.assertTrue(appInfo.areNecessaryInformationSet());
 
-      Assert.assertTrue(StringUtils.isNotNullOrEmpty(appInfo.getAppUrl()));
       Assert.assertTrue(StringUtils.isNotNullOrEmpty(appInfo.getPackageName()));
       Assert.assertTrue(StringUtils.isNotNullOrEmpty(appInfo.getTitle()));
       Assert.assertTrue(StringUtils.isNotNullOrEmpty(appInfo.getDeveloper()));
       Assert.assertTrue(StringUtils.isNotNullOrEmpty(appInfo.getSmallCoverImageUrl()));
       Assert.assertTrue(StringUtils.isNotNullOrEmpty(appInfo.getLargeCoverImageUrl()));
+      Assert.assertTrue(StringUtils.isNotNullOrEmpty(appInfo.getAppDetailsPageUrl()));
     }
   }
 }
