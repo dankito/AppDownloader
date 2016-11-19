@@ -33,8 +33,6 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
 
   protected static final String BASE_URL = "https://play.google.com";
 
-  protected static final String GET_APP_DETAIL_PAGE_URL = BASE_URL + "/store/apps/details?id=";
-
   protected static final String PACKAGE_NAME_ATTRIBUTE_NAME = "data-docid";
   protected static final String COOKIE_ATTRIBUTE_NAME = "data-server-cookie";
 
@@ -130,10 +128,6 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
     String packageName = cardContentElement.attr(PACKAGE_NAME_ATTRIBUTE_NAME);
 
     AppInfo appInfo = new AppInfo(packageName);
-    try {
-      String appDetailsPageUrl = GET_APP_DETAIL_PAGE_URL + URLEncoder.encode(appInfo.getPackageName(), "ASCII");
-      appInfo.setAppDetailsPageUrl(appDetailsPageUrl);
-    } catch(Exception e) { log.error("Could not create App Details Page Url from Package Name " + appInfo.getPackageName(), e); }
 
     for(Element child : cardContentElement.children()) {
       if("div".equals(child.nodeName())) {

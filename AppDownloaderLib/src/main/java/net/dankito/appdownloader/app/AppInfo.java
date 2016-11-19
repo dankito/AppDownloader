@@ -2,6 +2,7 @@ package net.dankito.appdownloader.app;
 
 import net.dankito.appdownloader.util.StringUtils;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,9 @@ import java.util.List;
  */
 
 public class AppInfo {
+
+  protected static final String GET_APP_DETAIL_PAGE_URL = "https://play.google.com/store/apps/details?id=";
+
 
   protected String packageName;
 
@@ -55,6 +59,15 @@ public class AppInfo {
 
   public AppInfo(String packageName) {
     this.packageName = packageName;
+
+    tryToSetAppDetailsPage(packageName);
+  }
+
+  private void tryToSetAppDetailsPage(String packageName) {
+    try {
+      String appDetailsPageUrl = GET_APP_DETAIL_PAGE_URL + URLEncoder.encode(packageName, "ASCII");
+      setAppDetailsPageUrl(appDetailsPageUrl);
+    } catch(Exception ignored) { }
   }
 
 
