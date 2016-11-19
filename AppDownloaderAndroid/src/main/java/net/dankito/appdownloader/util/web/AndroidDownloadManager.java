@@ -216,8 +216,10 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
   }
 
   protected void cancelDownload(long downloadId, AppDownloadInfo downloadInfo) {
-    DownloadManager downloadManager = getDownloadManager();
+    AppInfo appInfo = downloadInfo.getAppInfo();
+    appInfo.setToItsDefaultState();
 
+    DownloadManager downloadManager = getDownloadManager();
     downloadManager.remove(downloadId);
 
     CurrentDownload currentDownload = currentDownloads.remove(downloadId);
