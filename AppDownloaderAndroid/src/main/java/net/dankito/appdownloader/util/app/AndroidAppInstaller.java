@@ -37,7 +37,7 @@ public class AndroidAppInstaller implements IAppInstaller {
 
   protected Activity activity;
 
-  protected Map<Integer, AppInfo> appsBeingInstalled = new ConcurrentHashMap<>();
+  protected Map<Integer, AppDownloadLink> appsBeingInstalled = new ConcurrentHashMap<>();
 
 
   public AndroidAppInstaller(Activity activity) {
@@ -67,7 +67,7 @@ public class AndroidAppInstaller implements IAppInstaller {
     int requestCode = APP_INSTALL_REQUEST_CODE + CountInstalledApps++;
     activity.startActivityForResult(intent, requestCode);
 
-    appsBeingInstalled.put(requestCode, appToInstall);
+    appsBeingInstalled.put(requestCode, downloadLink);
   }
 
 
@@ -91,8 +91,9 @@ public class AndroidAppInstaller implements IAppInstaller {
       String dataString = intent.getDataString();
       String changedAppPackage = dataString.substring(dataString.indexOf(':') + 1); // remove scheme (= package:)
 
-      for(Map.Entry<Integer, AppInfo> appBeingInstalledEntry : new ArrayList<>(appsBeingInstalled.entrySet())) {
-        AppInfo appBeingInstalled = appBeingInstalledEntry.getValue();
+      for(Map.Entry<Integer, AppDownloadLink> appBeingInstalledEntry : new ArrayList<>(appsBeingInstalled.entrySet())) {
+        AppDownloadLink downloadLink = appBeingInstalledEntry.getValue();
+        AppInfo appBeingInstalled = downloadLink.getAppInfo();
 
         if(appBeingInstalled.getPackageName().equals(changedAppPackage)) {
           appSuccessfullyInstalled(appBeingInstalledEntry.getKey(), appBeingInstalled);
@@ -134,7 +135,8 @@ public class AndroidAppInstaller implements IAppInstaller {
   };
 
   protected void doneInstallingApp(int requestCode, int resultCode, Intent data) {
-    AppInfo appBeingInstalled = appsBeingInstalled.remove(requestCode);
+    AppDownloadLink downloadLink = appsBeingInstalled.remove(requestCode);
+    AppInfo appBeingInstalled = downloadLink.getAppInfo();
 
     if(appBeingInstalled != null) { // it may has already been removed by handlePackageAddedOrChanged()
       appBeingInstalled.setToItsDefaultState();
