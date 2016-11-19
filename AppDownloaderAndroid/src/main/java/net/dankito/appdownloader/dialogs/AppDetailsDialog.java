@@ -193,13 +193,11 @@ public class AppDetailsDialog extends FullscreenDialog {
   }
 
   protected void installApp() {
-    if(appInfo.isAlreadyDownloaded() == false) {
-      if(appInfo.hasDownloadUrls()) {
-        downloadApp(appInfo, getBestAppDownloadUrl(appInfo));
-      }
-      else {
-        getAppDownloadLinkAndDownloadApp(appInfo);
-      }
+    if(appInfo.hasDownloadUrls()) {
+      downloadApp(appInfo, getBestAppDownloadUrl(appInfo));
+    }
+    else {
+      getAppDownloadLinkAndDownloadApp(appInfo);
     }
   }
 
