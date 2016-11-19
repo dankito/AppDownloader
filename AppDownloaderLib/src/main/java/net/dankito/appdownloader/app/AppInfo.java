@@ -25,6 +25,10 @@ public class AppInfo {
 
   protected String appDetailsPageUrl;
 
+  protected boolean isAlreadyInstalled = false;
+
+  protected String installedVersion = null;
+
   protected AppState state = AppState.INSTALLABLE;
 
   protected List<AppStateListener> stateListeners = new ArrayList<>();
@@ -109,6 +113,22 @@ public class AppInfo {
 
   public void setAppDetailsPageUrl(String appDetailsPageUrl) {
     this.appDetailsPageUrl = appDetailsPageUrl;
+  }
+
+  public boolean isAlreadyInstalled() {
+    return isAlreadyInstalled;
+  }
+
+  public void setAlreadyInstalled(boolean alreadyInstalled) {
+    isAlreadyInstalled = alreadyInstalled;
+  }
+
+  public String getInstalledVersion() {
+    return installedVersion;
+  }
+
+  public void setInstalledVersion(String installedVersion) {
+    this.installedVersion = installedVersion;
   }
 
   public AppState getState() {
