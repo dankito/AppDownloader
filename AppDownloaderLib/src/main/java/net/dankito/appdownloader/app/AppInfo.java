@@ -27,6 +27,8 @@ public class AppInfo {
 
   protected boolean isAlreadyInstalled = false;
 
+  protected AppVersion installedVersion = null;
+
   protected String installedVersionString = null;
 
   protected AppState state = AppState.INSTALLABLE;
@@ -35,6 +37,8 @@ public class AppInfo {
 
 
   // from App Details Page
+
+  protected AppVersion version = null;
 
   protected String versionString;
 
@@ -123,12 +127,22 @@ public class AppInfo {
     }
   }
 
+  public AppVersion getInstalledVersion() {
+    return installedVersion;
+  }
+
+  public void setInstalledVersion(AppVersion installedVersion) {
+    this.installedVersion = installedVersion;
+  }
+
   public String getInstalledVersionString() {
     return installedVersionString;
   }
 
   public void setInstalledVersionString(String installedVersionString) {
     this.installedVersionString = installedVersionString;
+
+    setInstalledVersion(AppVersion.parse(installedVersionString));
   }
 
   public AppState getState() {
@@ -163,12 +177,22 @@ public class AppInfo {
   }
 
 
+  public AppVersion getVersion() {
+    return version;
+  }
+
+  public void setVersion(AppVersion version) {
+    this.version = version;
+  }
+
   public String getVersionString() {
     return versionString;
   }
 
   public void setVersionString(String versionString) {
     this.versionString = versionString;
+
+    setVersion(AppVersion.parse(versionString));
   }
 
   public String getRating() {
@@ -254,11 +278,14 @@ public class AppInfo {
     }
   }
 
-  protected boolean isUpdatable() {
-    return isNewerVersion(getVersionString(), getInstalledVersionString());
+  public boolean isUpdatable() {
+    return isUpdateAvailable(getVersion(), getInstalledVersion());
   }
 
-  protected boolean isNewerVersion(String version1, String version2) {
+  protected boolean isUpdateAvailable(AppVersion availableVersion, AppVersion installedVersion) {
+    if(availableVersion != null && installedVersion != null) {
+      return availableVersion.compareTo(installedVersion) > 0;
+    }
     return true;
   }
 
