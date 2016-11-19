@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.app.AppInfo;
+import net.dankito.appdownloader.app.IInstalledAppsManager;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,6 +24,8 @@ public class InstalledAppsAdapter extends BaseAdapter {
 
   protected Activity activity;
 
+  protected IInstalledAppsManager installedAppsManager;
+
   protected List<AppInfo> installedApps;
 
 
@@ -32,7 +35,13 @@ public class InstalledAppsAdapter extends BaseAdapter {
   }
 
 
-  public void setInstalledApps(List<AppInfo> installedApps) {
+  public void setInstalledAppsManager(IInstalledAppsManager installedAppsManager) {
+    this.installedAppsManager = installedAppsManager;
+
+    setInstalledApps(installedAppsManager.getAllInstalledApps());
+  }
+
+  protected void setInstalledApps(List<AppInfo> installedApps) {
     Collections.sort(installedApps, installedAppsComparator);
     this.installedApps = installedApps;
 
