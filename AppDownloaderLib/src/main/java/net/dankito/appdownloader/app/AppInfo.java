@@ -48,8 +48,6 @@ public class AppInfo {
 
   protected List<AppDownloadLink> downloadLinks = new ArrayList<>();
 
-  protected String downloadLocationUri = null;
-
   protected String downloadLocationPath = null;
 
 
@@ -217,15 +215,7 @@ public class AppInfo {
   }
 
   public boolean isAlreadyDownloaded() {
-    return downloadLocationUri != null;
-  }
-
-  public String getDownloadLocationUri() {
-    return downloadLocationUri;
-  }
-
-  public void setDownloadLocationUri(String downloadLocationUri) {
-    this.downloadLocationUri = downloadLocationUri;
+    return downloadLocationPath != null;
   }
 
   public String getDownloadLocationPath() {
