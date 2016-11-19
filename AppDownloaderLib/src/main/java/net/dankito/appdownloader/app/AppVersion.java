@@ -1,15 +1,10 @@
 package net.dankito.appdownloader.app;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Created by ganymed on 19/11/16.
  */
 
 public class AppVersion implements Comparable<AppVersion> {
-
-  private static final Logger log = LoggerFactory.getLogger(AppVersion.class);
 
   protected Integer major = null;
 
@@ -171,9 +166,7 @@ public class AppVersion implements Comparable<AppVersion> {
       }
 
       return appVersion;
-    } catch(Exception e) {
-      log.error("Could not parse version string " + versionString + " to AppVersion", e);
-    }
+    } catch(Exception ignored) { }
 
     return null;
   }
@@ -181,9 +174,7 @@ public class AppVersion implements Comparable<AppVersion> {
   static Integer tryToParseToInteger(String versionPart) {
     try {
       return Integer.parseInt(versionPart);
-    } catch(Exception ignored) {
-      log.error("Could not parse " + versionPart + " to Integer", ignored); // TODO: remove log output
-    }
+    } catch(Exception ignored) { }
 
     return null;
   }
