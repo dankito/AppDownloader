@@ -30,6 +30,11 @@ public class InstalledAppsFragment extends Fragment {
   protected InstalledAppsAdapter installedAppsAdapter;
 
 
+  public InstalledAppsFragment() {
+    setHasOptionsMenu(false);
+  }
+
+
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     View view = inflater.inflate(R.layout.fragment_installed_apps, container, false);

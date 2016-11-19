@@ -29,7 +29,7 @@ import javax.inject.Inject;
  * Created by ganymed on 02/11/16.
  */
 
-public class PlayStoreAppSearcher {
+public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
 
   protected static final String BASE_URL = "https://play.google.com";
 
@@ -61,6 +61,7 @@ public class PlayStoreAppSearcher {
   }
 
 
+  @Override
   public void searchAsync(String searchTerm, final SearchAppsResponseCallback callback) {
     try {
       String searchUrl = "https://play.google.com/store/search?q=" + URLEncoder.encode(searchTerm, "ASCII") + "&authuser=0";
@@ -214,6 +215,7 @@ public class PlayStoreAppSearcher {
     });
   }
 
+  @Override
   public void getAppDetailsAsync(final AppInfo appInfo, final GetAppDetailsCallback callback) {
     try {
       RequestParameters parameters = new RequestParameters(appInfo.getAppDetailsPageUrl());
@@ -311,10 +313,12 @@ public class PlayStoreAppSearcher {
   }
 
 
+  @Override
   public boolean addRetrievedAppDetailsListener(GetAppDetailsCallback listener) {
     return appDetailsListeners.add(listener);
   }
 
+  @Override
   public boolean removeRetrievedAppDetailsListener(GetAppDetailsCallback listener) {
     return appDetailsListeners.remove(listener);
   }

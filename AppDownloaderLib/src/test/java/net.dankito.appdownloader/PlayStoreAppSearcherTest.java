@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 public class PlayStoreAppSearcherTest {
 
-  protected PlayStoreAppSearcher underTest;
+  protected IPlayStoreAppSearcher underTest;
 
 
   @Before

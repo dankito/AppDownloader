@@ -16,8 +16,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import net.dankito.appdownloader.IPlayStoreAppSearcher;
 import net.dankito.appdownloader.MainActivity;
-import net.dankito.appdownloader.PlayStoreAppSearcher;
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.adapter.AppSearchResultsAdapter;
 import net.dankito.appdownloader.app.AppInfo;
@@ -48,7 +48,7 @@ public class AppSearchResultsFragment extends Fragment {
   protected IOnUiThreadRunner uiThreadRunner;
 
   @Inject
-  protected PlayStoreAppSearcher appSearcher;
+  protected IPlayStoreAppSearcher appSearcher;
 
   @Inject
   protected ApkMirrorPlayStoreAppDownloader apkMirrorPlayStoreAppDownloader;

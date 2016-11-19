@@ -2,6 +2,7 @@ package net.dankito.appdownloader.di;
 
 import android.app.Activity;
 
+import net.dankito.appdownloader.IPlayStoreAppSearcher;
 import net.dankito.appdownloader.PlayStoreAppSearcher;
 import net.dankito.appdownloader.app.AppDetailsCache;
 import net.dankito.appdownloader.app.IAppDetailsCache;
@@ -119,7 +120,7 @@ public class AndroidDiContainer {
 
   @Provides
   @Singleton
-  public PlayStoreAppSearcher providePlayStoreAppSearcher(IWebClient webClient, IInstalledAppsManager installedAppsManager, IAppDetailsCache appDetailsCache) {
+  public IPlayStoreAppSearcher providePlayStoreAppSearcher(IWebClient webClient, IInstalledAppsManager installedAppsManager, IAppDetailsCache appDetailsCache) {
     return new PlayStoreAppSearcher(webClient, installedAppsManager, appDetailsCache);
   }
 
