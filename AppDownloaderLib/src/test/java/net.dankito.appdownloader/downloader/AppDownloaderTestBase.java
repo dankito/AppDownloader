@@ -1,8 +1,9 @@
 package net.dankito.appdownloader.downloader;
 
+import net.dankito.appdownloader.app.AppDownloadLink;
 import net.dankito.appdownloader.app.AppInfo;
-import net.dankito.appdownloader.responses.DownloadAppResponse;
-import net.dankito.appdownloader.responses.callbacks.DownloadAppCallback;
+import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
+import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
 import net.dankito.appdownloader.util.IThreadPool;
 import net.dankito.appdownloader.util.ThreadPool;
 import net.dankito.appdownloader.util.web.IWebClient;
@@ -23,9 +24,9 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class AppDownloaderTestBase {
 
-  protected static final String TEST_APP_PACKAGE_NAME = "com.apkdownloader.adr";
+  protected static final String TEST_APP_PACKAGE_NAME = "com.whatsapp";
 
-  protected static final String TEST_APP_TITLE = "ApkDownloader";
+  protected static final String TEST_APP_TITLE = "WhatsApp Messenger";
 
 
   protected IAppDownloader underTest;
@@ -45,15 +46,15 @@ public abstract class AppDownloaderTestBase {
   @Test
   public void downloadAppAsync_DownloadApkDownloader() throws Exception {
     final CountDownLatch countDownLatch = new CountDownLatch(1);
-    final List<DownloadAppResponse> responseHolder = new ArrayList<>(1);
+    final List<GetAppDownloadUrlResponse> responseHolder = new ArrayList<>(1);
 
     AppInfo appToDownload = new AppInfo(TEST_APP_PACKAGE_NAME);
     appToDownload.setTitle(TEST_APP_TITLE);
     appToDownload.setDeveloper("");
 
-    underTest.downloadAppAsync(appToDownload, new DownloadAppCallback() {
+    underTest.getAppDownloadLinkAsync(appToDownload, new GetAppDownloadUrlResponseCallback() {
       @Override
-      public void completed(DownloadAppResponse response) {
+      public void completed(GetAppDownloadUrlResponse response) {
         responseHolder.add(response);
 
         countDownLatch.countDown();
@@ -64,13 +65,22 @@ public abstract class AppDownloaderTestBase {
 
     Assert.assertEquals(1, responseHolder.size());
 
-    DownloadAppResponse response = responseHolder.get(0);
+    GetAppDownloadUrlResponse response = responseHolder.get(0);
 
     Assert.assertTrue(response.isSuccessful());
-    Assert.assertEquals(TEST_APP_PACKAGE_NAME, response.getAppToDownload().getPackageName());
 
-    Assert.assertNotNull(response.getDownloadLocation());
-    Assert.assertTrue(response.getDownloadLocation().exists());
-    Assert.assertTrue(response.getDownloadLocation().length() > 0);
+    AppInfo appToDownloadFromResponse = response.getAppToDownload();
+    Assert.assertEquals(TEST_APP_PACKAGE_NAME, appToDownloadFromResponse.getPackageName());
+
+    List<AppDownloadLink> downloadLinks = appToDownloadFromResponse.getDownloadLinks();
+    Assert.assertEquals(1, downloadLinks.size());
+
+    AppDownloadLink downloadLink = downloadLinks.get(0);
+    Assert.assertNotNull(downloadLink.getAppDownloader());
+    Assert.assertNotNull(downloadLink.getAppInfo());
+    Assert.assertNotNull(downloadLink.getUrl());
+    Assert.assertNotNull(downloadLink.getFileSize());
+    Assert.assertNotNull(downloadLink.getFileHashSum());
+    Assert.assertNotNull(downloadLink.getHashAlgorithm());
   }
 }
