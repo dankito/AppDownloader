@@ -303,6 +303,9 @@ public class AppDetailsDialog extends FullscreenDialog {
     if(appInfo.getState() == AppState.INSTALLABLE) {
       setActionMenuInstallAppToStateInstallable();
     }
+    else if(appInfo.getState() == AppState.REINSTALLABLE) {
+      setActionMenuInstallAppToStateReinstallable();
+    }
     else if(appInfo.getState() == AppState.UPDATABLE) {
       setActionMenuInstallAppToStateUpdatable();
     }
@@ -312,6 +315,9 @@ public class AppDetailsDialog extends FullscreenDialog {
     else if(appInfo.getState() == AppState.DOWNLOADING) {
       setActionMenuInstallAppToStateDownloading();
     }
+    else if(appInfo.getState() == AppState.VERIFYING_SIGNATURE) {
+      setActionMenuInstallAppToStateVerifyingSignature();
+    }
     else if(appInfo.getState() == AppState.INSTALLING) {
       setActionMenuInstallAppToStateInstalling();
     }
@@ -320,6 +326,20 @@ public class AppDetailsDialog extends FullscreenDialog {
   protected void setActionMenuInstallAppToStateInstallable() {
     if(txtvwInstallationStep != null) {
       txtvwInstallationStep.setText(R.string.install);
+    }
+
+    if(prgbrInstallationProgress != null) {
+      prgbrInstallationProgress.setVisibility(View.GONE);
+    }
+
+    if(installAppActionView != null) {
+      installAppActionView.setEnabled(true);
+    }
+  }
+
+  protected void setActionMenuInstallAppToStateReinstallable() {
+    if(txtvwInstallationStep != null) {
+      txtvwInstallationStep.setText(R.string.reinstall);
     }
 
     if(prgbrInstallationProgress != null) {
@@ -356,6 +376,15 @@ public class AppDetailsDialog extends FullscreenDialog {
 
   protected void setActionMenuInstallAppToStateDownloading() {
     txtvwInstallationStep.setText(R.string.downloading);
+
+    prgbrInstallationProgress.setIndeterminate(true);
+    prgbrInstallationProgress.setVisibility(View.VISIBLE);
+
+    installAppActionView.setEnabled(false);
+  }
+
+  protected void setActionMenuInstallAppToStateVerifyingSignature() {
+    txtvwInstallationStep.setText(R.string.verifying_downloaded_apk);
 
     prgbrInstallationProgress.setIndeterminate(true);
     prgbrInstallationProgress.setVisibility(View.VISIBLE);

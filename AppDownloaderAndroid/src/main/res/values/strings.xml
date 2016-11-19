@@ -10,9 +10,11 @@
     <string name="search_hint_search_apps">Search Apps</string>
 
     <string name="install">Install</string>
+    <string name="reinstall">Reinstall</string>
     <string name="update">Update</string>
     <string name="get_download_url">Getting Download Link</string>
     <string name="downloading">Downloading</string>
+    <string name="verifying_downloaded_apk">Verifying downloaded apk</string>
     <string name="installing">Installing</string>
 
     <string name="error_message_could_not_search_for_apps">Could not search for Apps: %s</string>
