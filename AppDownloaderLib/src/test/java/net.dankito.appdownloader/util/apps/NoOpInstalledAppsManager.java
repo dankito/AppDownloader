@@ -13,7 +13,7 @@ import java.util.List;
 public class NoOpInstalledAppsManager implements IInstalledAppsManager {
 
   @Override
-  public List<AppInfo> getInstalledApps() {
+  public List<AppInfo> getAllInstalledApps() {
     return new ArrayList<>();
   }
 

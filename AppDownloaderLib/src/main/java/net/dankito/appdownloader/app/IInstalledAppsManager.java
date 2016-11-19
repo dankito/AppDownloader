@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface IInstalledAppsManager {
 
-  List<AppInfo> getInstalledApps();
+  List<AppInfo> getAllInstalledApps();
 
   AppInfo getAppInstallationInfo(String packageName);
 
