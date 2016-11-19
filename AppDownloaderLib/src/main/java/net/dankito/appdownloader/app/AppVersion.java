@@ -112,35 +112,37 @@ public class AppVersion implements Comparable<AppVersion> {
       return 1;
     }
 
-    if(getMajor() > other.getMajor()) {
+    int compareResult = compareTwoIntegers(getMajor(), other.getMajor());
+    if(compareResult != 0) {
+      return compareResult;
+    }
+
+    compareResult = compareTwoIntegers(getMinor(), other.getMinor());
+    if(compareResult != 0) {
+      return compareResult;
+    }
+
+    compareResult = compareTwoIntegers(getRevision(), other.getRevision());
+    if(compareResult != 0) {
+      return compareResult;
+    }
+
+    compareResult = compareTwoIntegers(getBuild(), other.getBuild());
+    return compareResult;
+  }
+
+  protected int compareTwoIntegers(Integer integer1, Integer integer2) {
+    if(integer1 == null && integer2 == null) {
+      return 0;
+    }
+    else if(integer1 != null && integer2 == null) {
       return 1;
     }
-    else if(getMajor() < other.getMajor()) {
+    else if(integer1 == null && integer2 != null) {
       return -1;
     }
 
-    if(getMinor() > other.getMinor()) {
-      return 1;
-    }
-    else if(getMinor() < other.getMinor()) {
-      return -1;
-    }
-
-    if(getRevision() > other.getRevision()) {
-      return 1;
-    }
-    else if(getRevision() < other.getRevision()) {
-      return -1;
-    }
-
-    if(getBuild() > other.getBuild()) {
-      return 1;
-    }
-    else if(getBuild() < other.getBuild()) {
-      return -1;
-    }
-
-    return 0;
+    return integer1.compareTo(integer2);
   }
 
 
