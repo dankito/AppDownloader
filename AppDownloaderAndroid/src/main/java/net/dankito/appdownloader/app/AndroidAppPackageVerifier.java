@@ -1,4 +1,4 @@
-package net.dankito.appdownloader.util.app;
+package net.dankito.appdownloader.app;
 
 import android.app.Activity;
 import android.content.pm.PackageInfo;
@@ -7,9 +7,6 @@ import android.content.pm.Signature;
 import android.content.res.Resources;
 
 import net.dankito.appdownloader.R;
-import net.dankito.appdownloader.app.AppDownloadInfo;
-import net.dankito.appdownloader.app.AppInfo;
-import net.dankito.appdownloader.app.AppState;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,6 +1,4 @@
-package net.dankito.appdownloader.util.app;
-
-import net.dankito.appdownloader.app.AppInfo;
+package net.dankito.appdownloader.app;
 
 import java.util.List;
 

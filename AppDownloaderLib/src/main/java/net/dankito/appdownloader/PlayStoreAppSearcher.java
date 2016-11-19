@@ -6,7 +6,7 @@ import net.dankito.appdownloader.responses.GetAppDetailsResponse;
 import net.dankito.appdownloader.responses.SearchAppsResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDetailsCallback;
 import net.dankito.appdownloader.responses.callbacks.SearchAppsResponseCallback;
-import net.dankito.appdownloader.util.app.IInstalledAppsManager;
+import net.dankito.appdownloader.app.IInstalledAppsManager;
 import net.dankito.appdownloader.util.web.IWebClient;
 import net.dankito.appdownloader.util.web.RequestCallback;
 import net.dankito.appdownloader.util.web.RequestParameters;

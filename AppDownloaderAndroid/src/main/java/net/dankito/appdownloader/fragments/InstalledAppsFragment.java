@@ -11,7 +11,7 @@ import net.dankito.appdownloader.MainActivity;
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.adapter.InstalledAppsAdapter;
 import net.dankito.appdownloader.util.IOnUiThreadRunner;
-import net.dankito.appdownloader.util.app.IInstalledAppsManager;
+import net.dankito.appdownloader.app.IInstalledAppsManager;
 
 import javax.inject.Inject;
 

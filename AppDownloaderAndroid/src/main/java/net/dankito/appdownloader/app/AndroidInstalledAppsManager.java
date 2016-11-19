@@ -1,11 +1,9 @@
-package net.dankito.appdownloader.util.app;
+package net.dankito.appdownloader.app;
 
 import android.app.Activity;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-
-import net.dankito.appdownloader.app.AppInfo;
 
 import java.util.ArrayList;
 import java.util.List;
