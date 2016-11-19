@@ -6,6 +6,8 @@
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
 
+    <string name="tab_title_search">Suchen</string>
+
     <string name="search_title">Suchen</string>
     <string name="search_hint_search_apps">Apps suchen</string>
 
