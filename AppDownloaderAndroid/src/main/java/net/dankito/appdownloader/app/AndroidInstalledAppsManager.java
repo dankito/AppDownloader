@@ -1,7 +1,6 @@
 package net.dankito.appdownloader.app;
 
 import android.app.Activity;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
@@ -45,11 +44,6 @@ public class AndroidInstalledAppsManager implements IInstalledAppsManager {
     }
 
     return launchableInstalledApps;
-  }
-
-  private boolean isSystemPackage(PackageInfo pkgInfo) {
-    return ((pkgInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) ? true
-        : false;
   }
 
   protected boolean isLaunchableApp(PackageManager packageManager, PackageInfo packageInfo) {
