@@ -42,7 +42,7 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
 
   @Override
   public void getAppDownloadLinkAsync(final AppInfo appToDownload, final GetAppDownloadUrlResponseCallback callback) {
-    getAppDetailsPageUrlAsync(appToDownload, new GetUrlCallback() {
+    getAppDetailsPageUrlAsync(appToDownload, callback, new GetUrlCallback() {
       @Override
       public void completed(GetUrlResponse response) {
         if(response.isSuccessful() == false) {
@@ -196,7 +196,7 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
   }
 
 
-  protected void getAppDetailsPageUrlAsync(final AppInfo appToDownload, final GetUrlCallback callback) {
+  protected void getAppDetailsPageUrlAsync(final AppInfo appToDownload, final GetAppDownloadUrlResponseCallback getAppDownloadUrlResponseCallback, final GetUrlCallback callback) {
     try {
       String url = SEARCH_APPS_URL_PREFIX + URLEncoder.encode(appToDownload.getPackageName(), "ASCII") + SEARCH_APPS_URL_SUFFIX;
       RequestParameters parameters = createRequestParametersWithDefaultValues(url);
@@ -208,7 +208,7 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
             callback.completed(new GetUrlResponse(response.getError()));
           }
           else {
-            parseAppSearchResultPage(response, callback);
+            parseAppSearchResultPage(appToDownload, response, getAppDownloadUrlResponseCallback, callback);
           }
         }
       });
@@ -218,7 +218,7 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
     }
   }
 
-  protected void parseAppSearchResultPage(WebClientResponse response, GetUrlCallback callback) {
+  protected void parseAppSearchResultPage(AppInfo appToDownload, WebClientResponse response, GetAppDownloadUrlResponseCallback getAppDownloadUrlResponseCallback, GetUrlCallback callback) {
     Document document = Jsoup.parse(response.getBody());
     Elements tabContainerElements = document.body().select(".tab-container");
 
@@ -238,8 +238,28 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
           return;
         }
       }
+
+      boolean doesNotContainThisApp = checkIfDoesNotHaveThisApp(tabContainerElement);
+      if(doesNotContainThisApp) {
+        getAppDownloadUrlResponseCallback.completed(new GetAppDownloadUrlResponse(appToDownload, true));
+        return;
+      }
     }
 
     callback.completed(new GetUrlResponse("Could not find App Details Page Url")); // TODO: translate
+  }
+
+  protected boolean checkIfDoesNotHaveThisApp(Element tabContainerElement) {
+    Elements addPaddingElements = tabContainerElement.parent().select(".addpadding");
+    if(addPaddingElements.size() > 0) {
+      Element addPaddingElement = addPaddingElements.first();
+
+      if(addPaddingElement.childNodeSize() > 0) {
+        Element addPaddingElementChild = addPaddingElement.child(0);
+        return "p".equals(addPaddingElementChild.nodeName()) && "No results found matching your query".equals(addPaddingElementChild.text());
+      }
+    }
+
+    return false;
   }
 }
