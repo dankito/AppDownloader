@@ -7,4 +7,8 @@ public interface IUpdatableAppsManager {
 
   void getUpdatableAppsAsync(GetUpdatableAppsCallback callback);
 
+  boolean addUpdatableAppsListener(UpdatableAppsListener listener);
+
+  boolean removeUpdatableAppsListener(UpdatableAppsListener listener);
+
 }

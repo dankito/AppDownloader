@@ -37,6 +37,8 @@ public class AndroidUpdatableAppsManager implements IUpdatableAppsManager {
 
   protected Map<String, AppInfo> updatableApps = new ConcurrentHashMap<>();
 
+  protected List<UpdatableAppsListener> updatableAppsListeners = new CopyOnWriteArrayList<>();
+
 
   public AndroidUpdatableAppsManager(Activity activity, IInstalledAppsManager installedAppsManager, IPlayStoreAppSearcher playStoreAppSearcher,
                                      IAppDetailsCache appDetailsCache, IThreadPool threadPool) {
@@ -90,6 +92,8 @@ public class AndroidUpdatableAppsManager implements IUpdatableAppsManager {
 
   protected void updatableAppFound(AppInfo app) {
     updatableApps.put(app.getPackageName(), app);
+
+    callFoundUpdatableAppListeners(app);
   }
 
   protected void initializationDone() {
@@ -116,6 +120,27 @@ public class AndroidUpdatableAppsManager implements IUpdatableAppsManager {
       else {
         clientsWaitingForFindingUpdatableAppsDone.add(callback);
       }
+    }
+  }
+
+
+  public boolean addUpdatableAppsListener(UpdatableAppsListener listener) {
+    return updatableAppsListeners.add(listener);
+  }
+
+  public boolean removeUpdatableAppsListener(UpdatableAppsListener listener) {
+    return updatableAppsListeners.remove(listener);
+  }
+
+  protected void callFoundUpdatableAppListeners(AppInfo updatableApp) {
+    for(UpdatableAppsListener listener : updatableAppsListeners) {
+      listener.foundUpdatableApp(new UpdatableAppsListenerInfo(updatableApp, new ArrayList<AppInfo>(updatableApps.values())));
+    }
+  }
+
+  protected void callAppUpdatedListeners(AppInfo updatedApp) {
+    for(UpdatableAppsListener listener : updatableAppsListeners) {
+      listener.appUpdated(new UpdatableAppsListenerInfo(updatedApp, new ArrayList<AppInfo>(updatableApps.values())));
     }
   }
 
