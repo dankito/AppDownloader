@@ -64,6 +64,10 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
       setErrorMessage(result, resources, R.string.error_message_app_file_not_valid);
     }
 
+    if(appPackageCouldBeVerified == false) {
+      appToInstall.setToItsDefaultState();
+    }
+
     return result;
   }
 
