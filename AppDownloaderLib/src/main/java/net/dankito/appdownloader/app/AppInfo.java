@@ -212,20 +212,6 @@ public class AppInfo {
     return downloadLinks;
   }
 
-  public boolean isAlreadyDownloaded() {
-    return StringUtils.isNotNullOrEmpty(getDownloadLocationPath());
-  }
-
-  public String getDownloadLocationPath() {
-    for(AppDownloadLink downloadLink : getDownloadLinks()) {
-      if(downloadLink.isDownloaded()) {
-        return downloadLink.getDownloadLocationPath();
-      }
-    }
-
-    return null;
-  }
-
 
   public String getApkSignature() {
     for(AppDownloadLink downloadLink : getDownloadLinks()) {
