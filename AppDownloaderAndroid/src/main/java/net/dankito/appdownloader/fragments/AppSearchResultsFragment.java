@@ -20,12 +20,12 @@ import net.dankito.appdownloader.MainActivity;
 import net.dankito.appdownloader.PlayStoreAppSearcher;
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.adapter.AppSearchResultsAdapter;
+import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.dialogs.AppDetailsDialog;
 import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.ApkMirrorPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.EvoziPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.IAppDownloader;
-import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.responses.GetAppDetailsResponse;
 import net.dankito.appdownloader.responses.SearchAppsResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDetailsCallback;
@@ -33,9 +33,6 @@ import net.dankito.appdownloader.responses.callbacks.SearchAppsResponseCallback;
 import net.dankito.appdownloader.util.AlertHelper;
 import net.dankito.appdownloader.util.IOnUiThreadRunner;
 import net.dankito.appdownloader.util.web.IWebClient;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,9 +43,6 @@ import javax.inject.Inject;
  * A placeholder fragment containing a simple view.
  */
 public class AppSearchResultsFragment extends Fragment {
-
-  private static final Logger log = LoggerFactory.getLogger(AppSearchResultsFragment.class);
-
 
   @Inject
   protected IOnUiThreadRunner uiThreadRunner;
