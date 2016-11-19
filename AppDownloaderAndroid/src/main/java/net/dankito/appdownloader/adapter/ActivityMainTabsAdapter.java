@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.fragments.AppSearchResultsFragment;
-import net.dankito.appdownloader.fragments.InstalledAppsFragment;
+import net.dankito.appdownloader.fragments.UpdatableAppsFragment;
 
 /**
  * Created by ganymed on 19/11/16.
@@ -21,7 +21,7 @@ public class ActivityMainTabsAdapter extends FragmentPagerAdapter {
   protected FragmentManager fragmentManager;
 
 
-  protected InstalledAppsFragment installedAppsFragment = null;
+  protected UpdatableAppsFragment updatableAppsFragment = null;
 
   protected AppSearchResultsFragment appSearchResultsFragment = null;
 
@@ -54,11 +54,11 @@ public class ActivityMainTabsAdapter extends FragmentPagerAdapter {
   @Override
   public Fragment getItem(int position) {
     if(position == 0) {
-      if(installedAppsFragment == null) {
-        installedAppsFragment = new InstalledAppsFragment();
+      if(updatableAppsFragment == null) {
+        updatableAppsFragment = new UpdatableAppsFragment();
       }
 
-      return installedAppsFragment;
+      return updatableAppsFragment;
     }
     else if(position == 1) {
       if(appSearchResultsFragment == null) {
