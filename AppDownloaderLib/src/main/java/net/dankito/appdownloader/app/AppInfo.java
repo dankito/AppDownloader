@@ -122,7 +122,7 @@ public class AppInfo {
   public void setAlreadyInstalled(boolean alreadyInstalled) {
     isAlreadyInstalled = alreadyInstalled;
 
-    resetToDefaultState();
+    setToItsDefaultState();
   }
 
   public String getInstalledVersion() {
@@ -248,7 +248,7 @@ public class AppInfo {
   }
 
 
-  public void resetToDefaultState() {
+  public void setToItsDefaultState() {
     if(isAlreadyInstalled() == false) {
       setState(AppState.INSTALLABLE);
     }

@@ -129,7 +129,7 @@ public class AndroidAppInstaller implements IAppInstaller {
     AppInfo appBeingInstalled = appsBeingInstalled.remove(requestCode);
 
     if(appBeingInstalled != null) { // it may has already been removed by handlePackageAddedOrChanged()
-      appBeingInstalled.resetToDefaultState();
+      appBeingInstalled.setToItsDefaultState();
 
       deletedDownloadedApk(appBeingInstalled);
     }
