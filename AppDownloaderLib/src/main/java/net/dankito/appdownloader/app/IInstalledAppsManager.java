@@ -10,6 +10,8 @@ public interface IInstalledAppsManager {
 
   List<AppInfo> getAllInstalledApps();
 
+  List<AppInfo> getLaunchableApps();
+
   AppInfo getAppInstallationInfo(String packageName);
 
   boolean addInstalledAppsListener(InstalledAppsListener listener);

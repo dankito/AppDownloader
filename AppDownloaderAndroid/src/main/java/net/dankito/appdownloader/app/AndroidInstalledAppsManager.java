@@ -90,6 +90,12 @@ public class AndroidInstalledAppsManager implements IInstalledAppsManager {
     return allInstalledApps;
   }
 
+  public List<AppInfo> getLaunchableApps() {
+    PackageManager packageManager = getPackageManager();
+
+    return getLaunchableApps(packageManager);
+  }
+
   protected List<AppInfo> getLaunchableApps(PackageManager packageManager) {
     List<AppInfo> launchableInstalledApps = new ArrayList<>();
 
