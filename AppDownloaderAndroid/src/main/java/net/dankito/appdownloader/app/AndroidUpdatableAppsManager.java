@@ -48,6 +48,8 @@ public class AndroidUpdatableAppsManager implements IUpdatableAppsManager {
     this.appDetailsCache = appDetailsCache;
     this.threadPool = threadPool;
 
+    installedAppsManager.addInstalledAppsListener(installedAppsListener);
+
     initUpdatableAppsManager();
   }
 
@@ -96,6 +98,12 @@ public class AndroidUpdatableAppsManager implements IUpdatableAppsManager {
     callFoundUpdatableAppListeners(app);
   }
 
+  protected void appUpdated(AppInfo app) {
+    updatableApps.remove(app.getPackageName());
+
+    callAppUpdatedListeners(app);
+  }
+
   protected void initializationDone() {
     this.isUpdatableAppsManagerInitialized = true;
 
@@ -141,6 +149,49 @@ public class AndroidUpdatableAppsManager implements IUpdatableAppsManager {
   protected void callAppUpdatedListeners(AppInfo updatedApp) {
     for(UpdatableAppsListener listener : updatableAppsListeners) {
       listener.appUpdated(new UpdatableAppsListenerInfo(updatedApp, new ArrayList<AppInfo>(updatableApps.values())));
+    }
+  }
+
+
+  protected InstalledAppsListener installedAppsListener = new InstalledAppsListener() {
+    @Override
+    public void appInstalled(InstalledAppListenerInfo info) {
+      AndroidUpdatableAppsManager.this.appInstalled(info.getInstalledApp());
+    }
+
+    @Override
+    public void appUpdated(InstalledAppListenerInfo info) {
+      installedAppUpdated(info.getInstalledApp());
+    }
+
+    @Override
+    public void appRemoved(InstalledAppListenerInfo info) {
+      installedAppRemoved(info);
+    }
+  };
+
+  protected void appInstalled(AppInfo installedApp) {
+    if(installedApp.isUpdatable()) {
+      updatableAppFound(installedApp);
+    }
+  }
+
+  protected void installedAppUpdated(AppInfo installedApp) {
+    if(installedApp.isUpdatable()) {
+      if(updatableApps.containsKey(installedApp.getPackageName()) == false) {
+        updatableAppFound(installedApp);
+      }
+    }
+    else if(updatableApps.containsKey(installedApp.getPackageName())) {
+      appUpdated(installedApp);
+    }
+  }
+
+  protected void installedAppRemoved(InstalledAppListenerInfo info) {
+    AppInfo removedApp = info.getInstalledApp();
+
+    if(updatableApps.containsKey(removedApp.getPackageName()) && removedApp.isUpdatable()) {
+      appUpdated(removedApp);
     }
   }
 
