@@ -225,7 +225,12 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
       webClient.getAsync(parameters, new RequestCallback() {
         @Override
         public void completed(WebClientResponse response) {
-          getAppDetailsCompleted(appInfo, response, callback);
+          if(response.isSuccessful() == false) {
+            callback.completed(new GetAppDetailsResponse(appInfo, response.getError()));
+          }
+          else {
+            getAppDetailsCompleted(appInfo, response, callback);
+          }
         }
       });
     } catch(Exception e) {
