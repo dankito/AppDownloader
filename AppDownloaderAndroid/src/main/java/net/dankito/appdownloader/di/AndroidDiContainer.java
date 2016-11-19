@@ -4,8 +4,10 @@ import android.app.Activity;
 
 import net.dankito.appdownloader.IPlayStoreAppSearcher;
 import net.dankito.appdownloader.PlayStoreAppSearcher;
+import net.dankito.appdownloader.app.AndroidUpdatableAppsManager;
 import net.dankito.appdownloader.app.AppDetailsCache;
 import net.dankito.appdownloader.app.IAppDetailsCache;
+import net.dankito.appdownloader.app.IUpdatableAppsManager;
 import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.ApkMirrorPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.EvoziPlayStoreAppDownloader;
@@ -85,6 +87,13 @@ public class AndroidDiContainer {
   @Singleton
   public IInstalledAppsManager provideInstalledAppsManager() {
     return new AndroidInstalledAppsManager(getActivity());
+  }
+
+  @Provides
+  @Singleton
+  public IUpdatableAppsManager provideUpdatableAppsManager(IInstalledAppsManager installedAppsManager, IPlayStoreAppSearcher playStoreAppSearcher,
+                                                           IAppDetailsCache appDetailsCache, IThreadPool threadPool) {
+    return new AndroidUpdatableAppsManager(getActivity(), installedAppsManager, playStoreAppSearcher, appDetailsCache, threadPool);
   }
 
   @Provides
