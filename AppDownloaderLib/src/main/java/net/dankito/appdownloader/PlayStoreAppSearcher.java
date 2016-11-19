@@ -31,7 +31,9 @@ import javax.inject.Inject;
 
 public class PlayStoreAppSearcher {
 
-  protected static final String GET_APP_DETAIL_PAGE_URL = "https://play.google.com/store/apps/details?id=";
+  protected static final String BASE_URL = "https://play.google.com";
+
+  protected static final String GET_APP_DETAIL_PAGE_URL = BASE_URL + "/store/apps/details?id=";
 
   protected static final String PACKAGE_NAME_ATTRIBUTE_NAME = "data-docid";
   protected static final String COOKIE_ATTRIBUTE_NAME = "data-server-cookie";
@@ -153,7 +155,7 @@ public class PlayStoreAppSearcher {
   protected void parseDetails(AppInfo appInfo, Element cardDetailsElement) {
     for(Element child : cardDetailsElement.children()) {
       if("a".equals(child.nodeName()) && child.hasClass("title")) {
-        appInfo.setAppDetailsPageUrl(child.attr("href"));
+        appInfo.setAppDetailsPageUrl(BASE_URL + child.attr("href"));
         appInfo.setTitle(child.attr("title"));
       }
       else if("div".equals(child.nodeName()) && child.hasClass("subtitle-container")) {
