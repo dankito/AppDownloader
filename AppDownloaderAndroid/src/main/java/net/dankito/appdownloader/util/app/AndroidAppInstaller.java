@@ -43,8 +43,6 @@ public class AndroidAppInstaller implements IAppInstaller {
   public AndroidAppInstaller(Activity activity) {
     this.activity = activity;
 
-    ((MainActivity)activity).registerActivityResultListener(APP_INSTALL_REQUEST_CODE, installAppActivityResultListener);
-
     registerBroadcastReceivers(activity);
   }
 
@@ -65,6 +63,7 @@ public class AndroidAppInstaller implements IAppInstaller {
     intent.setDataAndType(Uri.parse(downloadInfo.getDownloadLocationUri()), "application/vnd.android.package-archive");
 
     int requestCode = APP_INSTALL_REQUEST_CODE + CountInstalledApps++;
+    registerActivityResultListener(requestCode);
     activity.startActivityForResult(intent, requestCode);
 
     appsBeingInstalled.put(requestCode, downloadInfo);
@@ -112,6 +111,8 @@ public class AndroidAppInstaller implements IAppInstaller {
     appBeingInstalled.setToItsDefaultState();
 
     deletedDownloadedApk(downloadInfo);
+
+    unregisterActivityResultListener(appRequestCode);
   }
 
   protected void deletedDownloadedApk(AppDownloadInfo downloadInfo) {
@@ -126,6 +127,14 @@ public class AndroidAppInstaller implements IAppInstaller {
     }
   }
 
+
+  protected void registerActivityResultListener(int requestCode) {
+    ((MainActivity)activity).registerActivityResultListener(requestCode, installAppActivityResultListener);
+  }
+
+  protected void unregisterActivityResultListener(int requestCode) {
+    ((MainActivity)activity).unregisterActivityResultListener(requestCode);
+  }
 
   protected IActivityResultListener installAppActivityResultListener = new IActivityResultListener() {
     @Override
@@ -143,6 +152,8 @@ public class AndroidAppInstaller implements IAppInstaller {
 
       deletedDownloadedApk(downloadInfo);
     }
+
+    unregisterActivityResultListener(requestCode);
   }
 
 }
