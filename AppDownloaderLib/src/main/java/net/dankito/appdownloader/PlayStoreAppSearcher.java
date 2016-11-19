@@ -6,6 +6,7 @@ import net.dankito.appdownloader.responses.GetAppDetailsResponse;
 import net.dankito.appdownloader.responses.SearchAppsResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDetailsCallback;
 import net.dankito.appdownloader.responses.callbacks.SearchAppsResponseCallback;
+import net.dankito.appdownloader.util.app.IInstalledAppsManager;
 import net.dankito.appdownloader.util.web.IWebClient;
 import net.dankito.appdownloader.util.web.RequestCallback;
 import net.dankito.appdownloader.util.web.RequestParameters;
@@ -43,14 +44,17 @@ public class PlayStoreAppSearcher {
 
   protected IWebClient webClient;
 
+  protected IInstalledAppsManager installedAppsManager;
+
   protected IAppDetailsCache appDetailsCache;
 
   protected List<GetAppDetailsCallback> appDetailsListeners = new ArrayList<>();
 
 
   @Inject
-  public PlayStoreAppSearcher(IWebClient webClient, IAppDetailsCache appDetailsCache) {
+  public PlayStoreAppSearcher(IWebClient webClient, IInstalledAppsManager installedAppsManager, IAppDetailsCache appDetailsCache) {
     this.webClient = webClient;
+    this.installedAppsManager = installedAppsManager;
     this.appDetailsCache = appDetailsCache;
   }
 
@@ -94,6 +98,7 @@ public class PlayStoreAppSearcher {
           if(cardListChild.hasClass("card") && cardListChild.hasClass("apps")) { // TODO: implement Option to not only filter Apps
             AppInfo app = parseCardElement(cardListChild);
             if(app != null) {
+              addAppInstallationInfo(app);
               searchResults.add(app);
               setAppDetails(app);
             }
@@ -148,7 +153,7 @@ public class PlayStoreAppSearcher {
   protected void parseDetails(AppInfo appInfo, Element cardDetailsElement) {
     for(Element child : cardDetailsElement.children()) {
       if("a".equals(child.nodeName()) && child.hasClass("title")) {
-        appInfo.setAppUrl(child.attr("href"));
+        appInfo.setAppDetailsPageUrl(child.attr("href"));
         appInfo.setTitle(child.attr("title"));
       }
       else if("div".equals(child.nodeName()) && child.hasClass("subtitle-container")) {
@@ -171,6 +176,19 @@ public class PlayStoreAppSearcher {
     }
   }
 
+
+  protected void addAppInstallationInfo(AppInfo app) {
+    AppInfo installedAppInfo = installedAppsManager.getAppInstallationInfo(app.getPackageName());
+
+    if(installedAppInfo == null) {
+      app.setAlreadyInstalled(false);
+    }
+    else {
+      app.setIconImage(installedAppInfo.getIconImage());
+      app.setAlreadyInstalled(true);
+      app.setInstalledVersion(installedAppInfo.getInstalledVersion());
+    }
+  }
 
   protected void setAppDetails(AppInfo appInfo) {
     if(appDetailsCache.hasAppDetailsRetrievedForApp(appInfo)) {
