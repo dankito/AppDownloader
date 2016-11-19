@@ -1,6 +1,7 @@
 package net.dankito.appdownloader.adapter;
 
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -88,6 +89,10 @@ public class AppSearchResultsAdapter extends BaseAdapter {
       Picasso.with(activity)
           .load(appInfo.getSmallCoverImageUrl())
           .into(imgvwAppIcon);
+    }
+    else if(appInfo.getIconImage() instanceof Drawable) {
+      imgvwAppIcon.setVisibility(View.VISIBLE);
+      imgvwAppIcon.setImageDrawable((Drawable)appInfo.getIconImage());
     }
     else {
       imgvwAppIcon.setVisibility(View.INVISIBLE);
