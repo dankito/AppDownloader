@@ -21,4 +21,9 @@ public class GetAppDetailsResponse extends ResponseBase {
     this.appInfo = appInfo;
   }
 
+
+  public AppInfo getAppInfo() {
+    return appInfo;
+  }
+
 }
