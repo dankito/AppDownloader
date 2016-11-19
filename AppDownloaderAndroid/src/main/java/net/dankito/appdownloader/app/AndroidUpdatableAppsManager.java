@@ -161,8 +161,13 @@ public class AndroidUpdatableAppsManager implements IUpdatableAppsManager {
 
   protected InstalledAppsListener installedAppsListener = new InstalledAppsListener() {
     @Override
-    public void appInstalled(InstalledAppListenerInfo info) {
-      AndroidUpdatableAppsManager.this.appInstalled(info.getInstalledApp());
+    public void appInstalled(final InstalledAppListenerInfo info) {
+      threadPool.runAsync(new Runnable() {
+        @Override
+        public void run() {
+          AndroidUpdatableAppsManager.this.appInstalled(info.getInstalledApp());
+        }
+      });
     }
 
     @Override
@@ -177,6 +182,16 @@ public class AndroidUpdatableAppsManager implements IUpdatableAppsManager {
   };
 
   protected void appInstalled(AppInfo installedApp) {
+    if(appDetailsCache.hasAppDetailsRetrievedForApp(installedApp)) {
+      appDetailsCache.setAppDetailsForApp(installedApp);
+    }
+    else {
+      CountDownLatch countDownLatch = new CountDownLatch(1);
+      setAppDetails(installedApp, countDownLatch);
+
+      try { countDownLatch.await(1, TimeUnit.MINUTES); } catch(Exception ignored) { }
+    }
+
     if(installedApp.isUpdatable()) {
       updatableAppFound(installedApp);
     }
