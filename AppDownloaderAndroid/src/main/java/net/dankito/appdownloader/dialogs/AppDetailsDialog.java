@@ -233,10 +233,6 @@ public class AppDetailsDialog extends FullscreenDialog {
   protected void getAppDownloadLinkCompleted(AppInfo clickedApp, GetAppDownloadUrlResponse response, AtomicBoolean hasDownloadUrlBeenRetrieved, AtomicInteger countRequestsAppDownloadLinkCompleted) {
     countRequestsAppDownloadLinkCompleted.incrementAndGet();
 
-    if(response.isSuccessful()) {
-      clickedApp.addDownloadUrl(response.getDownloadLink());
-    }
-
     if(hasDownloadUrlBeenRetrieved.get() == false) {
       if(response.isSuccessful() == false) {
         if(countRequestsAppDownloadLinkCompleted.get() == appDownloaders.size()) { // only show error message if it's been the last AppDownloader which's request completed
