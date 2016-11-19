@@ -179,6 +179,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
         appDownloadUrl = "http:" + appDownloadUrl;
 
         appDownloadLink.setUrl(appDownloadUrl);
+        appToDownload.addDownloadUrl(appDownloadLink);
 
         callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, appDownloadLink));
         return;

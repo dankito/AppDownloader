@@ -83,6 +83,8 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
       appDownloadLink.setHashAlgorithm(HashAlgorithm.MD5);
       appDownloadLink.setFileHashSum(evoziAppDownloadUrlResponse.getMd5());
 
+      appToDownload.addDownloadUrl(appDownloadLink);
+
       GetAppDownloadUrlResponse appDownloadUrlResponse = new GetAppDownloadUrlResponse(true, appToDownload, appDownloadLink);
 
       callback.completed(appDownloadUrlResponse);
