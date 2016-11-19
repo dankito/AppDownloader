@@ -12,4 +12,8 @@ public interface IInstalledAppsManager {
 
   AppInfo getAppInstallationInfo(String packageName);
 
+  boolean addInstalledAppsListener(InstalledAppsListener listener);
+
+  boolean removeInstalledAppsListener(InstalledAppsListener listener);
+
 }
