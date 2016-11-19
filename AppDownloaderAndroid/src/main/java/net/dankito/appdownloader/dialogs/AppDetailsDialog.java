@@ -236,6 +236,7 @@ public class AppDetailsDialog extends FullscreenDialog {
     if(hasDownloadUrlBeenRetrieved.get() == false) {
       if(response.isSuccessful() == false) {
         if(countRequestsAppDownloadLinkCompleted.get() == appDownloaders.size()) { // only show error message if it's been the last AppDownloader which's request completed
+          clickedApp.setToItsDefaultState();
           AlertHelper.showErrorMessageThreadSafe(activity, activity.getString(R.string.error_message_could_not_download_app, response.getError()));
         }
       }
