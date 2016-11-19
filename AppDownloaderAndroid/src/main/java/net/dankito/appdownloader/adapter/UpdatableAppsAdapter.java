@@ -100,7 +100,7 @@ public class UpdatableAppsAdapter extends BaseAdapter {
     txtvwAppTitle.setText(appInfo.getTitle());
 
     TextView txtvwVersion = (TextView)convertView.findViewById(R.id.txtvwAppVersion);
-    txtvwVersion.setText(appInfo.getInstalledVersionString());
+    txtvwVersion.setText(activity.getString(R.string.updatable_app_version_comparison, appInfo.getInstalledVersionString(), appInfo.getVersion()));
 
     ImageView imgvwAppIcon = (ImageView)convertView.findViewById(R.id.imgvwAppIcon);
     if(appInfo.getIconImage() instanceof Drawable) {
