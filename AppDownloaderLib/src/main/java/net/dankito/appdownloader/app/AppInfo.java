@@ -48,8 +48,6 @@ public class AppInfo {
 
   protected List<AppDownloadLink> downloadLinks = new ArrayList<>();
 
-  protected String downloadLocationPath = null;
-
 
   public AppInfo(String packageName) {
     this.packageName = packageName;
@@ -215,15 +213,17 @@ public class AppInfo {
   }
 
   public boolean isAlreadyDownloaded() {
-    return downloadLocationPath != null;
+    return StringUtils.isNotNullOrEmpty(getDownloadLocationPath());
   }
 
   public String getDownloadLocationPath() {
-    return downloadLocationPath;
-  }
+    for(AppDownloadLink downloadLink : getDownloadLinks()) {
+      if(downloadLink.isDownloaded()) {
+        return downloadLink.getDownloadLocationPath();
+      }
+    }
 
-  public void setDownloadLocationPath(String downloadLocationPath) {
-    this.downloadLocationPath = downloadLocationPath;
+    return null;
   }
 
 

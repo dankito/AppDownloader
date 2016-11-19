@@ -89,6 +89,10 @@ public class AppDownloadLink {
   }
 
 
+  public boolean isDownloaded() {
+    return StringUtils.isNotNullOrEmpty(getDownloadLocationPath());
+  }
+
   public String getDownloadLocationUri() {
     return downloadLocationUri;
   }
