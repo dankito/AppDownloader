@@ -7,6 +7,7 @@ package net.dankito.appdownloader.app;
 public enum AppState {
 
   INSTALLABLE,
+  REINSTALLABLE,
   UPDATABLE,
   GETTING_DOWNLOAD_URL,
   DOWNLOADING,

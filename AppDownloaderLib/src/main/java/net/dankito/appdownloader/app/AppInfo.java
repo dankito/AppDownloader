@@ -121,6 +121,8 @@ public class AppInfo {
 
   public void setAlreadyInstalled(boolean alreadyInstalled) {
     isAlreadyInstalled = alreadyInstalled;
+
+    resetToDefaultState();
   }
 
   public String getInstalledVersion() {
@@ -243,6 +245,29 @@ public class AppInfo {
     }
 
     return null;
+  }
+
+
+  public void resetToDefaultState() {
+    if(isAlreadyInstalled() == false) {
+      setState(AppState.INSTALLABLE);
+    }
+    else {
+      if(isUpdatable()) {
+        setState(AppState.UPDATABLE);
+      }
+      else {
+        setState(AppState.REINSTALLABLE);
+      }
+    }
+  }
+
+  protected boolean isUpdatable() {
+    return isNewerVersion(getVersion(), getInstalledVersion());
+  }
+
+  protected boolean isNewerVersion(String version1, String version2) {
+    return true;
   }
 
 
