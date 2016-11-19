@@ -93,6 +93,17 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
       appDownloadPageUrl = DETAILS_PAGE_URL_PREFIX + downloadButtonElement.attr("href");
     }
 
+    parseAppDetails(downloadInfo, document);
+
+    if(appDownloadPageUrl == null) {
+      callback.completed(new GetAppDownloadUrlResponse(appToDownload, "Could not find App Download Page Url")); // TODO: translate
+    }
+    else {
+      getAppDownloadPageUrl(appToDownload, downloadInfo, appDownloadPageUrl, callback);
+    }
+  }
+
+  protected void parseAppDetails(AppDownloadInfo downloadInfo, Document document) {
     Elements fingerprintElements = document.body().select("span.wordbreak-all");
     if(fingerprintElements.size() > 0) {
       Element fingerprintElement = fingerprintElements.first();
@@ -102,13 +113,6 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
     }
 
     parseApkDetailTable(downloadInfo, document);
-
-    if(appDownloadPageUrl == null) {
-      callback.completed(new GetAppDownloadUrlResponse(appToDownload, "Could not find App Download Page Url")); // TODO: translate
-    }
-    else {
-      getAppDownloadPageUrl(appToDownload, downloadInfo, appDownloadPageUrl, callback);
-    }
   }
 
   protected void parseApkDetailTable(AppDownloadInfo downloadInfo, Document document) {
