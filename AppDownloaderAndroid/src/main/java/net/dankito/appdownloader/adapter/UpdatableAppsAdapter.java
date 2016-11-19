@@ -12,6 +12,8 @@ import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.app.GetUpdatableAppsCallback;
 import net.dankito.appdownloader.app.IUpdatableAppsManager;
+import net.dankito.appdownloader.app.UpdatableAppsListener;
+import net.dankito.appdownloader.app.UpdatableAppsListenerInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +41,8 @@ public class UpdatableAppsAdapter extends BaseAdapter {
 
   public void setUpdatableAppsManager(IUpdatableAppsManager updatableAppsManager) {
     this.updatableAppsManager = updatableAppsManager;
+
+    updatableAppsManager.addUpdatableAppsListener(updatableAppsListener);
 
     retrieveUpdatableApps(updatableAppsManager);
   }
@@ -120,5 +124,17 @@ public class UpdatableAppsAdapter extends BaseAdapter {
     }
   };
 
+
+  protected UpdatableAppsListener updatableAppsListener = new UpdatableAppsListener() {
+    @Override
+    public void foundUpdatableApp(UpdatableAppsListenerInfo info) {
+      setUpdatableAppsThreadSafe(info.getAllUpdatableApps());
+    }
+
+    @Override
+    public void appUpdated(UpdatableAppsListenerInfo info) {
+      setUpdatableAppsThreadSafe(info.getAllUpdatableApps());
+    }
+  };
 
 }
