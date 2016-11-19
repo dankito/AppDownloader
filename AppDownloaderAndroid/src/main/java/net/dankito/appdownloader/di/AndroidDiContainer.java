@@ -14,8 +14,10 @@ import net.dankito.appdownloader.util.IOnUiThreadRunner;
 import net.dankito.appdownloader.util.IThreadPool;
 import net.dankito.appdownloader.util.ThreadPool;
 import net.dankito.appdownloader.util.app.AndroidAppPackageVerifier;
+import net.dankito.appdownloader.util.app.AndroidInstalledAppsManager;
 import net.dankito.appdownloader.util.app.IAppInstaller;
 import net.dankito.appdownloader.util.app.IAppVerifier;
+import net.dankito.appdownloader.util.app.IInstalledAppsManager;
 import net.dankito.appdownloader.util.web.AndroidDownloadManager;
 import net.dankito.appdownloader.util.web.IDownloadManager;
 import net.dankito.appdownloader.util.web.IWebClient;
@@ -80,6 +82,12 @@ public class AndroidDiContainer {
 
   @Provides
   @Singleton
+  public IInstalledAppsManager provideInstalledAppsManager() {
+    return new AndroidInstalledAppsManager(getActivity());
+  }
+
+  @Provides
+  @Singleton
   public IAppVerifier provideAppVerifier() {
     return new AndroidAppPackageVerifier(getActivity());
   }
@@ -111,8 +119,8 @@ public class AndroidDiContainer {
 
   @Provides
   @Singleton
-  public PlayStoreAppSearcher providePlayStoreAppSearcher(IWebClient webClient, IAppDetailsCache appDetailsCache) {
-    return new PlayStoreAppSearcher(webClient, appDetailsCache);
+  public PlayStoreAppSearcher providePlayStoreAppSearcher(IWebClient webClient, IInstalledAppsManager installedAppsManager, IAppDetailsCache appDetailsCache) {
+    return new PlayStoreAppSearcher(webClient, installedAppsManager, appDetailsCache);
   }
 
 }
