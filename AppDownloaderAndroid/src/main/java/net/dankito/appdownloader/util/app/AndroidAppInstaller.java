@@ -96,14 +96,14 @@ public class AndroidAppInstaller implements IAppInstaller {
         AppInfo appBeingInstalled = downloadLink.getAppInfo();
 
         if(appBeingInstalled.getPackageName().equals(changedAppPackage)) {
-          appSuccessfullyInstalled(appBeingInstalledEntry.getKey(), appBeingInstalled);
+          appSuccessfullyInstalled(appBeingInstalledEntry.getKey(), appBeingInstalled, downloadLink);
           break;
         }
       }
     }
   }
 
-  protected void appSuccessfullyInstalled(Integer appRequestCode, AppInfo appBeingInstalled) {
+  protected void appSuccessfullyInstalled(Integer appRequestCode, AppInfo appBeingInstalled, AppDownloadLink downloadLink) {
     appsBeingInstalled.remove(appRequestCode);
 
     appBeingInstalled.setAlreadyInstalled(true);
@@ -111,18 +111,18 @@ public class AndroidAppInstaller implements IAppInstaller {
 
     appBeingInstalled.setToItsDefaultState();
 
-    deletedDownloadedApk(appBeingInstalled);
+    deletedDownloadedApk(downloadLink);
   }
 
-  protected void deletedDownloadedApk(AppInfo appBeingInstalled) {
+  protected void deletedDownloadedApk(AppDownloadLink downloadLink) {
     try {
-      File file = new File(appBeingInstalled.getDownloadLocationPath());
+      File file = new File(downloadLink.getDownloadLocationPath());
       if(file.exists()) {
         log.info("Deleting installed Apk file " + file.getAbsolutePath());
         file.delete();
       }
     } catch(Exception e) {
-      log.error("Could not deleted installed Apk file " + appBeingInstalled.getDownloadLocationPath(), e);
+      log.error("Could not deleted installed Apk file " + downloadLink.getDownloadLocationPath(), e);
     }
   }
 
@@ -141,7 +141,7 @@ public class AndroidAppInstaller implements IAppInstaller {
     if(appBeingInstalled != null) { // it may has already been removed by handlePackageAddedOrChanged()
       appBeingInstalled.setToItsDefaultState();
 
-      deletedDownloadedApk(appBeingInstalled);
+      deletedDownloadedApk(downloadLink);
     }
   }
 
