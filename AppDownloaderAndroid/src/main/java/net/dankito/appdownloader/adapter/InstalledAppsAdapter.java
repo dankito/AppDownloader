@@ -11,6 +11,8 @@ import android.widget.TextView;
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.app.IInstalledAppsManager;
+import net.dankito.appdownloader.app.InstalledAppListenerInfo;
+import net.dankito.appdownloader.app.InstalledAppsListener;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,7 +40,18 @@ public class InstalledAppsAdapter extends BaseAdapter {
   public void setInstalledAppsManager(IInstalledAppsManager installedAppsManager) {
     this.installedAppsManager = installedAppsManager;
 
-    setInstalledApps(installedAppsManager.getAllInstalledApps());
+    installedAppsManager.addInstalledAppsListener(installedAppsListener);
+
+    setInstalledApps(installedAppsManager.getLaunchableApps());
+  }
+
+  protected void setInstalledAppsThreadSafe(final List<AppInfo> installedApps) {
+    activity.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        setInstalledApps(installedApps);
+      }
+    });
   }
 
   protected void setInstalledApps(List<AppInfo> installedApps) {
@@ -99,5 +112,29 @@ public class InstalledAppsAdapter extends BaseAdapter {
       return appInfo1.getTitle().compareTo(appInfo2.getTitle());
     }
   };
+
+
+  protected InstalledAppsListener installedAppsListener = new InstalledAppsListener() {
+    @Override
+    public void appInstalled(InstalledAppListenerInfo info) {
+      installedAppsChanged(info);
+    }
+
+    @Override
+    public void appUpdated(InstalledAppListenerInfo info) {
+      installedAppsChanged(info);
+    }
+
+    @Override
+    public void appRemoved(InstalledAppListenerInfo info) {
+      installedAppsChanged(info);
+    }
+  };
+
+  protected void installedAppsChanged(InstalledAppListenerInfo info) {
+    if(info.isLaunchable()) {
+      setInstalledAppsThreadSafe(info.getLaunchableApps());
+    }
+  }
 
 }
