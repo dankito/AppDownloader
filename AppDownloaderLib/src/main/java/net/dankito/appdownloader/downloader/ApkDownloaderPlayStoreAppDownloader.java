@@ -69,14 +69,17 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
 
         AppDownloadInfo appDownloadInfo = parseAppDownloadFileDetails(appToDownload, detailsElement);
 
-        Elements downloadAnchorElements = detailsElement.select("a.mdl-button");
-        if (downloadAnchorElements.size() > 0) {
+        Elements downloadAnchorElements = detailsElement.select("a.mdl-button.mdl-button--colored");
+        if(downloadAnchorElements.size() > 0) {
           Element downloadAnchorElement = downloadAnchorElements.first();
           String appDownloadPageUrl = downloadAnchorElement.attr("href");
           appDownloadPageUrl = "https://apk-dl.com" + appDownloadPageUrl;
 
           downloadAndParseAppDownloadPage(appToDownload, appDownloadInfo, appDownloadPageUrl, callback);
           return;
+        }
+        else {
+          callback.completed(new GetAppDownloadUrlResponse(appToDownload, true));
         }
       }
 
