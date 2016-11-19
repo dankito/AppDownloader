@@ -10,7 +10,6 @@ import android.widget.ListView;
 import net.dankito.appdownloader.MainActivity;
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.adapter.InstalledAppsAdapter;
-import net.dankito.appdownloader.util.IOnUiThreadRunner;
 import net.dankito.appdownloader.app.IInstalledAppsManager;
 
 import javax.inject.Inject;
@@ -23,9 +22,6 @@ public class InstalledAppsFragment extends Fragment {
 
   @Inject
   protected IInstalledAppsManager installedAppsManager;
-
-  @Inject
-  protected IOnUiThreadRunner uiThreadRunner;
 
   protected InstalledAppsAdapter installedAppsAdapter;
 
