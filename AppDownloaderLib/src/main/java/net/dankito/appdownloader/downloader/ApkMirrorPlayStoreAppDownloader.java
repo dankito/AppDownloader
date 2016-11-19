@@ -228,25 +228,35 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
       Elements downloadIconElements = tabContainerElement.parent().select(".download-icon");
 
       if(downloadIconElements.size() > 0) {
-        Element downloadIconElement = downloadIconElements.first();
-        Element downloadIconElementParent = downloadIconElement.parent();
-        if("a".equals(downloadIconElementParent.nodeName())) {
-          String appDetailsPageUrl = downloadIconElementParent.attr("href");
-          appDetailsPageUrl = DETAILS_PAGE_URL_PREFIX + appDetailsPageUrl;
-
-          callback.completed(new GetUrlResponse(true, appDetailsPageUrl));
+        if(extractAppDetailsPageUrl(downloadIconElements, callback)) {
           return;
         }
       }
-
-      boolean doesNotContainThisApp = checkIfDoesNotHaveThisApp(tabContainerElement);
-      if(doesNotContainThisApp) {
-        getAppDownloadUrlResponseCallback.completed(new GetAppDownloadUrlResponse(appToDownload, true));
-        return;
+      else {
+        boolean doesNotContainThisApp = checkIfDoesNotHaveThisApp(tabContainerElement);
+        if(doesNotContainThisApp) {
+          getAppDownloadUrlResponseCallback.completed(new GetAppDownloadUrlResponse(appToDownload, true));
+          return;
+        }
       }
     }
 
     callback.completed(new GetUrlResponse("Could not find App Details Page Url")); // TODO: translate
+  }
+
+  protected boolean extractAppDetailsPageUrl(Elements downloadIconElements, GetUrlCallback callback) {
+    Element downloadIconElement = downloadIconElements.first();
+    Element downloadIconElementParent = downloadIconElement.parent();
+
+    if("a".equals(downloadIconElementParent.nodeName())) {
+      String appDetailsPageUrl = downloadIconElementParent.attr("href");
+      appDetailsPageUrl = DETAILS_PAGE_URL_PREFIX + appDetailsPageUrl;
+
+      callback.completed(new GetUrlResponse(true, appDetailsPageUrl));
+      return true;
+    }
+
+    return false;
   }
 
   protected boolean checkIfDoesNotHaveThisApp(Element tabContainerElement) {
