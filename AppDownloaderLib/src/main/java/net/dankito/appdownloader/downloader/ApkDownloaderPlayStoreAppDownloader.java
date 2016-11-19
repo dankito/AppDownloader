@@ -71,16 +71,13 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
 
         Elements downloadAnchorElements = detailsElement.select("a.mdl-button.mdl-button--colored");
         if(downloadAnchorElements.size() > 0) {
-          Element downloadAnchorElement = downloadAnchorElements.first();
-          String appDownloadPageUrl = downloadAnchorElement.attr("href");
-          appDownloadPageUrl = "https://apk-dl.com" + appDownloadPageUrl;
-
-          downloadAndParseAppDownloadPage(appToDownload, appDownloadInfo, appDownloadPageUrl, callback);
-          return;
+          downloadAndParseAppDownloadPage(appToDownload, appDownloadInfo, downloadAnchorElements.first(), callback);
         }
         else {
           callback.completed(new GetAppDownloadUrlResponse(appToDownload, true));
         }
+
+        return;
       }
 
       callback.completed(new GetAppDownloadUrlResponse(appToDownload, "Could not find download Link")); // TODO: translate
@@ -113,6 +110,13 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
     }
 
     return appDownloadInfo;
+  }
+
+  protected void downloadAndParseAppDownloadPage(AppInfo appToDownload, AppDownloadInfo appDownloadInfo, Element downloadAnchorElement, GetAppDownloadUrlResponseCallback callback) {
+    String appDownloadPageUrl = downloadAnchorElement.attr("href");
+    appDownloadPageUrl = "https://apk-dl.com" + appDownloadPageUrl;
+
+    downloadAndParseAppDownloadPage(appToDownload, appDownloadInfo, appDownloadPageUrl, callback);
   }
 
   protected void downloadAndParseAppDownloadPage(final AppInfo appToDownload, final AppDownloadInfo appDownloadInfo, final String appDownloadPageUrl, final GetAppDownloadUrlResponseCallback callback) {
