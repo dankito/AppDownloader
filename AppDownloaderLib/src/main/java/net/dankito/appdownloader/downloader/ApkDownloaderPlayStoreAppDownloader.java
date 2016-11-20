@@ -62,7 +62,6 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
       String responseBody = response.getBody();
       Document document = Jsoup.parse(responseBody);
 
-
       Elements detailsElements = document.body().select(".details");
       if(detailsElements.size() > 0) {
         Element detailsElement = detailsElements.first();
@@ -73,7 +72,10 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
         if(downloadAnchorElements.size() > 0) {
           downloadAndParseAppDownloadPage(appToDownload, appDownloadInfo, downloadAnchorElements.first(), callback);
         }
-        else {
+        else { // no download link available
+          // in rare cases like this there are file information like apk signature and file checksum available but no download link
+          appToDownload.addDownloadUrl(appDownloadInfo);
+
           callback.completed(new GetAppDownloadUrlResponse(appToDownload, true));
         }
 
