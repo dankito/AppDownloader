@@ -190,6 +190,10 @@ public class AppInfo {
   }
 
 
+  public boolean isVersionSet() {
+    return version != null;
+  }
+
   public AppVersion getVersion() {
     return version;
   }

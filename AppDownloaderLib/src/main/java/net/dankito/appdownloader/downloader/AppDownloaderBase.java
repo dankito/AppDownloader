@@ -1,6 +1,7 @@
 package net.dankito.appdownloader.downloader;
 
 import net.dankito.appdownloader.app.AppInfo;
+import net.dankito.appdownloader.app.AppVersion;
 import net.dankito.appdownloader.util.web.IWebClient;
 import net.dankito.appdownloader.util.web.RequestParameters;
 
@@ -53,7 +54,7 @@ public abstract class AppDownloaderBase implements IAppDownloader {
 
 
   protected boolean isCorrectAppVersion(AppInfo appToDownload, String appVersion) {
-    return appToDownload.getVersionString().equals(appVersion);
+    return appToDownload.isVersionSet() == false || appToDownload.getVersion().equals(AppVersion.parse(appVersion));
   }
 
 }
