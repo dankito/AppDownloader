@@ -100,9 +100,14 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
     appDownloadInfo.setFileHashAlgorithm(HashAlgorithm.MD5);
     appDownloadInfo.setFileChecksum(evoziAppDownloadUrlResponse.getMd5());
 
-    GetAppDownloadUrlResponse appDownloadUrlResponse = new GetAppDownloadUrlResponse(true, appToDownload, this, appDownloadInfo);
+    if(isCorrectAppVersion(appToDownload, evoziAppDownloadUrlResponse.getVersion())) {
+      GetAppDownloadUrlResponse appDownloadUrlResponse = new GetAppDownloadUrlResponse(true, appToDownload, this, appDownloadInfo);
 
-    callback.completed(appDownloadUrlResponse);
+      callback.completed(appDownloadUrlResponse);
+    }
+    else {
+      callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, false));
+    }
   }
 
   protected void getAppDownloadRequestParametersAsync(final String appPackageName, final GetAppDownloadRequestParametersCallback callback) {
