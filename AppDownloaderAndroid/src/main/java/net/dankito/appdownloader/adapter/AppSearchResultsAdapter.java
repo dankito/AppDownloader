@@ -33,14 +33,18 @@ public class AppSearchResultsAdapter extends BaseAdapter {
 
 
   public void setSearchResults(List<AppInfo> searchResults) {
-    this.searchResults = searchResults;
+    synchronized(this) {
+      this.searchResults = searchResults;
 
-    notifyDataSetChanged();
+      notifyDataSetChanged();
+    }
   }
 
   @Override
   public int getCount() {
-    return searchResults.size();
+    synchronized(this) {
+      return searchResults.size();
+    }
   }
 
   @Override
