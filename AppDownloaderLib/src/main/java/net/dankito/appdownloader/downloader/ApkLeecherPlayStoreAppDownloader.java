@@ -17,6 +17,8 @@ import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 /**
  * Created by ganymed on 20/11/16.
  */
@@ -51,7 +53,7 @@ public class ApkLeecherPlayStoreAppDownloader extends AppDownloaderBase {
     });
   }
 
-  private void parseAppDetailsPage(AppInfo appToDownload, WebClientResponse response, GetAppDownloadUrlResponseCallback callback) {
+  protected void parseAppDetailsPage(AppInfo appToDownload, WebClientResponse response, GetAppDownloadUrlResponseCallback callback) {
     try {
       Document document = Jsoup.parse(response.getBody());
 
@@ -83,15 +85,13 @@ public class ApkLeecherPlayStoreAppDownloader extends AppDownloaderBase {
       }
     }
 
-    String downloadUrl = downloadLinkGenerator.generateDownloadUrl();
+    String downloadUrl = tryToFindDownloadUrl(downloadLinkGenerator);
     if(downloadUrl != null) {
       downloadInfo.setUrl(downloadUrl);
     }
 
     return downloadInfo;
   }
-
-
 
   protected void parseAppDetails(AppDownloadInfo downloadInfo, ApkLeecherDownloadLinkGenerator downloadLinkGenerator, Element appDetailElement) {
     String appDetailName = appDetailElement.childNode(0).toString().trim();
@@ -115,5 +115,18 @@ public class ApkLeecherPlayStoreAppDownloader extends AppDownloaderBase {
     else if("Updated:".equals(appDetailName)) {
       downloadLinkGenerator.setLastUpdatedOn(appDetailValue);
     }
+  }
+
+  protected String tryToFindDownloadUrl(ApkLeecherDownloadLinkGenerator downloadLinkGenerator) {
+    List<String> downloadUrlVariants = downloadLinkGenerator.generateDownloadUrlVariants();
+
+    for(String downloadUrlCandidate : downloadUrlVariants) {
+      WebClientResponse headResponse = webClient.head(new RequestParameters(downloadUrlCandidate));
+      if(headResponse.isSuccessful()) {
+        return downloadUrlCandidate;
+      }
+    }
+
+    return null;
   }
 }
