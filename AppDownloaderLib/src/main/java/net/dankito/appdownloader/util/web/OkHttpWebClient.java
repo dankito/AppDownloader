@@ -103,6 +103,29 @@ public class OkHttpWebClient implements IWebClient {
     return requestBuilder.build();
   }
 
+
+  public WebClientResponse head(RequestParameters parameters) {
+    try {
+      Request request = createHeadRequest(parameters);
+
+      Response response = executeRequest(parameters, request);
+
+      return getResponse(parameters, response);
+    } catch(Exception e) {
+      return getRequestFailed(parameters, e);
+    }
+  }
+  protected Request createHeadRequest(RequestParameters parameters) {
+    Request.Builder requestBuilder = new Request.Builder();
+
+    applyParameters(requestBuilder, parameters);
+
+    requestBuilder.head();
+
+    return requestBuilder.build();
+  }
+
+
   protected void setPostBody(Request.Builder requestBuilder, RequestParameters parameters) {
     if(parameters.isBodySet()) {
       MediaType mediaType = parameters.getContentType() == ContentType.JSON ? JSON_MEDIA_TYPE : FORM_URL_ENCODED_MEDIA_TYPE;

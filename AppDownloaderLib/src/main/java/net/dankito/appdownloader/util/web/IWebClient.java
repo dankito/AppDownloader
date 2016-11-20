@@ -10,4 +10,6 @@ public interface IWebClient {
 
   void postAsync(RequestParameters parameters, final RequestCallback callback);
 
+  WebClientResponse head(RequestParameters parameters);
+
 }
