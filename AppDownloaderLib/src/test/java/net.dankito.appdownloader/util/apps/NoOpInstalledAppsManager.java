@@ -2,6 +2,7 @@ package net.dankito.appdownloader.util.apps;
 
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.app.IInstalledAppsManager;
+import net.dankito.appdownloader.app.InstalledAppsListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +19,23 @@ public class NoOpInstalledAppsManager implements IInstalledAppsManager {
   }
 
   @Override
+  public List<AppInfo> getLaunchableApps() {
+    return null;
+  }
+
+  @Override
   public AppInfo getAppInstallationInfo(String packageName) {
     return null;
+  }
+
+  @Override
+  public boolean addInstalledAppsListener(InstalledAppsListener listener) {
+    return false;
+  }
+
+  @Override
+  public boolean removeInstalledAppsListener(InstalledAppsListener listener) {
+    return false;
   }
 
 }
