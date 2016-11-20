@@ -16,6 +16,8 @@ public class AppDownloadInfo {
 
   protected String url;
 
+  protected boolean hasDownloadLink;
+
   protected String fileSize;
 
   protected HashAlgorithm hashAlgorithm;
@@ -50,6 +52,11 @@ public class AppDownloadInfo {
 
   public void setUrl(String url) {
     this.url = url;
+    this.hasDownloadLink = StringUtils.isNotNullOrEmpty(url); // TODO: check if it's a valid url
+  }
+
+  public boolean isHasDownloadLink() {
+    return hasDownloadLink;
   }
 
   public String getFileSize() {
