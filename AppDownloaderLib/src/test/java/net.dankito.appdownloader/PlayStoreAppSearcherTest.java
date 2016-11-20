@@ -39,7 +39,7 @@ public class PlayStoreAppSearcherTest {
     final List<AppInfo> searchResults = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    underTest.searchAsync("ausgaben manager", new SearchAppsResponseCallback() {
+    underTest.searchAsync("video", new SearchAppsResponseCallback() {
       @Override
       public void completed(SearchAppsResponse response) {
         searchResults.addAll(response.getSearchResults());
@@ -47,9 +47,10 @@ public class PlayStoreAppSearcherTest {
       }
     });
 
-    try { countDownLatch.await(5, TimeUnit.SECONDS); } catch(Exception ignored) { }
+    try { countDownLatch.await(15, TimeUnit.SECONDS); } catch(Exception ignored) { }
 
     Assert.assertTrue(searchResults.size() > 0);
+    Assert.assertEquals(80, searchResults.size());
 
     for(AppInfo appInfo : searchResults) {
       Assert.assertTrue(appInfo.areNecessaryInformationSet());

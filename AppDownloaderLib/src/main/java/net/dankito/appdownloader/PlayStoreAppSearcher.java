@@ -2,11 +2,11 @@ package net.dankito.appdownloader;
 
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.app.IAppDetailsCache;
+import net.dankito.appdownloader.app.IInstalledAppsManager;
 import net.dankito.appdownloader.responses.GetAppDetailsResponse;
 import net.dankito.appdownloader.responses.SearchAppsResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDetailsCallback;
 import net.dankito.appdownloader.responses.callbacks.SearchAppsResponseCallback;
-import net.dankito.appdownloader.app.IInstalledAppsManager;
 import net.dankito.appdownloader.util.web.IWebClient;
 import net.dankito.appdownloader.util.web.RequestCallback;
 import net.dankito.appdownloader.util.web.RequestParameters;
@@ -19,6 +19,7 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,10 @@ import javax.inject.Inject;
 public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
 
   protected static final String BASE_URL = "https://play.google.com";
+
+  protected static final int MAX_SEARCH_RESULT_PAGE_NUMBER = 4;
+
+  protected static final int COUNT_SEARCH_RESULTS_PER_PAGE = 20;
 
   protected static final String PACKAGE_NAME_ATTRIBUTE_NAME = "data-docid";
 
@@ -61,32 +66,36 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
   @Override
   public void searchAsync(String searchTerm, final SearchAppsResponseCallback callback) {
     try {
-      String searchUrl = "https://play.google.com/store/search?q=" + URLEncoder.encode(searchTerm, "ASCII") + "&c=apps";
-      RequestParameters parameters = new RequestParameters(searchUrl);
-      parameters.setConnectionTimeoutMillis(CONNECTION_TIMEOUT_MILLIS);
-      parameters.setCountConnectionRetries(COUNT_CONNECTION_RETRIES);
-
-      webClient.postAsync(parameters, new RequestCallback() {
-        @Override
-        public void completed(WebClientResponse response) {
-          if(response.isSuccessful() == false) {
-            callback.completed(new SearchAppsResponse(response.getError()));
-          }
-          else {
-            parseSearchAppsResponse(response, callback);
-          }
-        }
-      });
+      final String searchUrl = "https://play.google.com/store/search?q=" + URLEncoder.encode(searchTerm, "ASCII") + "&c=apps&docType=1";
+      searchAsync(searchUrl, 0, callback);
     } catch(Exception e) {
       log.error("Could not search for '" + searchTerm + "'", e);
       callback.completed(new SearchAppsResponse(e.getLocalizedMessage()));
     }
   }
 
-  protected void parseSearchAppsResponse(WebClientResponse response, SearchAppsResponseCallback callback) {
-    try {
-      List<AppInfo> searchResults = new ArrayList<>();
+  protected void searchAsync(final String searchUrl, final int pageNumber, final SearchAppsResponseCallback callback) {
+    RequestParameters parameters = createRequestParametersWithDefaultValues(searchUrl);
 
+    webClient.postAsync(parameters, new RequestCallback() {
+      @Override
+      public void completed(WebClientResponse response) {
+        if(response.isSuccessful() == false) {
+          callback.completed(new SearchAppsResponse(response.getError()));
+        }
+        else {
+          parseSearchAppsResponse(searchUrl, pageNumber, response, callback);
+        }
+      }
+    });
+  }
+
+  protected void parseSearchAppsResponse(String searchUrl, int pageNumber, WebClientResponse response, SearchAppsResponseCallback callback) {
+    parseSearchAppsResponse(searchUrl, pageNumber, response, new ArrayList<AppInfo>(), callback);
+  }
+
+  protected void parseSearchAppsResponse(String searchUrl, int pageNumber, WebClientResponse response, List<AppInfo> searchResults, SearchAppsResponseCallback callback) {
+    try {
       String responseBody = response.getBody();
 
       Document document = Jsoup.parse(responseBody);
@@ -106,7 +115,13 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
         }
       }
 
-      callback.completed(new SearchAppsResponse(searchResults));
+      pageNumber++;
+      if(pageNumber < MAX_SEARCH_RESULT_PAGE_NUMBER && searchResults.size() == pageNumber * COUNT_SEARCH_RESULTS_PER_PAGE) {
+        retrieveAndParseNextSearchResultPage(searchUrl, pageNumber, responseBody, document, searchResults, callback);
+      }
+      else {
+        callback.completed(new SearchAppsResponse(searchResults));
+      }
     } catch(Exception e) {
       log.error("Could not parse Apps Search Response", e);
       callback.completed(new SearchAppsResponse(e.getLocalizedMessage()));
@@ -168,6 +183,68 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
 
       appInfo.setSmallCoverImageUrl("http:" + coverImageElement.attr("data-cover-small"));
       appInfo.setLargeCoverImageUrl("http:" + coverImageElement.attr("data-cover-large"));
+    }
+  }
+
+
+  protected void retrieveAndParseNextSearchResultPage(String searchUrl, int pageNumber, String responseBody, Document document, List<AppInfo> searchResults, SearchAppsResponseCallback callback) {
+    try {
+      Element seeMoreElement = document.body().select("a.see-more[data-server-cookie").first();
+      String nextSearchResultsPageReferer = seeMoreElement.attr("href");
+
+      String token = extractTokenParameter(responseBody);
+
+      String sp = extractSpParameter(nextSearchResultsPageReferer);
+
+      retrieveNextSearchResultPage(searchUrl, nextSearchResultsPageReferer, token, sp, pageNumber, searchResults, callback);
+    } catch(Exception e) {
+      log.error("Could not retrieve next search result page", e);
+      callback.completed(new SearchAppsResponse(searchResults));
+    }
+  }
+
+  protected String extractTokenParameter(String responseBody) throws UnsupportedEncodingException {
+    int nbpVariableStartIndex = responseBody.indexOf("var nbp='[") + "var nbp='[".length();
+    int nbpVariableEndIndex = responseBody.indexOf(']', nbpVariableStartIndex);
+    String nbpJavaScriptArray = responseBody.substring(nbpVariableStartIndex, nbpVariableEndIndex);
+
+    String[] arrayFields = nbpJavaScriptArray.split(",");
+    String token = null;
+
+    if(arrayFields.length > 1) {
+      token = arrayFields[1];
+      token = token.replace("\\x22", "");
+      token = URLEncoder.encode(token, "ASCII");
+    }
+    return token;
+  }
+
+  protected String extractSpParameter(String nextSearchResultsPageUrl) {
+    int spStartIndex = nextSearchResultsPageUrl.indexOf("&sp=") + "&sp=".length();
+    int spEndIndex = nextSearchResultsPageUrl.indexOf("&", spStartIndex);
+    String sp = nextSearchResultsPageUrl.substring(spStartIndex);
+    if (spEndIndex > 0) {
+      sp = nextSearchResultsPageUrl.substring(spStartIndex, spEndIndex);
+    }
+//      sp = URLEncoder.encode(sp, "ASCII");
+    sp = sp.replace(":", "%3A");
+    return sp;
+  }
+
+  protected void retrieveNextSearchResultPage(String searchUrl, String nextSearchResultsPageReferer, String token, String sp, int pageNumber, List<AppInfo> searchResults, SearchAppsResponseCallback callback) {
+    RequestParameters nextSearchResultsParameters = new RequestParameters(searchUrl);
+    nextSearchResultsParameters.addHeader("Referer", nextSearchResultsPageReferer);
+    nextSearchResultsParameters.addHeader("Accept-Language", "en-US,en;q=0.8");
+
+    String requestBody = "start=0&num=0&numChildren=0&pagTok=" + token + "&sp=" + sp + "&cctcss=square-cover&cllayout=NORMAL&ipf=1&xhr=1";
+    nextSearchResultsParameters.setBody(requestBody);
+
+    WebClientResponse nextSearchResultResponse = webClient.post(nextSearchResultsParameters);
+    if(nextSearchResultResponse.isSuccessful()) {
+      parseSearchAppsResponse(searchUrl, pageNumber, nextSearchResultResponse, searchResults, callback);
+    }
+    else {
+      callback.completed(new SearchAppsResponse(searchResults));
     }
   }
 
@@ -307,6 +384,16 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
         }
       }
     }
+  }
+
+
+  protected RequestParameters createRequestParametersWithDefaultValues(String url) {
+    RequestParameters parameters = new RequestParameters(url);
+
+    parameters.setConnectionTimeoutMillis(CONNECTION_TIMEOUT_MILLIS);
+    parameters.setCountConnectionRetries(COUNT_CONNECTION_RETRIES);
+
+    return parameters;
   }
 
 

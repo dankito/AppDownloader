@@ -43,8 +43,10 @@ public abstract class AppDownloaderBase implements IAppDownloader {
 
   protected RequestParameters createRequestParametersWithDefaultValues(String url) {
     RequestParameters parameters = new RequestParameters(url);
+
     parameters.setConnectionTimeoutMillis(DOWNLOAD_CONNECTION_TIMEOUT_MILLIS);
     parameters.setCountConnectionRetries(COUNT_CONNECTION_RETRIES);
+
     return parameters;
   }
 
