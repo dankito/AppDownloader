@@ -61,7 +61,7 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
   @Override
   public void searchAsync(String searchTerm, final SearchAppsResponseCallback callback) {
     try {
-      String searchUrl = "https://play.google.com/store/search?q=" + URLEncoder.encode(searchTerm, "ASCII") + "&authuser=0";
+      String searchUrl = "https://play.google.com/store/search?q=" + URLEncoder.encode(searchTerm, "ASCII") + "&c=apps";
       RequestParameters parameters = new RequestParameters(searchUrl, "ipf=1&xhr=1");
       parameters.setConnectionTimeoutMillis(CONNECTION_TIMEOUT_MILLIS);
       parameters.setCountConnectionRetries(COUNT_CONNECTION_RETRIES);
