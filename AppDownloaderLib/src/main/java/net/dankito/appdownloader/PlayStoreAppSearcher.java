@@ -287,9 +287,7 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
   @Override
   public void getAppDetailsAsync(final AppInfo appInfo, final GetAppDetailsCallback callback) {
     try {
-      RequestParameters parameters = new RequestParameters(appInfo.getAppDetailsPageUrl());
-      parameters.setConnectionTimeoutMillis(CONNECTION_TIMEOUT_MILLIS);
-      parameters.setCountConnectionRetries(COUNT_CONNECTION_RETRIES);
+      RequestParameters parameters = createRequestParametersWithDefaultValues(appInfo.getAppDetailsPageUrl());
 
       webClient.getAsync(parameters, new RequestCallback() {
         @Override
