@@ -4,12 +4,14 @@ import android.app.Activity;
 
 import net.dankito.appdownloader.IPlayStoreAppSearcher;
 import net.dankito.appdownloader.PlayStoreAppSearcher;
+import net.dankito.appdownloader.app.AndroidAppDownloadAndInstallationService;
 import net.dankito.appdownloader.app.AndroidAppInstaller;
 import net.dankito.appdownloader.app.AndroidAppPackageVerifier;
 import net.dankito.appdownloader.app.AndroidInstalledAppsManager;
 import net.dankito.appdownloader.app.AndroidUpdatableAppsManager;
 import net.dankito.appdownloader.app.AppDetailsCache;
 import net.dankito.appdownloader.app.IAppDetailsCache;
+import net.dankito.appdownloader.app.IAppDownloadAndInstallationService;
 import net.dankito.appdownloader.app.IAppInstaller;
 import net.dankito.appdownloader.app.IAppVerifier;
 import net.dankito.appdownloader.app.IInstalledAppsManager;
@@ -110,6 +112,13 @@ public class AndroidDiContainer {
   @Singleton
   public IAppInstaller provideAppInstaller() {
     return new AndroidAppInstaller(getActivity());
+  }
+
+  @Provides
+  @Singleton
+  public IAppDownloadAndInstallationService provideAppDownloadAndInstallationService(List<IAppDownloader> appDownloaders, IDownloadManager downloadManager,
+                                                                                     IAppVerifier appVerifier, IAppInstaller appInstaller) {
+    return new AndroidAppDownloadAndInstallationService(getActivity(), appDownloaders, downloadManager, appVerifier, appInstaller);
   }
 
 

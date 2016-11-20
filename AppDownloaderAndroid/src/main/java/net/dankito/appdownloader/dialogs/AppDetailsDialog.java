@@ -1,6 +1,5 @@
 package net.dankito.appdownloader.dialogs;
 
-import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,29 +11,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import net.dankito.appdownloader.R;
-import net.dankito.appdownloader.app.AppDownloadInfo;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.app.AppState;
 import net.dankito.appdownloader.app.AppStateListener;
-import net.dankito.appdownloader.di.AndroidDiComponent;
-import net.dankito.appdownloader.downloader.IAppDownloader;
-import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
-import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
-import net.dankito.appdownloader.util.AlertHelper;
-import net.dankito.appdownloader.util.IOnUiThreadRunner;
+import net.dankito.appdownloader.app.IAppDownloadAndInstallationService;
 import net.dankito.appdownloader.app.IAppInstaller;
 import net.dankito.appdownloader.app.IAppVerifier;
-import net.dankito.appdownloader.app.AppPackageVerificationResult;
-import net.dankito.appdownloader.util.web.DownloadResult;
-import net.dankito.appdownloader.util.web.IDownloadCompletedCallback;
+import net.dankito.appdownloader.di.AndroidDiComponent;
+import net.dankito.appdownloader.downloader.IAppDownloader;
+import net.dankito.appdownloader.util.IOnUiThreadRunner;
 import net.dankito.appdownloader.util.web.IDownloadManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
@@ -43,9 +31,6 @@ import javax.inject.Inject;
  */
 
 public class AppDetailsDialog extends FullscreenDialog {
-
-  private static final Logger log = LoggerFactory.getLogger(AppDetailsDialog.class);
-
 
   protected AppInfo appInfo;
 
@@ -59,6 +44,9 @@ public class AppDetailsDialog extends FullscreenDialog {
 
   @Inject
   protected IAppInstaller appInstaller;
+
+  @Inject
+  protected IAppDownloadAndInstallationService downloadAndInstallationService;
 
   @Inject
   protected IOnUiThreadRunner onUiThreadRunner;
@@ -189,101 +177,7 @@ public class AppDetailsDialog extends FullscreenDialog {
   };
 
   protected void mnitmInstallAppClicked() {
-    installApp();
-  }
-
-  protected void installApp() {
-    if(appInfo.hasDownloadUrls()) {
-      downloadApp(appInfo, getBestAppDownloadUrl(appInfo));
-    }
-    else {
-      getAppDownloadLinkAndDownloadApp(appInfo);
-    }
-  }
-
-  protected AppDownloadInfo getBestAppDownloadUrl(AppInfo appInfo) {
-    if(appInfo.getDownloadInfos().size() == 1) {
-      return appInfo.getDownloadInfos().get(0);
-    }
-    else {
-      // TODO: choose best one
-      return appInfo.getDownloadInfos().get(0);
-    }
-  }
-
-  protected void getAppDownloadLinkAndDownloadApp(final AppInfo clickedApp) {
-    appInfo.setState(AppState.GETTING_DOWNLOAD_URL);
-
-    final AtomicBoolean hasDownloadUrlBeenRetrieved = new AtomicBoolean(false);
-    final AtomicInteger countRequestsAppDownloadLinkCompleted = new AtomicInteger(0);
-
-    for(IAppDownloader appDownloader : appDownloaders) {
-      appDownloader.getAppDownloadLinkAsync(clickedApp, new GetAppDownloadUrlResponseCallback() {
-        @Override
-        public void completed(GetAppDownloadUrlResponse response) {
-          synchronized(hasDownloadUrlBeenRetrieved) {
-            getAppDownloadLinkCompleted(clickedApp, response, hasDownloadUrlBeenRetrieved, countRequestsAppDownloadLinkCompleted);
-          }
-        }
-      });
-    }
-  }
-
-  protected void getAppDownloadLinkCompleted(AppInfo clickedApp, GetAppDownloadUrlResponse response, AtomicBoolean hasDownloadUrlBeenRetrieved, AtomicInteger countRequestsAppDownloadLinkCompleted) {
-    countRequestsAppDownloadLinkCompleted.incrementAndGet();
-
-    if(hasDownloadUrlBeenRetrieved.get() == false) {
-      if(response.isSuccessful() == false) {
-        if(countRequestsAppDownloadLinkCompleted.get() == appDownloaders.size()) { // only show error message if it's been the last AppDownloader which's request completed
-          clickedApp.setToItsDefaultState();
-          AlertHelper.showErrorMessageThreadSafe(activity, activity.getString(R.string.error_message_could_not_download_app, response.getError()));
-        }
-      }
-      else {
-        downloadApp(clickedApp, response.getDownloadInfo());
-      }
-    }
-
-    if(response.isSuccessful()) {
-      hasDownloadUrlBeenRetrieved.set(true);
-    }
-  }
-
-  protected void downloadApp(AppInfo clickedApp, AppDownloadInfo downloadInfo) {
-    log.info("Starting to download App " + clickedApp + " from " + downloadInfo + " ...");
-
-    appInfo.setState(AppState.DOWNLOADING);
-
-    downloadAppViaAndroidDownloadManager(clickedApp, downloadInfo);
-  }
-
-  protected void downloadAppViaAndroidDownloadManager(AppInfo clickedApp, AppDownloadInfo downloadInfo) {
-    downloadManager.downloadUrlAsync(clickedApp, downloadInfo, new IDownloadCompletedCallback() {
-      @Override
-      public void completed(DownloadResult result) {
-        appDownloadCompleted(result);
-      }
-    });
-  }
-
-  protected void appDownloadCompleted(DownloadResult result) {
-    AppDownloadInfo downloadInfo = result.getDownloadInfo();
-    AppInfo appInfo = downloadInfo.getAppInfo();
-
-    if(result.isSuccessful()) {
-      AppPackageVerificationResult verificationResult = appVerifier.verifyDownloadedApk(downloadInfo);
-      if(verificationResult.wasVerificationSuccessful()) {
-        appInstaller.installApp(downloadInfo);
-      }
-      else {
-        Resources resources = activity.getResources();
-        String errorMessageTitle = resources.getString(R.string.error_message_title_could_not_verify_app_package, appInfo.getTitle());
-        showErrorMessageThreadSafe(verificationResult.getErrorMessage(), errorMessageTitle);
-      }
-    }
-    else if(result.isUserCancelled() == false) {
-      showErrorMessageThreadSafe(result.getError(), activity.getResources().getString(R.string.error_message_could_not_download_app, appInfo.getTitle()));
-    }
+    downloadAndInstallationService.installApp(appInfo);
   }
 
 
@@ -398,10 +292,6 @@ public class AppDetailsDialog extends FullscreenDialog {
     installAppActionView.setEnabled(false);
   }
 
-
-  protected void showErrorMessageThreadSafe(String error, String title) {
-    AlertHelper.showErrorMessageThreadSafe(activity, error, title);
-  }
 
 
   protected AppStateListener appStateListener = new AppStateListener() {
