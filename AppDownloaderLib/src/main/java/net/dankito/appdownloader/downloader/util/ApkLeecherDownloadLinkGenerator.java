@@ -27,13 +27,14 @@ public class ApkLeecherDownloadLinkGenerator {
       int indexAppNameAndVersionSeparator = appNameAndVersion.lastIndexOf('.'); // sometimes there's a string at the end of the version, e.g. ' lite'
       indexAppNameAndVersionSeparator = appNameAndVersion.lastIndexOf(' ', indexAppNameAndVersionSeparator);
 
-      String version = appNameAndVersion.substring(indexAppNameAndVersionSeparator + 1);
-
+      String version = appNameAndVersion.substring(indexAppNameAndVersionSeparator);
       String appName = getAppName(appNameAndVersion, indexAppNameAndVersionSeparator);
 
       String formattedUpdateString = lastUpdatedOn.replace('-', '/');
 
-      return "http://apkleecher.com/apps/" + formattedUpdateString + "/" + appName + "%20" + version + "_[www.apkleecher.com].apk";
+      String formattedVersion = version.replace(" ", "%20");
+
+      return "http://apkleecher.com/apps/" + formattedUpdateString + "/" + appName + formattedVersion + "_[www.apkleecher.com].apk";
     } catch(Exception e) {
       log.error("Could not generate download link", e);
     }
