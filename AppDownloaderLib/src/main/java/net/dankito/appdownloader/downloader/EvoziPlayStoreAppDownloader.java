@@ -40,6 +40,11 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
   }
 
 
+  @Override
+  public int getTrustworthinessFactor() {
+    return TRUSTWORTHINESS_NOT_SURE;
+  }
+
   public void getAppDownloadLinkAsync(final AppInfo appToDownload, final GetAppDownloadUrlResponseCallback callback) {
     getAppDownloadRequestParametersAsync(appToDownload.getPackageName(), new GetAppDownloadRequestParametersCallback() {
       @Override

@@ -35,6 +35,11 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
   }
 
 
+  @Override
+  public int getTrustworthinessFactor() {
+    return TRUSTWORTHINESS_NOT_SURE;
+  }
+
   public void getAppDownloadLinkAsync(final AppInfo appToDownload, final GetAppDownloadUrlResponseCallback callback) {
     try {
       String url = APK_DOWNLOADER_APP_DETAILS_PAGE_URL + URLEncoder.encode(appToDownload.getPackageName(), "ASCII");

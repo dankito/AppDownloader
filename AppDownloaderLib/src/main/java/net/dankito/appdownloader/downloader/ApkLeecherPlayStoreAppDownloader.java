@@ -37,6 +37,11 @@ public class ApkLeecherPlayStoreAppDownloader extends AppDownloaderBase {
 
 
   @Override
+  public int getTrustworthinessFactor() {
+    return TRUSTWORTHINESS_NOT_SURE;
+  }
+
+  @Override
   public void getAppDownloadLinkAsync(final AppInfo appToDownload, final GetAppDownloadUrlResponseCallback callback) {
     String searchUrl = SEARCH_URL_BASE + appToDownload.getPackageName();
     RequestParameters parameters = createRequestParametersWithDefaultValues(searchUrl);

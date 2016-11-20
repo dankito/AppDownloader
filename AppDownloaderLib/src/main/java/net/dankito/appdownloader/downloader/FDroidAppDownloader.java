@@ -35,6 +35,11 @@ public class FDroidAppDownloader extends AppDownloaderBase {
 
 
   @Override
+  public int getTrustworthinessFactor() {
+    return TRUSTWORTHINESS_ABSOLUTE_TRUSTWORTHY;
+  }
+
+  @Override
   public void getAppDownloadLinkAsync(final AppInfo appToDownload, final GetAppDownloadUrlResponseCallback callback) {
     String url = APP_DETAILS_PAGE_URL_PREFIX + appToDownload.getPackageName() + APP_DETAILS_PAGE_URL_CENTER_PART + appToDownload.getPackageName();
     RequestParameters parameters = new RequestParameters(url);

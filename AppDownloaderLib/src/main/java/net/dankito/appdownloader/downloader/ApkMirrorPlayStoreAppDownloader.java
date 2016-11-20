@@ -41,6 +41,11 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
 
 
   @Override
+  public int getTrustworthinessFactor() {
+    return TRUSTWORTHINESS_TRUSTWORTHY;
+  }
+
+  @Override
   public void getAppDownloadLinkAsync(final AppInfo appToDownload, final GetAppDownloadUrlResponseCallback callback) {
     getAppDetailsPageUrlAsync(appToDownload, callback, new GetUrlCallback() {
       @Override

@@ -9,6 +9,13 @@ import net.dankito.appdownloader.util.web.RequestParameters;
 
 public abstract class AppDownloaderBase implements IAppDownloader {
 
+  public static final int TRUSTWORTHINESS_ABSOLUTE_TRUSTWORTHY = 1000;
+
+  public static final int TRUSTWORTHINESS_TRUSTWORTHY = 100;
+
+  public static final int TRUSTWORTHINESS_NOT_SURE = 10;
+
+
   public static final int DOWNLOAD_CONNECTION_TIMEOUT_MILLIS = 2000;
 
   public static final int COUNT_CONNECTION_RETRIES = 2;
@@ -20,6 +27,14 @@ public abstract class AppDownloaderBase implements IAppDownloader {
   public AppDownloaderBase(IWebClient webClient) {
     this.webClient = webClient;
   }
+
+
+  @Override
+  public boolean isTrustworthySource() {
+    return getTrustworthinessFactor() > TRUSTWORTHINESS_TRUSTWORTHY;
+  }
+
+  protected abstract int getTrustworthinessFactor();
 
 
   protected RequestParameters createRequestParametersWithDefaultValues(String url) {

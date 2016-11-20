@@ -9,6 +9,8 @@ import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCa
 
 public interface IAppDownloader {
 
+  boolean isTrustworthySource();
+
   void getAppDownloadLinkAsync(AppInfo appToDownload, final GetAppDownloadUrlResponseCallback callback);
 
 }

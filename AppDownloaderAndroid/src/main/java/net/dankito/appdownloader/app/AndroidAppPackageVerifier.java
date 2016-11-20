@@ -7,9 +7,6 @@ import android.content.pm.Signature;
 import android.content.res.Resources;
 
 import net.dankito.appdownloader.R;
-import net.dankito.appdownloader.downloader.ApkMirrorPlayStoreAppDownloader;
-import net.dankito.appdownloader.downloader.FDroidAppDownloader;
-import net.dankito.appdownloader.downloader.IAppDownloader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,7 +153,7 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
           }
           countChecksumsChecked++;
         }
-        else if(isAbsoluteTrustworthySource(downloadInfo.getAppDownloader())) { // file checksum of absolute trustworthy have to equal
+        else if(downloadInfo.getAppDownloader().isTrustworthySource()) { // file checksum of absolute trustworthy have to equal
           result = false;
         }
       }
@@ -166,10 +163,6 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
     result &= hasIndependentSourceBeenChecked;
 
     return result;
-  }
-
-  protected boolean isAbsoluteTrustworthySource(IAppDownloader appDownloader) {
-    return appDownloader instanceof FDroidAppDownloader || appDownloader instanceof ApkMirrorPlayStoreAppDownloader;
   }
 
   protected boolean verifyApkSignatureIsCorrect(AppDownloadInfo downloadInfo, PackageManager packageManager, AppPackageVerificationResult result, Resources resources) {
