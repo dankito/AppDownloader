@@ -16,7 +16,6 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -122,8 +121,8 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
         FileInputStream fileInputStream = new FileInputStream(file);
         DataInputStream dataInputStream = new DataInputStream(fileInputStream);
 
-        ByteBuffer buffer = ByteBuffer.allocate((int)file.length());
-        dataInputStream.read(buffer.array());
+        byte[] buffer = new byte[(int)file.length()];
+        dataInputStream.read(buffer);
 
         byte[] md5CheckSum = calculateCheckSum(HashAlgorithm.MD5.getAlgorithmName(), buffer);
         byte[] sha1CheckSum = calculateCheckSum(HashAlgorithm.SHA1.getAlgorithmName(), buffer);
@@ -230,13 +229,6 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
   }
 
   protected byte[] calculateCheckSum(String algorithmName, byte[] signatureBytes) throws NoSuchAlgorithmException {
-    MessageDigest messageDigest = MessageDigest.getInstance(algorithmName);
-    messageDigest.update(signatureBytes);
-
-    return messageDigest.digest();
-  }
-
-  protected byte[] calculateCheckSum(String algorithmName, ByteBuffer signatureBytes) throws NoSuchAlgorithmException {
     MessageDigest messageDigest = MessageDigest.getInstance(algorithmName);
     messageDigest.update(signatureBytes);
 
