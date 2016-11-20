@@ -17,6 +17,7 @@ import net.dankito.appdownloader.app.IAppVerifier;
 import net.dankito.appdownloader.app.IInstalledAppsManager;
 import net.dankito.appdownloader.app.IUpdatableAppsManager;
 import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
+import net.dankito.appdownloader.downloader.ApkLeecherPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.ApkMirrorPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.EvoziPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.IAppDownloader;
@@ -136,6 +137,12 @@ public class AndroidDiContainer {
 
   @Provides
   @Singleton
+  public ApkLeecherPlayStoreAppDownloader provideApkLeecherPlayStoreAppDownloader(IWebClient webClient) {
+    return new ApkLeecherPlayStoreAppDownloader(webClient);
+  }
+
+  @Provides
+  @Singleton
   public EvoziPlayStoreAppDownloader provideEvoziPlayStoreAppDownloader(IWebClient webClient) {
     return new EvoziPlayStoreAppDownloader(webClient);
   }
@@ -143,11 +150,12 @@ public class AndroidDiContainer {
   @Provides
   @Singleton
   public List<IAppDownloader> provideAppDownloaders(ApkMirrorPlayStoreAppDownloader apkMirrorDownloader, ApkDownloaderPlayStoreAppDownloader apkDownloaderDownloader,
-                                                    EvoziPlayStoreAppDownloader evoziDownloader) {
+                                                    ApkLeecherPlayStoreAppDownloader apkLeecherDownloader, EvoziPlayStoreAppDownloader evoziDownloader) {
     List<IAppDownloader> appDownloaders = new ArrayList<>();
 
     appDownloaders.add(apkMirrorDownloader);
     appDownloaders.add(apkDownloaderDownloader);
+    appDownloaders.add(apkLeecherDownloader);
     appDownloaders.add(evoziDownloader);
 
     return appDownloaders;
