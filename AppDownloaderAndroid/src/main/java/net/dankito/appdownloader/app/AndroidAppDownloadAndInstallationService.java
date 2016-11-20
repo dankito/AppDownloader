@@ -17,6 +17,7 @@ import net.dankito.appdownloader.util.web.IDownloadManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -179,6 +180,19 @@ public class AndroidAppDownloadAndInstallationService implements IAppDownloadAnd
     appInstaller.installApp(downloadInfo);
   }
 
+  // TODO: this is the same code as in AppInstaller
+  protected void deleteDownloadedFile(AppDownloadInfo downloadInfo) {
+    try {
+      File file = new File(downloadInfo.getDownloadLocationPath());
+      if(file.exists()) {
+        log.info("Deleting installed Apk file " + file.getAbsolutePath());
+        file.delete();
+      }
+    } catch(Exception e) {
+      log.error("Could not deleted installed Apk file " + downloadInfo.getDownloadLocationPath(), e);
+    }
+  }
+
   protected void showApkVerificationWasNotSuccessfulErrorMessage(final AppInfo app, final AppDownloadInfo downloadInfo, AppPackageVerificationResult verificationResult) {
     Resources resources = activity.getResources();
 
@@ -189,7 +203,12 @@ public class AndroidAppDownloadAndInstallationService implements IAppDownloadAnd
     builder = builder.setMessage(errorMessage);
     builder = builder.setTitle(errorMessageTitle);
 
-    builder.setPositiveButton(R.string.ok, null);
+    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialogInterface, int i) {
+        deleteDownloadedFile(downloadInfo);
+      }
+    });
     builder.setNeutralButton(R.string.install_anyway, new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialogInterface, int i) {
