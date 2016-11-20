@@ -24,7 +24,9 @@ public class ApkLeecherDownloadLinkGenerator {
 
   public String generateDownloadUrl() {
     try {
-      int indexAppNameAndVersionSeparator = appNameAndVersion.lastIndexOf(' ');
+      int indexAppNameAndVersionSeparator = appNameAndVersion.lastIndexOf('.'); // sometimes there's a string at the end of the version, e.g. ' lite'
+      indexAppNameAndVersionSeparator = appNameAndVersion.lastIndexOf(' ', indexAppNameAndVersionSeparator);
+
       String version = appNameAndVersion.substring(indexAppNameAndVersionSeparator + 1);
 
       String appName = getAppName(appNameAndVersion, indexAppNameAndVersionSeparator);
