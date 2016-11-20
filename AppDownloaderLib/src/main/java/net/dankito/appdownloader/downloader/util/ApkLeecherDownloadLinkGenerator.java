@@ -40,9 +40,9 @@ public class ApkLeecherDownloadLinkGenerator {
    * @return
    */
   public List<String> generateDownloadUrlVariants() {
-    try {
-      List<String> downloadUrlVariants = new ArrayList<>();
+    List<String> downloadUrlVariants = new ArrayList<>();
 
+    try {
       int indexAppNameAndVersionSeparator = appNameAndVersion.lastIndexOf('.'); // sometimes there's a string at the end of the version, e.g. ' lite'
       indexAppNameAndVersionSeparator = appNameAndVersion.lastIndexOf(' ', indexAppNameAndVersionSeparator);
 
@@ -64,13 +64,11 @@ public class ApkLeecherDownloadLinkGenerator {
         downloadUrlVariants.add(urlBase + "_" + formattedVersion + DOWNLOAD_URL_SUFFIX_1);
         downloadUrlVariants.add(urlBase + "_" + formattedVersion + DOWNLOAD_URL_SUFFIX_2);
       }
-
-      return downloadUrlVariants;
-    } catch(Exception e) {
+    } catch (Exception e) {
       log.error("Could not generate download link", e);
     }
 
-    return null;
+    return downloadUrlVariants;
   }
 
   protected String getAppName(String appName) {
