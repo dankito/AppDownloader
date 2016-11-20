@@ -15,6 +15,7 @@ import net.dankito.appdownloader.util.web.IDownloadManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -60,13 +61,22 @@ public class AndroidAppDownloadAndInstallationService implements IAppDownloadAnd
   }
 
   protected AppDownloadInfo getBestAppDownloadUrl(AppInfo app) {
-    if(app.getDownloadInfos().size() == 1) {
-      return app.getDownloadInfos().get(0);
+    List<AppDownloadInfo> downloadInfoFromNotSoTrustworthySources = new ArrayList<>();
+
+    for(AppDownloadInfo downloadInfo : app.getDownloadInfos()) {
+      if(downloadInfo.hasDownloadLink()) { // if it's a trustworthy source, return immediately, otherwise add to downloadInfoFromNotSoTrustworthySources and ...
+        if(downloadInfo.getAppDownloader().isTrustworthySource()) {
+          return downloadInfo;
+        }
+
+        downloadInfoFromNotSoTrustworthySources.add(downloadInfo);
+      }
     }
-    else {
-      // TODO: choose best one
-      return app.getDownloadInfos().get(0);
+
+    if(downloadInfoFromNotSoTrustworthySources.size() > 0) { // ... return it only if no download link from an absolute trustworthy source has been found
+      return downloadInfoFromNotSoTrustworthySources.get(0);
     }
+    return null;
   }
 
   protected void getAppDownloadLinkAndDownloadApp(final AppInfo app) {
