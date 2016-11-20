@@ -73,6 +73,7 @@ public class AndroidAppDownloadAndInstallationService implements IAppDownloadAnd
     app.setState(AppState.GETTING_DOWNLOAD_URL);
 
     final AtomicBoolean hasDownloadUrlBeenRetrieved = new AtomicBoolean(false);
+    final AtomicBoolean hasDownloadBeenStarted = new AtomicBoolean(false);
     final AtomicInteger countRequestsAppDownloadLinkCompleted = new AtomicInteger(0);
 
     for(IAppDownloader appDownloader : appDownloaders) {
@@ -80,32 +81,35 @@ public class AndroidAppDownloadAndInstallationService implements IAppDownloadAnd
         @Override
         public void completed(GetAppDownloadUrlResponse response) {
           synchronized(hasDownloadUrlBeenRetrieved) {
-            getAppDownloadLinkCompleted(app, response, hasDownloadUrlBeenRetrieved, countRequestsAppDownloadLinkCompleted);
+            getAppDownloadLinkCompleted(app, response, hasDownloadUrlBeenRetrieved, hasDownloadBeenStarted, countRequestsAppDownloadLinkCompleted);
           }
         }
       });
     }
   }
 
-  protected void getAppDownloadLinkCompleted(AppInfo app, GetAppDownloadUrlResponse response, AtomicBoolean hasDownloadUrlBeenRetrieved, AtomicInteger countRequestsAppDownloadLinkCompleted) {
+  protected void getAppDownloadLinkCompleted(AppInfo app, GetAppDownloadUrlResponse response, AtomicBoolean hasDownloadUrlBeenRetrieved, AtomicBoolean hasDownloadBeenStarted, AtomicInteger countRequestsAppDownloadLinkCompleted) {
     countRequestsAppDownloadLinkCompleted.incrementAndGet();
     // TODO: move add AppDownloadInfo to AppInfo to here (so it's centrally placed)
-    // TODO: wait for others, may more trustworthy sources provide a download link
-
-    if(hasDownloadUrlBeenRetrieved.get() == false) {
-      if(response.isSuccessful() == false) {
-        if(countRequestsAppDownloadLinkCompleted.get() == appDownloaders.size()) { // only show error message if it's been the last AppDownloader which's request completed
-          app.setToItsDefaultState();
-          showErrorMessageThreadSafe(activity.getString(R.string.error_message_could_not_download_app, response.getError()), null);
-        }
-      }
-      else {
-        downloadApp(app, response.getDownloadInfo());
-      }
-    }
 
     if(response.isSuccessful()) {
       hasDownloadUrlBeenRetrieved.set(true);
+
+      AppDownloadInfo downloadInfo = response.getDownloadInfo();
+      if(hasDownloadBeenStarted.get() == false && downloadInfo.getAppDownloader().isTrustworthySource()) {
+        hasDownloadBeenStarted.set(true);
+        downloadApp(app, downloadInfo);
+      }
+    }
+
+    if(countRequestsAppDownloadLinkCompleted.get() == appDownloaders.size()) {
+      if(hasDownloadUrlBeenRetrieved.get() == false) {
+        app.setToItsDefaultState();
+        showErrorMessageThreadSafe(activity.getString(R.string.error_message_could_not_download_app, response.getError()), null);
+      }
+      else if(hasDownloadBeenStarted.get() == false) {
+        downloadApp(app, getBestAppDownloadUrl(app));
+      }
     }
   }
 
