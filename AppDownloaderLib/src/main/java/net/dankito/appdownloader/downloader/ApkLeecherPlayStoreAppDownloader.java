@@ -65,13 +65,18 @@ public class ApkLeecherPlayStoreAppDownloader extends AppDownloaderBase {
 
       AppDownloadInfo downloadInfo = parseAppDetails(appToDownload, document);
 
-      if(downloadInfo.hasDownloadLink()) {
-        callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, this, downloadInfo));
+      if(downloadInfo == null) {
+        callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, false));
       }
       else {
-        AppDownloadInfo downloadInfoToReturn = downloadInfo.isFileChecksumSet() ? downloadInfo : null; // so we can at least provide another file checksum
+        if(downloadInfo.hasDownloadLink()) {
+          callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, this, downloadInfo));
+        }
+        else {
+          AppDownloadInfo downloadInfoToReturn = downloadInfo.isFileChecksumSet() ? downloadInfo : null; // so we can at least provide another file checksum
 
-        callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, true, downloadInfoToReturn));
+          callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, true, downloadInfoToReturn));
+        }
       }
     } catch(Exception e) {
       log.error("Could not parse App Details Page", e);
@@ -92,12 +97,15 @@ public class ApkLeecherPlayStoreAppDownloader extends AppDownloaderBase {
       }
     }
 
-    String downloadUrl = tryToFindDownloadUrl(downloadLinkGenerator);
-    if(downloadUrl != null) {
-      downloadInfo.setUrl(downloadUrl);
-    }
+    if(isCorrectAppVersion(appToDownload, downloadLinkGenerator.getVersionString())) {
+      String downloadUrl = tryToFindDownloadUrl(downloadLinkGenerator);
+      if (downloadUrl != null) {
+        downloadInfo.setUrl(downloadUrl);
+      }
 
-    return downloadInfo;
+      return downloadInfo;
+    }
+    return null;
   }
 
   protected void parseAppDetails(AppDownloadInfo downloadInfo, ApkLeecherDownloadLinkGenerator downloadLinkGenerator, Element appDetailElement) {

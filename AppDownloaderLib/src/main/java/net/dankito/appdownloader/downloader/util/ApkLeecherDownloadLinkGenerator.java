@@ -80,6 +80,13 @@ public class ApkLeecherDownloadLinkGenerator {
     return formattedAppName;
   }
 
+  public String getVersionString() {
+    int indexAppNameAndVersionSeparator = appNameAndVersion.lastIndexOf('.'); // sometimes there's a string at the end of the version, e.g. ' lite'
+    indexAppNameAndVersionSeparator = appNameAndVersion.lastIndexOf(' ', indexAppNameAndVersionSeparator);
+
+    return appNameAndVersion.substring(indexAppNameAndVersionSeparator);
+  }
+
 
   public String getAppNameAndVersion() {
     return appNameAndVersion;
