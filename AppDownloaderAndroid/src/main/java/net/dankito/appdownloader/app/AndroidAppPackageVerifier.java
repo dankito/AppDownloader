@@ -7,6 +7,9 @@ import android.content.pm.Signature;
 import android.content.res.Resources;
 
 import net.dankito.appdownloader.R;
+import net.dankito.appdownloader.downloader.ApkMirrorPlayStoreAppDownloader;
+import net.dankito.appdownloader.downloader.FDroidAppDownloader;
+import net.dankito.appdownloader.downloader.IAppDownloader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,17 +128,48 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
         ByteBuffer buffer = ByteBuffer.allocate((int)file.length());
         dataInputStream.read(buffer.array());
 
-        byte[] fileCheckSum = calculateCheckSum(downloadInfo.getFileHashAlgorithm().getAlgorithmName(), buffer);
+        byte[] md5CheckSum = calculateCheckSum(HashAlgorithm.MD5.getAlgorithmName(), buffer);
+        byte[] sha1CheckSum = calculateCheckSum(HashAlgorithm.SHA1.getAlgorithmName(), buffer);
 
         dataInputStream.close();
 
-        return verifyCheckSumsEqual(downloadInfo.getFileChecksum(), fileCheckSum);
+        return verifyAllCheckSumsEqual(downloadInfo, md5CheckSum, sha1CheckSum);
       } catch(Exception e) {
         log.error("Could not verify file check sum");
       }
     }
 
     return false;
+  }
+
+  protected boolean verifyAllCheckSumsEqual(AppDownloadInfo linkAppDownloadedFrom, byte[] md5CheckSum, byte[] sha1CheckSum) {
+    AppInfo downloadedApp = linkAppDownloadedFrom.getAppInfo();
+    boolean result = true;
+    boolean hasIndependentSourceBeenChecked = false;
+    int countChecksumsChecked = 0;
+
+    for(AppDownloadInfo downloadInfo : downloadedApp.getDownloadInfos()) {
+      if(downloadInfo.isFileChecksumSet()) {
+        if(verifyCheckSumsEqual(downloadInfo.getFileChecksum(), downloadInfo.getFileHashAlgorithm() == HashAlgorithm.MD5 ? md5CheckSum : sha1CheckSum)) {
+          if(downloadInfo != linkAppDownloadedFrom) {
+            hasIndependentSourceBeenChecked = true;
+          }
+          countChecksumsChecked++;
+        }
+        else if(isAbsoluteTrustworthySource(downloadInfo.getAppDownloader())) { // file checksum of absolute trustworthy have to equal
+          result = false;
+        }
+      }
+    }
+
+    result &= countChecksumsChecked > 0; // we need at least two independent sources to verify that file has correct check sum
+    result &= hasIndependentSourceBeenChecked;
+
+    return result;
+  }
+
+  protected boolean isAbsoluteTrustworthySource(IAppDownloader appDownloader) {
+    return appDownloader instanceof FDroidAppDownloader || appDownloader instanceof ApkMirrorPlayStoreAppDownloader;
   }
 
   protected boolean verifyApkSignatureIsCorrect(AppDownloadInfo downloadInfo, PackageManager packageManager, AppPackageVerificationResult result, Resources resources) {
