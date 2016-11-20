@@ -48,7 +48,7 @@ public class FDroidAppDownloader extends AppDownloaderBase {
       @Override
       public void completed(WebClientResponse response) {
         if(response.isSuccessful() == false) {
-          callback.completed(new GetAppDownloadUrlResponse(appToDownload, response.getError()));
+          callback.completed(new GetAppDownloadUrlResponse(appToDownload, FDroidAppDownloader.this, response.getError()));
         }
         else {
           parseAppDetailsPage(appToDownload, response, callback);
@@ -69,15 +69,15 @@ public class FDroidAppDownloader extends AppDownloaderBase {
 
           appToDownload.addDownloadUrl(downloadInfo);
 
-          callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, downloadInfo));
+          callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, this, downloadInfo));
           return;
         }
       }
 
-      callback.completed(new GetAppDownloadUrlResponse(appToDownload, true));
+      callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, true));
     } catch(Exception e) {
       log.error("Could not parse App Detail Page", e);
-      callback.completed(new GetAppDownloadUrlResponse(appToDownload, e.getLocalizedMessage()));
+      callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, e.getLocalizedMessage()));
     }
   }
 

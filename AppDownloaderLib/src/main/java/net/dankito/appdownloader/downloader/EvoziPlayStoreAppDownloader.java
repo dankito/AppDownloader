@@ -50,7 +50,7 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
       @Override
       public void completed(AppDownloadRequestParameters requestParameters) {
         if(requestParameters.isSuccessful() == false) {
-          callback.completed(new GetAppDownloadUrlResponse(appToDownload, requestParameters.getError()));
+          callback.completed(new GetAppDownloadUrlResponse(appToDownload, EvoziPlayStoreAppDownloader.this, requestParameters.getError()));
         }
         else {
           requestAppDownloadUrl(appToDownload, requestParameters, callback);
@@ -67,7 +67,7 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
       @Override
       public void completed(WebClientResponse response) {
         if(response.isSuccessful() == false) {
-          callback.completed(new GetAppDownloadUrlResponse(appToDownload, response.getError()));
+          callback.completed(new GetAppDownloadUrlResponse(appToDownload, EvoziPlayStoreAppDownloader.this, response.getError()));
         }
         else {
           receivedAppDownloadUrlResponse(appToDownload, response.getBody(), callback);
@@ -82,14 +82,14 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
       log.info("Retrieved Download Url for " + appToDownload + ": " + evoziAppDownloadUrlResponse.getUrl());
 
       if(evoziAppDownloadUrlResponse.hasErrorOccurred()) {
-        callback.completed(new GetAppDownloadUrlResponse(appToDownload, evoziAppDownloadUrlResponse.getData()));
+        callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, evoziAppDownloadUrlResponse.getData()));
       }
       else {
         appDownloadLinkSuccessfullyDownloaded(appToDownload, callback, evoziAppDownloadUrlResponse);
       }
     } catch(Exception e) {
       log.error("Could not parse GetAppDownloadUrlResponse for App Package " + appToDownload, e);
-      callback.completed(new GetAppDownloadUrlResponse(appToDownload, e.getLocalizedMessage()));
+      callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, e.getLocalizedMessage()));
     }
   }
 
@@ -102,7 +102,7 @@ public class EvoziPlayStoreAppDownloader extends AppDownloaderBase {
 
     appToDownload.addDownloadUrl(appDownloadInfo);
 
-    GetAppDownloadUrlResponse appDownloadUrlResponse = new GetAppDownloadUrlResponse(true, appToDownload, appDownloadInfo);
+    GetAppDownloadUrlResponse appDownloadUrlResponse = new GetAppDownloadUrlResponse(true, appToDownload, this, appDownloadInfo);
 
     callback.completed(appDownloadUrlResponse);
   }

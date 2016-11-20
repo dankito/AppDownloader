@@ -50,7 +50,7 @@ public class ApkLeecherPlayStoreAppDownloader extends AppDownloaderBase {
       @Override
       public void completed(WebClientResponse response) {
         if(response.isSuccessful() == false) {
-          callback.completed(new GetAppDownloadUrlResponse(appToDownload, response.getError()));
+          callback.completed(new GetAppDownloadUrlResponse(appToDownload, ApkLeecherPlayStoreAppDownloader.this, response.getError()));
         }
         else {
           parseAppDetailsPage(appToDownload, response, callback);
@@ -67,18 +67,18 @@ public class ApkLeecherPlayStoreAppDownloader extends AppDownloaderBase {
 
       if(downloadInfo.hasDownloadLink()) {
         appToDownload.addDownloadUrl(downloadInfo);
-        callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, downloadInfo));
+        callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, this, downloadInfo));
       }
       else {
         if(downloadInfo.isFileChecksumSet()) {
           appToDownload.addDownloadUrl(downloadInfo); // so we can at least provide another file checksum
         }
 
-        callback.completed(new GetAppDownloadUrlResponse(appToDownload, true));
+        callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, true));
       }
     } catch(Exception e) {
       log.error("Could not parse App Details Page", e);
-      callback.completed(new GetAppDownloadUrlResponse(appToDownload, e.getLocalizedMessage()));
+      callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, e.getLocalizedMessage()));
     }
   }
 

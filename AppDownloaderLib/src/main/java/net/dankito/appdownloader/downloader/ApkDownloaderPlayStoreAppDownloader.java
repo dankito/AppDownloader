@@ -49,7 +49,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
         @Override
         public void completed(WebClientResponse response) {
           if(response.isSuccessful() == false) {
-            callback.completed(new GetAppDownloadUrlResponse(appToDownload, response.getError()));
+            callback.completed(new GetAppDownloadUrlResponse(appToDownload, ApkDownloaderPlayStoreAppDownloader.this, response.getError()));
           }
           else {
             parseAppDetailsPage(appToDownload, response, callback);
@@ -58,7 +58,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
       });
     } catch(Exception e) {
       log.error("Could not get Download Link for " + appToDownload, e);
-      callback.completed(new GetAppDownloadUrlResponse(appToDownload, e.getLocalizedMessage()));
+      callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, e.getLocalizedMessage()));
     }
   }
 
@@ -81,16 +81,16 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
           // in rare cases like this there are file information like apk signature and file checksum available but no download link
           appToDownload.addDownloadUrl(appDownloadInfo);
 
-          callback.completed(new GetAppDownloadUrlResponse(appToDownload, true));
+          callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, true));
         }
 
         return;
       }
 
-      callback.completed(new GetAppDownloadUrlResponse(appToDownload, "Could not find download Link")); // TODO: translate
+      callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, "Could not find download Link")); // TODO: translate
     } catch(Exception e) {
       log.error("Could not parse App Download Page for " + appToDownload, e);
-      callback.completed(new GetAppDownloadUrlResponse(appToDownload, e.getLocalizedMessage()));
+      callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, e.getLocalizedMessage()));
     }
   }
 
@@ -133,7 +133,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
       @Override
       public void completed(WebClientResponse response) {
         if(response.isSuccessful() == false) {
-          callback.completed(new GetAppDownloadUrlResponse(appToDownload, response.getError()));
+          callback.completed(new GetAppDownloadUrlResponse(appToDownload, ApkDownloaderPlayStoreAppDownloader.this, response.getError()));
         }
         else {
           parseAppDownloadPage(appToDownload, appDownloadInfo, response, callback);
@@ -157,10 +157,10 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
         }
       }
 
-      callback.completed(new GetAppDownloadUrlResponse(appToDownload, "Could not find download Link")); // TODO: translate
+      callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, "Could not find download Link")); // TODO: translate
     } catch(Exception e) {
       log.error("Could not parse App Download Page for " + appToDownload, e);
-      callback.completed(new GetAppDownloadUrlResponse(appToDownload, e.getLocalizedMessage()));
+      callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, e.getLocalizedMessage()));
     }
   }
 
@@ -171,7 +171,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
       @Override
       public void completed(WebClientResponse response) {
         if(response.isSuccessful() == false) {
-          callback.completed(new GetAppDownloadUrlResponse(appToDownload, response.getError()));
+          callback.completed(new GetAppDownloadUrlResponse(appToDownload, ApkDownloaderPlayStoreAppDownloader.this, response.getError()));
         }
         else {
           parseAppDetailDownloadPage(appToDownload, appDownloadInfo, response, callback);
@@ -194,14 +194,14 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
         appDownloadInfo.setUrl(appDownloadUrl);
         appToDownload.addDownloadUrl(appDownloadInfo);
 
-        callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, appDownloadInfo));
+        callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, this, appDownloadInfo));
         return;
       }
 
-      callback.completed(new GetAppDownloadUrlResponse(appToDownload, "Could not find download Link")); // TODO: translate
+      callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, "Could not find download Link")); // TODO: translate
     } catch(Exception e) {
       log.error("Could not parse App Download Page for " + appToDownload, e);
-      callback.completed(new GetAppDownloadUrlResponse(appToDownload, e.getLocalizedMessage()));
+      callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, e.getLocalizedMessage()));
     }
   }
 

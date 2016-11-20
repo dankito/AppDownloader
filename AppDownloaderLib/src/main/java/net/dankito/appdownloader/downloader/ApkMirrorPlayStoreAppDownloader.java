@@ -51,7 +51,7 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
       @Override
       public void completed(GetUrlResponse response) {
         if(response.isSuccessful() == false) {
-          callback.completed(new GetAppDownloadUrlResponse(appToDownload, response.getError()));
+          callback.completed(new GetAppDownloadUrlResponse(appToDownload, ApkMirrorPlayStoreAppDownloader.this, response.getError()));
         }
         else {
           successfullyRetrievedAppDetailsPageUrl(appToDownload, response, callback);
@@ -67,7 +67,7 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
       @Override
       public void completed(WebClientResponse response) {
         if(response.isSuccessful() == false) {
-          callback.completed(new GetAppDownloadUrlResponse(appToDownload, response.getError()));
+          callback.completed(new GetAppDownloadUrlResponse(appToDownload, ApkMirrorPlayStoreAppDownloader.this, response.getError()));
         }
         else {
           parseAppDetailsPage(appToDownload, response, callback);
@@ -101,12 +101,12 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
     parseAppDetails(downloadInfo, document);
 
     if(appDownloadPageUrl == null) {
-      callback.completed(new GetAppDownloadUrlResponse(appToDownload, "Could not find App Download Page Url")); // TODO: translate
+      callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, "Could not find App Download Page Url")); // TODO: translate
     }
     else {
       if(appDownloadPageUrl.contains("/download.php?id=")) { // this is already the download link
         appDownloadUrlExtracted(appToDownload, downloadInfo, appDownloadPageUrl);
-        callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, downloadInfo));
+        callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, this, downloadInfo));
       }
       else {
         getAppDownloadPageUrl(appToDownload, downloadInfo, appDownloadPageUrl, callback);
@@ -172,7 +172,7 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
       }
     }
 
-    callback.completed(new GetAppDownloadUrlResponse(appToDownload, "Could not find App Details Page Url")); // TODO: translate
+    callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, "Could not find App Details Page Url")); // TODO: translate
   }
 
 
@@ -183,7 +183,7 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
       @Override
       public void completed(WebClientResponse response) {
         if(response.isSuccessful() == false) {
-          callback.completed(new GetAppDownloadUrlResponse(appToDownload, response.getError()));
+          callback.completed(new GetAppDownloadUrlResponse(appToDownload, ApkMirrorPlayStoreAppDownloader.this, response.getError()));
         }
         else {
           parseAppDownloadPage(appToDownload, downloadInfo, response, callback);
@@ -202,11 +202,11 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
 
       appDownloadUrlExtracted(appToDownload, downloadInfo, appDownloadUrl);
 
-      callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, downloadInfo));
+      callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, this, downloadInfo));
       return;
     }
 
-    callback.completed(new GetAppDownloadUrlResponse(appToDownload, "Could not find App Download Url")); // TODO: translate
+    callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, "Could not find App Download Url")); // TODO: translate
   }
 
   protected void appDownloadUrlExtracted(AppInfo appToDownload, AppDownloadInfo downloadInfo, String appDownloadUrl) {
@@ -255,7 +255,7 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
       else {
         boolean doesNotContainThisApp = checkIfDoesNotHaveThisApp(tabContainerElement);
         if(doesNotContainThisApp) {
-          getAppDownloadUrlResponseCallback.completed(new GetAppDownloadUrlResponse(appToDownload, true));
+          getAppDownloadUrlResponseCallback.completed(new GetAppDownloadUrlResponse(appToDownload, this, true));
           return;
         }
       }

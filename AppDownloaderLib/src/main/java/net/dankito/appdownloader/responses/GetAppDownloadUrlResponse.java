@@ -2,6 +2,7 @@ package net.dankito.appdownloader.responses;
 
 import net.dankito.appdownloader.app.AppDownloadInfo;
 import net.dankito.appdownloader.app.AppInfo;
+import net.dankito.appdownloader.downloader.IAppDownloader;
 
 /**
  * Created by ganymed on 02/11/16.
@@ -12,38 +13,47 @@ public class GetAppDownloadUrlResponse extends ResponseBase {
 
   protected AppInfo appToDownload;
 
+  protected IAppDownloader appDownloader;
+
   protected AppDownloadInfo downloadInfo;
 
   protected boolean doesNotHaveThisApp = false;
 
 
 
-  public GetAppDownloadUrlResponse(AppInfo appToDownload, String error) {
+  public GetAppDownloadUrlResponse(AppInfo appToDownload, IAppDownloader appDownloader, String error) {
     super(error);
 
     this.appToDownload = appToDownload;
+    this.appDownloader = appDownloader;
   }
 
-  public GetAppDownloadUrlResponse(AppInfo appToDownload, boolean doesNotHaveThisApp) {
+  public GetAppDownloadUrlResponse(AppInfo appToDownload, IAppDownloader appDownloader, boolean doesNotHaveThisApp) {
     super(false);
 
     this.appToDownload = appToDownload;
+    this.appDownloader = appDownloader;
     this.doesNotHaveThisApp = doesNotHaveThisApp;
   }
 
-  protected GetAppDownloadUrlResponse(boolean isSuccessful, AppInfo appToDownload) {
+  protected GetAppDownloadUrlResponse(boolean isSuccessful, AppInfo appToDownload, IAppDownloader appDownloader) {
     super(isSuccessful);
     this.appToDownload = appToDownload;
+    this.appDownloader = appDownloader;
   }
 
-  public GetAppDownloadUrlResponse(boolean isSuccessful, AppInfo appToDownload, AppDownloadInfo downloadInfo) {
-    this(isSuccessful, appToDownload);
+  public GetAppDownloadUrlResponse(boolean isSuccessful, AppInfo appToDownload, IAppDownloader appDownloader, AppDownloadInfo downloadInfo) {
+    this(isSuccessful, appToDownload, appDownloader);
     this.downloadInfo = downloadInfo;
   }
 
 
   public AppInfo getAppToDownload() {
     return appToDownload;
+  }
+
+  public IAppDownloader getAppDownloader() {
+    return appDownloader;
   }
 
   public AppDownloadInfo getDownloadInfo() {
