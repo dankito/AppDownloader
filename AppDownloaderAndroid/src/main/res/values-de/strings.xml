@@ -5,6 +5,7 @@
     <string name="ok">OK</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
+    <string name="install_anyway">Trotzdem installieren</string>
 
     <string name="tab_title_updates">Updates</string>
     <string name="tab_title_search">Suchen</string>
@@ -29,7 +30,9 @@
     <string name="error_message_app_version_not_correct">App hat falsche Version</string>
     <string name="error_message_app_file_checksum_not_correct">App Datei hat falsche Prüfsumme</string>
     <string name="error_message_app_signature_invalid">App hat eine nicht gültige Signatur</string>
-    <string name="error_message_title_could_not_verify_app_package">Sicherheitsprüfung für App %s ist fehlgeschlagen</string>
+    <string name="error_message_could_not_verify_apk_file">%s\n\nWenn Sie möchten, können Sie die App natürlich trotzdem installieren, wir
+        möchten Sie jedoch ausdrücklich davor warnen dies zu tun!</string>
+    <string name="error_message_title_could_not_verify_apk_file">Sicherheitsprüfung fehlgeschlagen für %s</string>
 
     <string name="alert_message_cancel_download">Download von %s abbrechen?</string>
 </resources>

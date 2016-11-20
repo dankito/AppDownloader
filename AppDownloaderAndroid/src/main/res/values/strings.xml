@@ -5,6 +5,7 @@
     <string name="ok">OK</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="install_anyway" formatted="false">I\'m risky, install</string>
 
     <string name="tab_title_updates">Updates</string>
     <string name="tab_title_search">Search</string>
@@ -29,7 +30,8 @@
     <string name="error_message_app_version_not_correct">App has wrong version</string>
     <string name="error_message_app_file_checksum_not_correct">App has wrong file checksum</string>
     <string name="error_message_app_signature_invalid">App has invalid signature</string>
-    <string name="error_message_title_could_not_verify_app_package">Downloaded App package for %s is not secure to install</string>
+    <string name="error_message_could_not_verify_apk_file">%s\n\nIf you want it that way you can install the app anyway, but we advice you not to do so!</string>
+    <string name="error_message_title_could_not_verify_apk_file">Security check failed for %s</string>
 
     <string name="alert_message_cancel_download">Cancel download of %s?</string>
 </resources>

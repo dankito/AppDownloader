@@ -1,7 +1,9 @@
 package net.dankito.appdownloader.app;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.support.v7.app.AlertDialog;
 
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.downloader.IAppDownloader;
@@ -162,17 +164,40 @@ public class AndroidAppDownloadAndInstallationService implements IAppDownloadAnd
     if(result.isSuccessful()) {
       AppPackageVerificationResult verificationResult = appVerifier.verifyDownloadedApk(downloadInfo);
       if(verificationResult.wasVerificationSuccessful()) {
-        appInstaller.installApp(downloadInfo);
+        doAppInstall(downloadInfo);
       }
       else {
-        Resources resources = activity.getResources();
-        String errorMessageTitle = resources.getString(R.string.error_message_title_could_not_verify_app_package, app.getTitle());
-        showErrorMessageThreadSafe(verificationResult.getErrorMessage(), errorMessageTitle);
+        showApkVerificationWasNotSuccessfulErrorMessage(app, downloadInfo, verificationResult);
       }
     }
     else if(result.isUserCancelled() == false) {
       showErrorMessageThreadSafe(result.getError(), activity.getResources().getString(R.string.error_message_could_not_download_app, app.getTitle()));
     }
+  }
+
+  protected void doAppInstall(AppDownloadInfo downloadInfo) {
+    appInstaller.installApp(downloadInfo);
+  }
+
+  protected void showApkVerificationWasNotSuccessfulErrorMessage(final AppInfo app, final AppDownloadInfo downloadInfo, AppPackageVerificationResult verificationResult) {
+    Resources resources = activity.getResources();
+
+    String errorMessageTitle = resources.getString(R.string.error_message_title_could_not_verify_apk_file, app.getTitle());
+    String errorMessage = resources.getString(R.string.error_message_could_not_verify_apk_file, verificationResult.getErrorMessage());
+
+    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+    builder = builder.setMessage(errorMessage);
+    builder = builder.setTitle(errorMessageTitle);
+
+    builder.setPositiveButton(R.string.ok, null);
+    builder.setNeutralButton(R.string.install_anyway, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialogInterface, int i) {
+        doAppInstall(downloadInfo);
+      }
+    });
+
+    builder.create().show();
   }
 
   protected void showErrorMessageThreadSafe(String error, String title) {
