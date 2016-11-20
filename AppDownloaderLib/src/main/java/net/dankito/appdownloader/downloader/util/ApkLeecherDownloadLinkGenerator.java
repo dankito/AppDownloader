@@ -27,8 +27,7 @@ public class ApkLeecherDownloadLinkGenerator {
       int indexAppNameAndVersionSeparator = appNameAndVersion.lastIndexOf(' ');
       String version = appNameAndVersion.substring(indexAppNameAndVersionSeparator + 1);
 
-      String appName = appNameAndVersion.substring(0, indexAppNameAndVersionSeparator);
-      appName = appName.replace(' ', '_');
+      String appName = getAppName(appNameAndVersion, indexAppNameAndVersionSeparator);
 
       String formattedUpdateString = lastUpdatedOn.replace('-', '/');
 
@@ -38,6 +37,16 @@ public class ApkLeecherDownloadLinkGenerator {
     }
 
     return null;
+  }
+
+  protected String getAppName(String appNameAndVersion, int indexAppNameAndVersionSeparator) {
+    String appName = appNameAndVersion.substring(0, indexAppNameAndVersionSeparator);
+
+    appName = appName.replace("-", " ").replace("&", " ").replace(":", " ").replace("(", " ").replace(")", " ");
+    appName = appName.replace("  ", " ");
+    appName = appName.replace(' ', '_');
+
+    return appName;
   }
 
 
