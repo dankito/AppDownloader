@@ -55,7 +55,7 @@ public class AppDownloadInfo {
     this.hasDownloadLink = StringUtils.isNotNullOrEmpty(url); // TODO: check if it's a valid url
   }
 
-  public boolean isHasDownloadLink() {
+  public boolean hasDownloadLink() {
     return hasDownloadLink;
   }
 
@@ -73,6 +73,10 @@ public class AppDownloadInfo {
 
   public void setFileHashAlgorithm(HashAlgorithm fileHashAlgorithm) {
     this.fileHashAlgorithm = fileHashAlgorithm;
+  }
+
+  public boolean isFileChecksumSet() {
+    return StringUtils.isNotNullOrEmpty(getFileChecksum()) && getFileHashAlgorithm() != null;
   }
 
   public String getFileChecksum() {
