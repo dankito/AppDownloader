@@ -240,7 +240,13 @@ public class AppInfo {
 
 
   public boolean hasDownloadUrls() {
-    return downloadInfos.size() > 0; // TODO: also check if they really contain a download url
+    for(AppDownloadInfo downloadInfo : getDownloadInfos()) {
+      if(downloadInfo.hasDownloadLink()) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public boolean addDownloadInfo(AppDownloadInfo appDownloadInfo) {
