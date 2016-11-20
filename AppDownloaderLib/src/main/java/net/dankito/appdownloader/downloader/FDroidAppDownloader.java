@@ -67,8 +67,11 @@ public class FDroidAppDownloader extends AppDownloaderBase {
           AppDownloadInfo downloadInfo = new AppDownloadInfo(appToDownload, this);
           downloadInfo.setUrl(anchorElement.attr("href"));
 
-          callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, this, downloadInfo));
-          return;
+          String appVersion = getAppVersionToDownloadLink(anchorElement);
+          if(isCorrectAppVersion(appToDownload, appVersion)) {
+            callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, this, downloadInfo));
+            return;
+          }
         }
       }
 
@@ -77,6 +80,22 @@ public class FDroidAppDownloader extends AppDownloaderBase {
       log.error("Could not parse App Detail Page", e);
       callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, e.getLocalizedMessage()));
     }
+  }
+
+  protected String getAppVersionToDownloadLink(Element anchorElement) {
+    Element previousSibling = anchorElement.previousElementSibling();
+
+    while(previousSibling != null) {
+      if("p".equals(previousSibling.nodeName()) && previousSibling.children().size() > 0 && "b".equals(previousSibling.child(0).nodeName())) {
+        String previousSiblingChildText = previousSibling.child(0).text();
+        if(previousSiblingChildText != null && previousSiblingChildText.startsWith("Version ")) {
+          return previousSiblingChildText.substring("Version ".length());
+        }
+      }
+
+      previousSibling = previousSibling.previousElementSibling();
+    }
+    return null;
   }
 
 }

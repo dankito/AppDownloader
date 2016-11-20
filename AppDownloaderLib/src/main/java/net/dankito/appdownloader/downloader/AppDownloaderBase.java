@@ -1,5 +1,6 @@
 package net.dankito.appdownloader.downloader;
 
+import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.util.web.IWebClient;
 import net.dankito.appdownloader.util.web.RequestParameters;
 
@@ -48,6 +49,11 @@ public abstract class AppDownloaderBase implements IAppDownloader {
     parameters.setCountConnectionRetries(COUNT_CONNECTION_RETRIES);
 
     return parameters;
+  }
+
+
+  protected boolean isCorrectAppVersion(AppInfo appToDownload, String appVersion) {
+    return appToDownload.getVersionString().equals(appVersion);
   }
 
 }
