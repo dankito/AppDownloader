@@ -197,6 +197,15 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
 
   protected void askShouldDownloadGetCancelled(final long downloadId) {
     CurrentDownload currentDownload = currentDownloads.get(downloadId);
+    if(currentDownload != null) {
+      askShouldDownloadGetCancelled(downloadId, currentDownload);
+    }
+    else { // on old download from previous run of this app
+      removeDownloadFromDownloadManager(downloadId);
+    }
+  }
+
+  protected void askShouldDownloadGetCancelled(final long downloadId, CurrentDownload currentDownload) {
     final AppDownloadInfo downloadInfo = currentDownload.getDownloadInfo();
     AppInfo appToStop = downloadInfo.getAppInfo();
     String appTitle = appToStop == null ? "" : appToStop.getTitle();
@@ -216,8 +225,7 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
   }
 
   protected void cancelDownload(long downloadId, AppDownloadInfo downloadInfo) {
-    DownloadManager downloadManager = getDownloadManager();
-    downloadManager.remove(downloadId);
+    removeDownloadFromDownloadManager(downloadId);
 
     CurrentDownload currentDownload = currentDownloads.remove(downloadId);
 
@@ -229,6 +237,11 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
 
       callback.completed(new DownloadResult(downloadInfo, false, true));
     }
+  }
+
+  protected void removeDownloadFromDownloadManager(long downloadId) {
+    DownloadManager downloadManager = getDownloadManager();
+    downloadManager.remove(downloadId);
   }
 
 
