@@ -31,7 +31,7 @@ public abstract class AppDownloaderBase implements IAppDownloader {
 
   @Override
   public boolean isTrustworthySource() {
-    return getTrustworthinessFactor() > TRUSTWORTHINESS_TRUSTWORTHY;
+    return getTrustworthinessFactor() >= TRUSTWORTHINESS_TRUSTWORTHY;
   }
 
   protected abstract int getTrustworthinessFactor();
