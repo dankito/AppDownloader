@@ -216,17 +216,19 @@ public class AndroidDownloadManager extends BroadcastReceiver implements IDownlo
   }
 
   protected void cancelDownload(long downloadId, AppDownloadInfo downloadInfo) {
-    AppInfo appInfo = downloadInfo.getAppInfo();
-    appInfo.setToItsDefaultState();
-
     DownloadManager downloadManager = getDownloadManager();
     downloadManager.remove(downloadId);
 
     CurrentDownload currentDownload = currentDownloads.remove(downloadId);
 
-    IDownloadCompletedCallback callback = currentDownload.getCallback();
+    if(currentDownload != null) {
+      AppInfo appInfo = downloadInfo.getAppInfo();
+      appInfo.setToItsDefaultState();
 
-    callback.completed(new DownloadResult(downloadInfo, false, true));
+      IDownloadCompletedCallback callback = currentDownload.getCallback();
+
+      callback.completed(new DownloadResult(downloadInfo, false, true));
+    }
   }
 
 
