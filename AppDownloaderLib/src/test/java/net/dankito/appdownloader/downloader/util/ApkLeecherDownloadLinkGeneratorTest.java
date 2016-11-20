@@ -21,22 +21,18 @@ public class ApkLeecherDownloadLinkGeneratorTest {
   public void generateDownloadUrl_AppNamesContainingDash() throws Exception {
     testDownloadUrlGeneration("NetGuard - no-root firewall 2.56", "2016-11-09", "http://apkleecher.com/apps/2016/11/09/NetGuard_no_root_firewall%202.56_%5Bwww.apkleecher.com%5D.apk");
 
-//    testDownloadUrlGeneration("AutoStart - No root 2.2", "2016-06-23", "http://apkleecher.com/apps/2016/06/23/AutoStart_No_root%202.2_%5Bwww.Apkleecher.com%5D.apk");
-    testDownloadUrlGeneration("AutoStart - No root 2.2", "2016-06-23", "http://apkleecher.com/apps/2016/06/23/AutoStart_No_root%202.2_%5Bwww.apkleecher.com%5D.apk");
+    testDownloadUrlGeneration("AutoStart - No root 2.2", "2016-06-23", "http://apkleecher.com/apps/2016/06/23/AutoStart_No_root%202.2_%5Bwww.Apkleecher.com%5D.apk");
 
     testDownloadUrlGeneration("CyberGhost - Free VPN & Proxy 5.5.1.7", "2016-01-18", "http://apkleecher.com/apps/2016/01/18/CyberGhost_Free_VPN_Proxy%205.5.1.7_%5Bwww.apkleecher.com%5D.apk");
   }
 
   @Test
   public void generateDownloadUrl_AppNamesContainingBraces() throws Exception {
-//    testDownloadUrlGeneration("ADB Wireless (no root) 1.2", "2016-06-13", "http://apkleecher.com/apps/2016/06/13/ADB_Wireless_no_root_%201.2_%5Bwww.Apkleecher.com%5D.apk");
-    testDownloadUrlGeneration("ADB Wireless (no root) 1.2", "2016-06-13", "http://apkleecher.com/apps/2016/06/13/ADB_Wireless_no_root_%201.2_%5Bwww.apkleecher.com%5D.apk");
+    testDownloadUrlGeneration("ADB Wireless (no root) 1.2", "2016-06-13", "http://apkleecher.com/apps/2016/06/13/ADB_Wireless_no_root_%201.2_%5Bwww.Apkleecher.com%5D.apk");
 
-//    testDownloadUrlGeneration("BusyBox Install (No Root) 3.66.0.41", "2016-06-16", "http://apkleecher.com/apps/2016/06/16/BusyBox_Install_No_Root_%203.66.0.41_%5Bwww.Apkleecher.com%5D.apk");
-    testDownloadUrlGeneration("BusyBox Install (No Root) 3.66.0.41", "2016-06-16", "http://apkleecher.com/apps/2016/06/16/BusyBox_Install_No_Root_%203.66.0.41_%5Bwww.apkleecher.com%5D.apk");
+    testDownloadUrlGeneration("BusyBox Install (No Root) 3.66.0.41", "2016-06-16", "http://apkleecher.com/apps/2016/06/16/BusyBox_Install_No_Root_%203.66.0.41_%5Bwww.Apkleecher.com%5D.apk");
 
-//    testDownloadUrlGeneration("Wifi Password(ROOT) 1.5.2", "2016-06-22", "http://apkleecher.com/apps/2016/06/22/Wifi_Password_ROOT_%201.5.2_%5Bwww.Apkleecher.com%5D.apk");
-    testDownloadUrlGeneration("Wifi Password(ROOT) 1.5.2", "2016-06-22", "http://apkleecher.com/apps/2016/06/22/Wifi_Password_ROOT_%201.5.2_%5Bwww.apkleecher.com%5D.apk");
+    testDownloadUrlGeneration("Wifi Password(ROOT) 1.5.2", "2016-06-22", "http://apkleecher.com/apps/2016/06/22/Wifi_Password_ROOT_%201.5.2_%5Bwww.Apkleecher.com%5D.apk");
 
     testDownloadUrlGeneration("Device Control [root] 0.8.7.2-git-fb92bc", "2016-11-19", "http://apkleecher.com/apps/2016/11/19/Device_Control_root_%200.8.7.2-git-fb92bc_%5Bwww.apkleecher.com%5D.apk");
 
@@ -47,8 +43,7 @@ public class ApkLeecherDownloadLinkGeneratorTest {
 
   @Test
   public void generateDownloadUrl_AppNamesContainingOtherNonAlphanumericalCharacters() throws Exception {
-//    testDownloadUrlGeneration("VideoShowLite: Video editor 7.1.7 lite", "2016-11-20", "http://apkleecher.com/apps/2016/11/20/VideoShowLite_Video_editor%207.1.7%20lite_%5Bwww.Apkleecher.com%5D.apk");
-    testDownloadUrlGeneration("VideoShowLite: Video editor 7.1.7 lite", "2016-11-20", "http://apkleecher.com/apps/2016/11/20/VideoShowLite_Video_editor%207.1.7%20lite_%5Bwww.apkleecher.com%5D.apk");
+    testDownloadUrlGeneration("VideoShowLite: Video editor 7.1.7 lite", "2016-11-20", "http://apkleecher.com/apps/2016/11/20/VideoShowLite_Video_editor%207.1.7%20lite_%5Bwww.Apkleecher.com%5D.apk");
 
     testDownloadUrlGeneration("VivaVideo: Free Video Editor 5.3.0", "2016-11-20", "http://apkleecher.com/apps/2016/11/20/VivaVideo_Free_Video_Editor%205.3.0_%5Bwww.apkleecher.com%5D.apk");
 
