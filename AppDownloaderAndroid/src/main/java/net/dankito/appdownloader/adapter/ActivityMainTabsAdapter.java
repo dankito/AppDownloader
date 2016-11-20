@@ -42,10 +42,10 @@ public class ActivityMainTabsAdapter extends FragmentPagerAdapter {
   @Override
   public CharSequence getPageTitle(int position) {
     if(position == 0) {
-      return activity.getString(R.string.tab_title_updates);
+      return activity.getString(R.string.tab_title_search);
     }
     else if(position == 1) {
-      return activity.getString(R.string.tab_title_search);
+      return activity.getString(R.string.tab_title_updates);
     }
 
     return super.getPageTitle(position);
@@ -54,18 +54,18 @@ public class ActivityMainTabsAdapter extends FragmentPagerAdapter {
   @Override
   public Fragment getItem(int position) {
     if(position == 0) {
-      if(updatableAppsFragment == null) {
-        updatableAppsFragment = new UpdatableAppsFragment();
-      }
-
-      return updatableAppsFragment;
-    }
-    else if(position == 1) {
       if(appSearchResultsFragment == null) {
         appSearchResultsFragment = new AppSearchResultsFragment();
       }
 
       return appSearchResultsFragment;
+    }
+    else if(position == 1) {
+      if(updatableAppsFragment == null) {
+        updatableAppsFragment = new UpdatableAppsFragment();
+      }
+
+      return updatableAppsFragment;
     }
 
     return null;
