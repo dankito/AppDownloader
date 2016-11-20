@@ -3,6 +3,9 @@ package net.dankito.appdownloader.util.web;
 import net.dankito.appdownloader.responses.callbacks.DownloadProgressListener;
 import net.dankito.appdownloader.util.StringUtils;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Created by ganymed on 03/11/16.
  */
@@ -19,6 +22,8 @@ public class RequestParameters {
   protected ContentType contentType;
 
   protected String userAgent;
+
+  protected Map<String, String> headers = new ConcurrentHashMap<>();
 
   protected int connectionTimeoutMillis;
 
@@ -132,6 +137,15 @@ public class RequestParameters {
 
   public void setDownloadProgressListener(DownloadProgressListener downloadProgressListener) {
     this.downloadProgressListener = downloadProgressListener;
+  }
+
+
+  public void addHeader(String headerName, String value) {
+    headers.put(headerName, value);
+  }
+
+  public Map<String, String> getHeaders() {
+    return headers;
   }
 
 

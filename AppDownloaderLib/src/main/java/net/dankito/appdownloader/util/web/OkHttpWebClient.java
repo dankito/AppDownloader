@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -151,6 +152,10 @@ public class OkHttpWebClient implements IWebClient {
 
     if(parameters.isUserAgentSet()) {
       requestBuilder.header("User-Agent", parameters.getUserAgent());
+    }
+
+    for(Map.Entry<String, String> header : parameters.getHeaders().entrySet()) {
+      requestBuilder.addHeader(header.getKey(), header.getValue());
     }
 
     if(parameters.isConnectionTimeoutSet()) {
