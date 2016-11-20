@@ -9,6 +9,10 @@ import net.dankito.appdownloader.util.web.RequestParameters;
 
 public abstract class AppDownloaderBase implements IAppDownloader {
 
+  // two additional download sources would be https://apkplz.com and https://sameapk.com.
+  // But they either require executing JavaScript (https://sameapk.com) or user interaction (reading a captcha; https://apkplz.com).
+
+
   public static final int TRUSTWORTHINESS_ABSOLUTE_TRUSTWORTHY = 1000;
 
   public static final int TRUSTWORTHINESS_TRUSTWORTHY = 100;
