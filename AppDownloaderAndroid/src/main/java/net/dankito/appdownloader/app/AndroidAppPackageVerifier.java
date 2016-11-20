@@ -125,11 +125,11 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
         ByteBuffer buffer = ByteBuffer.allocate((int)file.length());
         dataInputStream.read(buffer.array());
 
-        byte[] fileCheckSum = calculateCheckSum(downloadInfo.getHashAlgorithm().getAlgorithmName(), buffer);
+        byte[] fileCheckSum = calculateCheckSum(downloadInfo.getFileHashAlgorithm().getAlgorithmName(), buffer);
 
         dataInputStream.close();
 
-        return verifyCheckSumsEqual(downloadInfo.getFileHashSum(), fileCheckSum);
+        return verifyCheckSumsEqual(downloadInfo.getFileChecksum(), fileCheckSum);
       } catch(Exception e) {
         log.error("Could not verify file check sum");
       }

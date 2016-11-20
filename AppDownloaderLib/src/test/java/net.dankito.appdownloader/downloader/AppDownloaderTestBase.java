@@ -77,7 +77,7 @@ public abstract class AppDownloaderTestBase {
     Assert.assertNotNull(downloadInfo.getAppInfo());
     Assert.assertNotNull(downloadInfo.getUrl());
     Assert.assertNotNull(downloadInfo.getFileSize());
-    Assert.assertNotNull(downloadInfo.getFileHashSum());
-    Assert.assertNotNull(downloadInfo.getHashAlgorithm());
+    Assert.assertNotNull(downloadInfo.getFileChecksum());
+    Assert.assertNotNull(downloadInfo.getFileHashAlgorithm());
   }
 }

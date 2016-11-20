@@ -20,9 +20,9 @@ public class AppDownloadInfo {
 
   protected String fileSize;
 
-  protected HashAlgorithm hashAlgorithm;
+  protected HashAlgorithm fileHashAlgorithm;
 
-  protected String fileHashSum;
+  protected String fileChecksum;
 
   protected String apkSignature;
 
@@ -67,20 +67,20 @@ public class AppDownloadInfo {
     this.fileSize = fileSize;
   }
 
-  public HashAlgorithm getHashAlgorithm() {
-    return hashAlgorithm;
+  public HashAlgorithm getFileHashAlgorithm() {
+    return fileHashAlgorithm;
   }
 
-  public void setHashAlgorithm(HashAlgorithm hashAlgorithm) {
-    this.hashAlgorithm = hashAlgorithm;
+  public void setFileHashAlgorithm(HashAlgorithm fileHashAlgorithm) {
+    this.fileHashAlgorithm = fileHashAlgorithm;
   }
 
-  public String getFileHashSum() {
-    return fileHashSum;
+  public String getFileChecksum() {
+    return fileChecksum;
   }
 
-  public void setFileHashSum(String fileHashSum) {
-    this.fileHashSum = fileHashSum;
+  public void setFileChecksum(String fileChecksum) {
+    this.fileChecksum = fileChecksum;
   }
 
   public boolean isApkSignatureSet() {

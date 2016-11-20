@@ -104,8 +104,8 @@ public class ApkLeecherPlayStoreAppDownloader extends AppDownloaderBase {
     }
     else if("MD5 File Hash:".equals(appDetailName)) {
       if(StringUtils.isNotNullOrEmpty(appDetailValue)) {
-        downloadInfo.setHashAlgorithm(HashAlgorithm.MD5);
-        downloadInfo.setFileHashSum(appDetailValue);
+        downloadInfo.setFileHashAlgorithm(HashAlgorithm.MD5);
+        downloadInfo.setFileChecksum(appDetailValue);
       }
     }
 

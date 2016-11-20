@@ -146,8 +146,8 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
         downloadInfo.setFileSize(appSpecificationValue);
       }
       else if("MD5 signature".equals(appSpecificationTitle)) {
-        downloadInfo.setHashAlgorithm(HashAlgorithm.MD5);
-        downloadInfo.setFileHashSum(appSpecificationValue);
+        downloadInfo.setFileHashAlgorithm(HashAlgorithm.MD5);
+        downloadInfo.setFileChecksum(appSpecificationValue);
       }
     }
   }
