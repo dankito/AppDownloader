@@ -49,6 +49,8 @@ public abstract class AppDownloaderBase implements IAppDownloader {
     parameters.setConnectionTimeoutMillis(DOWNLOAD_CONNECTION_TIMEOUT_MILLIS);
     parameters.setCountConnectionRetries(COUNT_CONNECTION_RETRIES);
 
+    parameters.addHeader("Accept-Language", "en-US,en;q=0.8");
+
     return parameters;
   }
 
