@@ -233,9 +233,8 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
   }
 
   protected void retrieveNextSearchResultPage(String searchUrl, String nextSearchResultsPageReferer, String token, String sp, int pageNumber, List<AppInfo> searchResults, SearchAppsResponseCallback callback) {
-    RequestParameters nextSearchResultsParameters = new RequestParameters(searchUrl);
+    RequestParameters nextSearchResultsParameters = createRequestParametersWithDefaultValues(searchUrl);
     nextSearchResultsParameters.addHeader("Referer", nextSearchResultsPageReferer);
-    nextSearchResultsParameters.addHeader("Accept-Language", "en-US,en;q=0.8");
 
     String requestBody = "start=0&num=0&numChildren=0&pagTok=" + token + "&sp=" + sp + "&cctcss=square-cover&cllayout=NORMAL&ipf=1&xhr=1";
     nextSearchResultsParameters.setBody(requestBody);
@@ -393,6 +392,8 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
 
     parameters.setConnectionTimeoutMillis(CONNECTION_TIMEOUT_MILLIS);
     parameters.setCountConnectionRetries(COUNT_CONNECTION_RETRIES);
+
+    parameters.addHeader("Accept-Language", "en-US,en;q=0.8");
 
     return parameters;
   }
