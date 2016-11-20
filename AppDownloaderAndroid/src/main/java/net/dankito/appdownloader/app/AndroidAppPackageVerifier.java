@@ -151,6 +151,11 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
   }
 
   protected boolean verifyApkSignature(AppDownloadInfo downloadInfo, PackageManager packageManager) {
+    String validApkSignature = downloadInfo.getAppInfo().getApkSignature();
+    if(validApkSignature == null) { // no apk signature found at from downloader's sites -> there's no way we can verify if app has correct signature
+      return false;
+    }
+
     // So, you call that, passing in the path to the APK, along with PackageManager.GET_SIGNATURES.
     // If you get null back, the APK was tampered with and does not have valid digital signature.
     // If you get a PackageInfo back, it will have the "signatures", which you can use for comparison purposes.
@@ -172,7 +177,7 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
       try {
         byte[] digest = calculateCheckSum("SHA", signatureBytes);
 
-        return verifyCheckSumsEqual(downloadInfo.getAppInfo().getApkSignature(), digest);
+        return verifyCheckSumsEqual(validApkSignature, digest);
       } catch(Exception e) {
         log.error("Could not validate Certificate signature", e);
       }
