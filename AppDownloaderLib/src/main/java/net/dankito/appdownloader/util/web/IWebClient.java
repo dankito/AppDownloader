@@ -6,7 +6,11 @@ package net.dankito.appdownloader.util.web;
 
 public interface IWebClient {
 
+  WebClientResponse get(RequestParameters parameters);
+
   void getAsync(RequestParameters parameters, final RequestCallback callback);
+
+  WebClientResponse post(RequestParameters parameters);
 
   void postAsync(RequestParameters parameters, final RequestCallback callback);
 
