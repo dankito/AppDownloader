@@ -44,11 +44,12 @@ public class ApkLeecherDownloadLinkGenerator {
   protected String getAppName(String appNameAndVersion, int indexAppNameAndVersionSeparator) {
     String appName = appNameAndVersion.substring(0, indexAppNameAndVersionSeparator);
 
-    appName = appName.replace("-", " ").replace("&", " ").replace(":", " ").replace("(", " ").replace(")", " ");
-    appName = appName.replace("  ", " ");
-    appName = appName.replace(' ', '_');
+    String parsedAppName = appName.replaceAll("[^A-Za-z0-9 ]", " ");
 
-    return appName;
+    parsedAppName = parsedAppName.replace("   ", " ").replace("  ", " ").replace("  ", " ");
+    parsedAppName = parsedAppName.replace(' ', '_');
+
+    return parsedAppName;
   }
 
 
