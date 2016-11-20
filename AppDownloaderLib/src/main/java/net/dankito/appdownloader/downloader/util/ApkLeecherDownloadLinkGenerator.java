@@ -39,16 +39,23 @@ public class ApkLeecherDownloadLinkGenerator {
       indexAppNameAndVersionSeparator = appNameAndVersion.lastIndexOf(' ', indexAppNameAndVersionSeparator);
 
       String version = appNameAndVersion.substring(indexAppNameAndVersionSeparator);
-      String appName = getAppName(appNameAndVersion, indexAppNameAndVersionSeparator);
+      String appName = appNameAndVersion.substring(0, indexAppNameAndVersionSeparator);
+
+      String formattedAppName = getAppName(appName);
 
       String formattedUpdateString = lastUpdatedOn.replace('-', '/');
 
       String formattedVersion = version.replace(" ", "%20");
 
-      String urlBase = "http://apkleecher.com/apps/" + formattedUpdateString + "/" + appName;
+      String urlBase = "http://apkleecher.com/apps/" + formattedUpdateString + "/" + formattedAppName;
 
       downloadUrlVariants.add(urlBase + formattedVersion + "_[www.apkleecher.com].apk");
       downloadUrlVariants.add(urlBase + formattedVersion + "_[www.Apkleecher.com].apk");
+
+      if(appName.endsWith(")") || appName.endsWith("]")) {
+        downloadUrlVariants.add(urlBase + "_" + formattedVersion + "_[www.apkleecher.com].apk");
+        downloadUrlVariants.add(urlBase + "_" + formattedVersion + "_[www.Apkleecher.com].apk");
+      }
 
       return downloadUrlVariants;
     } catch(Exception e) {
@@ -58,15 +65,13 @@ public class ApkLeecherDownloadLinkGenerator {
     return null;
   }
 
-  protected String getAppName(String appNameAndVersion, int indexAppNameAndVersionSeparator) {
-    String appName = appNameAndVersion.substring(0, indexAppNameAndVersionSeparator);
+  protected String getAppName(String appName) {
+    String formattedAppName = appName.replaceAll("[^A-Za-z0-9 ]", " ").trim();
 
-    String parsedAppName = appName.replaceAll("[^A-Za-z0-9 ]", " ");
+    formattedAppName = formattedAppName.replace("   ", " ").replace("  ", " ").replace("  ", " ");
+    formattedAppName = formattedAppName.replace(' ', '_');
 
-    parsedAppName = parsedAppName.replace("   ", " ").replace("  ", " ").replace("  ", " ");
-    parsedAppName = parsedAppName.replace(' ', '_');
-
-    return parsedAppName;
+    return formattedAppName;
   }
 
 
