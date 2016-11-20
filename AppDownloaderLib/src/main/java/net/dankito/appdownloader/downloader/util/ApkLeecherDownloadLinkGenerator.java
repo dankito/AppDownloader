@@ -3,6 +3,7 @@ package net.dankito.appdownloader.downloader.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,10 @@ import java.util.List;
  * So we try to generate download link manually.
  */
 public class ApkLeecherDownloadLinkGenerator {
+
+  protected static String DOWNLOAD_URL_SUFFIX_1;
+
+  protected static String DOWNLOAD_URL_SUFFIX_2;
 
   private static final Logger log = LoggerFactory.getLogger(ApkLeecherDownloadLinkGenerator.class);
 
@@ -21,7 +26,10 @@ public class ApkLeecherDownloadLinkGenerator {
 
 
   public ApkLeecherDownloadLinkGenerator() {
-
+    try {
+      DOWNLOAD_URL_SUFFIX_1 = "_" + URLEncoder.encode("[www.apkleecher.com].apk", "ASCII");
+      DOWNLOAD_URL_SUFFIX_2 = "_" + URLEncoder.encode("[www.Apkleecher.com].apk", "ASCII");
+    } catch(Exception ignored) { }
   }
 
 
@@ -49,12 +57,12 @@ public class ApkLeecherDownloadLinkGenerator {
 
       String urlBase = "http://apkleecher.com/apps/" + formattedUpdateString + "/" + formattedAppName;
 
-      downloadUrlVariants.add(urlBase + formattedVersion + "_[www.apkleecher.com].apk");
-      downloadUrlVariants.add(urlBase + formattedVersion + "_[www.Apkleecher.com].apk");
+      downloadUrlVariants.add(urlBase + formattedVersion + DOWNLOAD_URL_SUFFIX_1);
+      downloadUrlVariants.add(urlBase + formattedVersion + DOWNLOAD_URL_SUFFIX_2);
 
       if(appName.endsWith(")") || appName.endsWith("]")) {
-        downloadUrlVariants.add(urlBase + "_" + formattedVersion + "_[www.apkleecher.com].apk");
-        downloadUrlVariants.add(urlBase + "_" + formattedVersion + "_[www.Apkleecher.com].apk");
+        downloadUrlVariants.add(urlBase + "_" + formattedVersion + DOWNLOAD_URL_SUFFIX_1);
+        downloadUrlVariants.add(urlBase + "_" + formattedVersion + DOWNLOAD_URL_SUFFIX_2);
       }
 
       return downloadUrlVariants;
