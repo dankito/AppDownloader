@@ -8,6 +8,6 @@ import net.dankito.appdownloader.responses.SearchAppsResponse;
 
 public interface SearchAppsResponseCallback {
 
-  void completed(SearchAppsResponse response);
+  void searchResultsRetrieved(SearchAppsResponse response);
 
 }

@@ -70,7 +70,7 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
       searchAsync(searchUrl, 0, callback);
     } catch(Exception e) {
       log.error("Could not search for '" + searchTerm + "'", e);
-      callback.completed(new SearchAppsResponse(e.getLocalizedMessage()));
+      callback.searchResultsRetrieved(new SearchAppsResponse(e.getLocalizedMessage()));
     }
   }
 
@@ -81,7 +81,7 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
       @Override
       public void completed(WebClientResponse response) {
         if(response.isSuccessful() == false) {
-          callback.completed(new SearchAppsResponse(response.getError()));
+          callback.searchResultsRetrieved(new SearchAppsResponse(response.getError()));
         }
         else {
           parseSearchAppsResponse(searchUrl, pageNumber, response, callback);
@@ -116,15 +116,16 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
       }
 
       pageNumber++;
-      if(pageNumber < MAX_SEARCH_RESULT_PAGE_NUMBER && searchResults.size() == pageNumber * COUNT_SEARCH_RESULTS_PER_PAGE) {
+      boolean areThereMoreSearchResultsToRetrieve = pageNumber < MAX_SEARCH_RESULT_PAGE_NUMBER && searchResults.size() == pageNumber * COUNT_SEARCH_RESULTS_PER_PAGE;
+
+      callback.searchResultsRetrieved(new SearchAppsResponse(searchResults, ! areThereMoreSearchResultsToRetrieve));
+
+      if(areThereMoreSearchResultsToRetrieve) {
         retrieveAndParseNextSearchResultPage(searchUrl, pageNumber, responseBody, document, searchResults, callback);
-      }
-      else {
-        callback.completed(new SearchAppsResponse(searchResults));
       }
     } catch(Exception e) {
       log.error("Could not parse Apps Search Response", e);
-      callback.completed(new SearchAppsResponse(e.getLocalizedMessage()));
+      callback.searchResultsRetrieved(new SearchAppsResponse(e.getLocalizedMessage()));
     }
   }
 
@@ -199,7 +200,7 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
       retrieveNextSearchResultPage(searchUrl, nextSearchResultsPageReferer, token, sp, pageNumber, searchResults, callback);
     } catch(Exception e) {
       log.error("Could not retrieve next search result page", e);
-      callback.completed(new SearchAppsResponse(searchResults));
+      callback.searchResultsRetrieved(new SearchAppsResponse(searchResults, true));
     }
   }
 
@@ -244,7 +245,7 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
       parseSearchAppsResponse(searchUrl, pageNumber, nextSearchResultResponse, searchResults, callback);
     }
     else {
-      callback.completed(new SearchAppsResponse(searchResults));
+      callback.searchResultsRetrieved(new SearchAppsResponse(searchResults, true));
     }
   }
 

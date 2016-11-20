@@ -41,7 +41,7 @@ public class PlayStoreAppSearcherTest {
 
     underTest.searchAsync("video", new SearchAppsResponseCallback() {
       @Override
-      public void completed(SearchAppsResponse response) {
+      public void searchResultsRetrieved(SearchAppsResponse response) {
         searchResults.addAll(response.getSearchResults());
         countDownLatch.countDown();
       }

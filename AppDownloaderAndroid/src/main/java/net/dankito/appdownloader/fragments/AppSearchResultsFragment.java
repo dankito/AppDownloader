@@ -162,7 +162,7 @@ public class AppSearchResultsFragment extends Fragment {
   protected void searchApps(String query) {
     appSearcher.searchAsync(query, new SearchAppsResponseCallback() {
       @Override
-      public void completed(SearchAppsResponse response) {
+      public void searchResultsRetrieved(SearchAppsResponse response) {
         if(response.isSuccessful()) {
           appSearchResultRetrieved(response.getSearchResults());
         }

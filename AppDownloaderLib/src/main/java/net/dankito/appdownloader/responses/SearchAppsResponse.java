@@ -13,14 +13,17 @@ public class SearchAppsResponse extends ResponseBase {
 
   protected List<AppInfo> searchResults = new ArrayList<>(0);
 
+  protected boolean hasCompleted = false;
+
 
   public SearchAppsResponse(String error) {
     super(error);
   }
 
-  public SearchAppsResponse(List<AppInfo> searchResults) {
+  public SearchAppsResponse(List<AppInfo> searchResults, boolean hasCompleted) {
     super(true);
     this.searchResults = searchResults;
+    this.hasCompleted = hasCompleted;
   }
 
 
@@ -28,6 +31,9 @@ public class SearchAppsResponse extends ResponseBase {
     return searchResults;
   }
 
+  public boolean isHasCompleted() {
+    return hasCompleted;
+  }
 
   @Override
   public String toString() {
