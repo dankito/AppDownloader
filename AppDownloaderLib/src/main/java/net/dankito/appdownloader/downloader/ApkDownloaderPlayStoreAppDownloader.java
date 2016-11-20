@@ -79,9 +79,7 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
         }
         else { // no download link available
           // in rare cases like this there are file information like apk signature and file checksum available but no download link
-          appToDownload.addDownloadInfo(appDownloadInfo);
-
-          callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, true));
+          callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, true, appDownloadInfo));
         }
 
         return;
@@ -192,7 +190,6 @@ public class ApkDownloaderPlayStoreAppDownloader extends AppDownloaderBase {
         appDownloadUrl = "http:" + appDownloadUrl;
 
         appDownloadInfo.setUrl(appDownloadUrl);
-        appToDownload.addDownloadInfo(appDownloadInfo);
 
         callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, this, appDownloadInfo));
         return;

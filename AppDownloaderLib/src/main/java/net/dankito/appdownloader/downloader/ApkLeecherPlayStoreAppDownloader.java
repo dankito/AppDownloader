@@ -66,15 +66,12 @@ public class ApkLeecherPlayStoreAppDownloader extends AppDownloaderBase {
       AppDownloadInfo downloadInfo = parseAppDetails(appToDownload, document);
 
       if(downloadInfo.hasDownloadLink()) {
-        appToDownload.addDownloadInfo(downloadInfo);
         callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, this, downloadInfo));
       }
       else {
-        if(downloadInfo.isFileChecksumSet()) {
-          appToDownload.addDownloadInfo(downloadInfo); // so we can at least provide another file checksum
-        }
+        AppDownloadInfo downloadInfoToReturn = downloadInfo.isFileChecksumSet() ? downloadInfo : null; // so we can at least provide another file checksum
 
-        callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, true));
+        callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, true, downloadInfoToReturn));
       }
     } catch(Exception e) {
       log.error("Could not parse App Details Page", e);

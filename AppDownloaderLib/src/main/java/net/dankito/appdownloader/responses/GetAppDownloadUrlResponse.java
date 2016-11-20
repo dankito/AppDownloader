@@ -28,22 +28,28 @@ public class GetAppDownloadUrlResponse extends ResponseBase {
     this.appDownloader = appDownloader;
   }
 
-  public GetAppDownloadUrlResponse(AppInfo appToDownload, IAppDownloader appDownloader, boolean doesNotHaveThisApp) {
-    super(false);
+  protected GetAppDownloadUrlResponse(boolean isSuccessful, AppInfo appToDownload, IAppDownloader appDownloader) {
+    super(isSuccessful);
 
     this.appToDownload = appToDownload;
     this.appDownloader = appDownloader;
+  }
+
+  public GetAppDownloadUrlResponse(AppInfo appToDownload, IAppDownloader appDownloader, boolean doesNotHaveThisApp) {
+    this(false, appToDownload, appDownloader);
+
     this.doesNotHaveThisApp = doesNotHaveThisApp;
   }
 
-  protected GetAppDownloadUrlResponse(boolean isSuccessful, AppInfo appToDownload, IAppDownloader appDownloader) {
-    super(isSuccessful);
-    this.appToDownload = appToDownload;
-    this.appDownloader = appDownloader;
+  public GetAppDownloadUrlResponse(AppInfo appToDownload, IAppDownloader appDownloader, boolean doesNotHaveThisApp, AppDownloadInfo downloadInfo) {
+    this(appToDownload, appDownloader, doesNotHaveThisApp);
+
+    this.downloadInfo = downloadInfo;
   }
 
   public GetAppDownloadUrlResponse(boolean isSuccessful, AppInfo appToDownload, IAppDownloader appDownloader, AppDownloadInfo downloadInfo) {
     this(isSuccessful, appToDownload, appDownloader);
+
     this.downloadInfo = downloadInfo;
   }
 

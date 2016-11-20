@@ -69,10 +69,9 @@ public abstract class AppDownloaderTestBase {
     AppInfo appToDownloadFromResponse = response.getAppToDownload();
     Assert.assertEquals(TEST_APP_PACKAGE_NAME, appToDownloadFromResponse.getPackageName());
 
-    List<AppDownloadInfo> downloadInfos = appToDownloadFromResponse.getDownloadInfos();
-    Assert.assertEquals(1, downloadInfos.size());
+    AppDownloadInfo downloadInfo = response.getDownloadInfo();
+    Assert.assertNotNull(downloadInfo);
 
-    AppDownloadInfo downloadInfo = downloadInfos.get(0);
     Assert.assertNotNull(downloadInfo.getAppDownloader());
     Assert.assertNotNull(downloadInfo.getAppInfo());
     Assert.assertNotNull(downloadInfo.getUrl());
