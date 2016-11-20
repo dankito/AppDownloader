@@ -66,12 +66,12 @@ public class ApkLeecherPlayStoreAppDownloader extends AppDownloaderBase {
       AppDownloadInfo downloadInfo = parseAppDetails(appToDownload, document);
 
       if(downloadInfo.hasDownloadLink()) {
-        appToDownload.addDownloadUrl(downloadInfo);
+        appToDownload.addDownloadInfo(downloadInfo);
         callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, this, downloadInfo));
       }
       else {
         if(downloadInfo.isFileChecksumSet()) {
-          appToDownload.addDownloadUrl(downloadInfo); // so we can at least provide another file checksum
+          appToDownload.addDownloadInfo(downloadInfo); // so we can at least provide another file checksum
         }
 
         callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, true));

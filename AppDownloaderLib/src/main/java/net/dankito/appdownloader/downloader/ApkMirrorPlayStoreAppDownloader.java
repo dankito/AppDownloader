@@ -212,7 +212,7 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
   protected void appDownloadUrlExtracted(AppInfo appToDownload, AppDownloadInfo downloadInfo, String appDownloadUrl) {
     downloadInfo.setUrl(appDownloadUrl);
 
-    appToDownload.addDownloadUrl(downloadInfo);
+    appToDownload.addDownloadInfo(downloadInfo);
   }
 
 

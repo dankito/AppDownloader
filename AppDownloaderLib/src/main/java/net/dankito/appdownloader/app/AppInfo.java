@@ -243,7 +243,7 @@ public class AppInfo {
     return downloadInfos.size() > 0; // TODO: also check if they really contain a download url
   }
 
-  public boolean addDownloadUrl(AppDownloadInfo appDownloadInfo) {
+  public boolean addDownloadInfo(AppDownloadInfo appDownloadInfo) {
     return downloadInfos.add(appDownloadInfo);
   }
 
