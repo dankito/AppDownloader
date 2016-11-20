@@ -62,6 +62,8 @@ public class FDroidAppDownloader extends AppDownloaderBase {
           AppDownloadInfo downloadInfo = new AppDownloadInfo(appToDownload, this);
           downloadInfo.setUrl(anchorElement.attr("href"));
 
+          appToDownload.addDownloadUrl(downloadInfo);
+
           callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, downloadInfo));
           return;
         }
