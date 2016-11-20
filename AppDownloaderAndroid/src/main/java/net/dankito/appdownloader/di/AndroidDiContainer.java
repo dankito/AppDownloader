@@ -4,27 +4,31 @@ import android.app.Activity;
 
 import net.dankito.appdownloader.IPlayStoreAppSearcher;
 import net.dankito.appdownloader.PlayStoreAppSearcher;
+import net.dankito.appdownloader.app.AndroidAppInstaller;
+import net.dankito.appdownloader.app.AndroidAppPackageVerifier;
+import net.dankito.appdownloader.app.AndroidInstalledAppsManager;
 import net.dankito.appdownloader.app.AndroidUpdatableAppsManager;
 import net.dankito.appdownloader.app.AppDetailsCache;
 import net.dankito.appdownloader.app.IAppDetailsCache;
+import net.dankito.appdownloader.app.IAppInstaller;
+import net.dankito.appdownloader.app.IAppVerifier;
+import net.dankito.appdownloader.app.IInstalledAppsManager;
 import net.dankito.appdownloader.app.IUpdatableAppsManager;
 import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.ApkMirrorPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.EvoziPlayStoreAppDownloader;
-import net.dankito.appdownloader.app.AndroidAppInstaller;
+import net.dankito.appdownloader.downloader.IAppDownloader;
 import net.dankito.appdownloader.util.AndroidOnUiThreadRunner;
 import net.dankito.appdownloader.util.IOnUiThreadRunner;
 import net.dankito.appdownloader.util.IThreadPool;
 import net.dankito.appdownloader.util.ThreadPool;
-import net.dankito.appdownloader.app.AndroidAppPackageVerifier;
-import net.dankito.appdownloader.app.AndroidInstalledAppsManager;
-import net.dankito.appdownloader.app.IAppInstaller;
-import net.dankito.appdownloader.app.IAppVerifier;
-import net.dankito.appdownloader.app.IInstalledAppsManager;
 import net.dankito.appdownloader.util.web.AndroidDownloadManager;
 import net.dankito.appdownloader.util.web.IDownloadManager;
 import net.dankito.appdownloader.util.web.IWebClient;
 import net.dankito.appdownloader.util.web.OkHttpWebClient;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Singleton;
 
@@ -125,6 +129,19 @@ public class AndroidDiContainer {
   @Singleton
   public EvoziPlayStoreAppDownloader provideEvoziPlayStoreAppDownloader(IWebClient webClient) {
     return new EvoziPlayStoreAppDownloader(webClient);
+  }
+
+  @Provides
+  @Singleton
+  public List<IAppDownloader> provideAppDownloaders(ApkMirrorPlayStoreAppDownloader apkMirrorDownloader, ApkDownloaderPlayStoreAppDownloader apkDownloaderDownloader,
+                                                    EvoziPlayStoreAppDownloader evoziDownloader) {
+    List<IAppDownloader> appDownloaders = new ArrayList<>();
+
+    appDownloaders.add(apkMirrorDownloader);
+    appDownloaders.add(apkDownloaderDownloader);
+    appDownloaders.add(evoziDownloader);
+
+    return appDownloaders;
   }
 
   @Provides

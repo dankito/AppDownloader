@@ -34,7 +34,6 @@ import net.dankito.appdownloader.util.AlertHelper;
 import net.dankito.appdownloader.util.IOnUiThreadRunner;
 import net.dankito.appdownloader.util.web.IWebClient;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -59,7 +58,8 @@ public class AppSearchResultsFragment extends Fragment {
   @Inject
   protected EvoziPlayStoreAppDownloader evoziPlayStoreAppDownloader;
 
-  protected List<IAppDownloader> appDownloaders = new ArrayList<>();
+  @Inject
+  protected List<IAppDownloader> appDownloaders;
 
   @Inject
   protected IWebClient webClient;
@@ -98,10 +98,6 @@ public class AppSearchResultsFragment extends Fragment {
     ((MainActivity) getActivity()).getComponent().inject(this);
 
     appSearcher.addRetrievedAppDetailsListener(appDetailsRetrievedListener);
-
-    appDownloaders.add(apkMirrorPlayStoreAppDownloader);
-    appDownloaders.add(apkDownloaderPlayStoreAppDownloader);
-    appDownloaders.add(evoziPlayStoreAppDownloader);
   }
 
 
