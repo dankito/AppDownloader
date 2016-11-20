@@ -22,6 +22,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@id/imgvwAppIcon"
+        android:layout_toLeftOf="@+id/btnDownloadUpdatedApp"
         style="?android:textAppearanceListItem"
         android:layout_marginTop="@dimen/list_item_installed_app_title_margin_top"
         android:maxLines="1"
@@ -35,10 +36,24 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_toRightOf="@id/imgvwAppIcon"
+        android:layout_toLeftOf="@+id/btnDownloadUpdatedApp"
         style="?android:textAppearanceSmall"
         android:layout_marginBottom="@dimen/list_item_installed_app_version_margin_bottom"
         android:maxLines="1"
         android:textSize="@dimen/list_item_installed_app_version_text_size"
+    />
+
+    <Button
+        android:id="@+id/btnDownloadUpdatedApp"
+        android:layout_width="@dimen/list_item_updatable_app_button_download_width"
+        android:layout_height="@dimen/list_item_updatable_app_button_download_height"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="@dimen/list_item_updatable_app_button_download_margin_top"
+        android:layout_marginRight="@dimen/list_item_updatable_app_button_download_margin_right"
+        android:layout_marginBottom="@dimen/list_item_updatable_app_button_download_margin_bottom"
+        android:text="@string/update"
     />
 
 </RelativeLayout>

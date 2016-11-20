@@ -10,6 +10,7 @@ import android.widget.ListView;
 import net.dankito.appdownloader.MainActivity;
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.adapter.UpdatableAppsAdapter;
+import net.dankito.appdownloader.app.IAppDownloadAndInstallationService;
 import net.dankito.appdownloader.app.IUpdatableAppsManager;
 
 import javax.inject.Inject;
@@ -22,6 +23,9 @@ public class UpdatableAppsFragment extends Fragment {
 
   @Inject
   protected IUpdatableAppsManager updatableAppsManager;
+
+  @Inject
+  protected IAppDownloadAndInstallationService downloadAndInstallationService;
 
   protected UpdatableAppsAdapter updatableAppsAdapter;
 
@@ -37,8 +41,7 @@ public class UpdatableAppsFragment extends Fragment {
 
     injectComponents();
 
-    updatableAppsAdapter = new UpdatableAppsAdapter(getActivity());
-    updatableAppsAdapter.setUpdatableAppsManager(updatableAppsManager);
+    updatableAppsAdapter = new UpdatableAppsAdapter(getActivity(), updatableAppsManager, downloadAndInstallationService);
 
     ListView lstvwUpdatableApps = (ListView)view.findViewById(R.id.lstvwUpdatableApps);
     lstvwUpdatableApps.setAdapter(updatableAppsAdapter);

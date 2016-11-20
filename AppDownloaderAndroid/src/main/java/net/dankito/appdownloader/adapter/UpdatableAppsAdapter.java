@@ -5,12 +5,14 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.app.AppInfo;
 import net.dankito.appdownloader.app.GetUpdatableAppsCallback;
+import net.dankito.appdownloader.app.IAppDownloadAndInstallationService;
 import net.dankito.appdownloader.app.IUpdatableAppsManager;
 import net.dankito.appdownloader.app.UpdatableAppsListener;
 import net.dankito.appdownloader.app.UpdatableAppsListenerInfo;
@@ -30,17 +32,16 @@ public class UpdatableAppsAdapter extends BaseAdapter {
 
   protected IUpdatableAppsManager updatableAppsManager;
 
+  protected IAppDownloadAndInstallationService downloadAndInstallationService;
+
   protected List<AppInfo> updatableApps = new ArrayList<>();
 
 
 
-  public UpdatableAppsAdapter(Activity activity) {
+  public UpdatableAppsAdapter(Activity activity, IUpdatableAppsManager updatableAppsManager, IAppDownloadAndInstallationService downloadAndInstallationService) {
     this.activity = activity;
-  }
-
-
-  public void setUpdatableAppsManager(IUpdatableAppsManager updatableAppsManager) {
     this.updatableAppsManager = updatableAppsManager;
+    this.downloadAndInstallationService = downloadAndInstallationService;
 
     updatableAppsManager.addUpdatableAppsListener(updatableAppsListener);
 
@@ -111,10 +112,22 @@ public class UpdatableAppsAdapter extends BaseAdapter {
       imgvwAppIcon.setVisibility(View.INVISIBLE);
     }
 
+    Button btnDownloadUpdatedApp = (Button)convertView.findViewById(R.id.btnDownloadUpdatedApp);
+    btnDownloadUpdatedApp.setTag(appInfo);
+    btnDownloadUpdatedApp.setOnClickListener(btnDownloadUpdatedAppClickListener);
+
     convertView.setTag(appInfo);
 
     return convertView;
   }
+
+  protected View.OnClickListener btnDownloadUpdatedAppClickListener = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      AppInfo appToUpdate = (AppInfo)view.getTag();
+      downloadAndInstallationService.installApp(appToUpdate);
+    }
+  };
 
 
   protected Comparator<AppInfo> updatableAppsComparator = new Comparator<AppInfo>() {
