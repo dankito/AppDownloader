@@ -115,6 +115,17 @@ public class OkHttpWebClient implements IWebClient {
       return getRequestFailed(parameters, e);
     }
   }
+
+  public void headAsync(RequestParameters parameters, final RequestCallback callback) {
+    try {
+      Request request = createHeadRequest(parameters);
+
+      executeRequestAsync(parameters, request, callback);
+    } catch(Exception e) {
+      asyncPostRequestFailed(parameters, e, callback);
+    }
+  }
+
   protected Request createHeadRequest(RequestParameters parameters) {
     Request.Builder requestBuilder = new Request.Builder();
 

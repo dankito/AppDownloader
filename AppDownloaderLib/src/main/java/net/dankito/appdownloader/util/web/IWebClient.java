@@ -16,4 +16,6 @@ public interface IWebClient {
 
   WebClientResponse head(RequestParameters parameters);
 
+  void headAsync(RequestParameters parameters, final RequestCallback callback);
+
 }
