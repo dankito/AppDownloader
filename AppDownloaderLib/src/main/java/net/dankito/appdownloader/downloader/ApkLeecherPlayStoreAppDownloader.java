@@ -6,6 +6,7 @@ import net.dankito.appdownloader.app.HashAlgorithm;
 import net.dankito.appdownloader.downloader.util.ApkLeecherDownloadLinkGenerator;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
+import net.dankito.appdownloader.util.StringUtils;
 import net.dankito.appdownloader.util.web.IWebClient;
 import net.dankito.appdownloader.util.web.RequestCallback;
 import net.dankito.appdownloader.util.web.RequestParameters;
@@ -102,8 +103,10 @@ public class ApkLeecherPlayStoreAppDownloader extends AppDownloaderBase {
       downloadInfo.setFileSize(appDetailValue);
     }
     else if("MD5 File Hash:".equals(appDetailName)) {
-      downloadInfo.setHashAlgorithm(HashAlgorithm.MD5);
-      downloadInfo.setFileHashSum(appDetailValue);
+      if(StringUtils.isNotNullOrEmpty(appDetailValue)) {
+        downloadInfo.setHashAlgorithm(HashAlgorithm.MD5);
+        downloadInfo.setFileHashSum(appDetailValue);
+      }
     }
 
     // DownloadLinkGenerator
