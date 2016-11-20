@@ -100,6 +100,28 @@ public class AppVersion implements Comparable<AppVersion> {
     return getVersionString();
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof AppVersion)) return false;
+
+    AppVersion that = (AppVersion) o;
+
+    if (major != null ? !major.equals(that.major) : that.major != null) return false;
+    if (minor != null ? !minor.equals(that.minor) : that.minor != null) return false;
+    if (revision != null ? !revision.equals(that.revision) : that.revision != null) return false;
+    return build != null ? build.equals(that.build) : that.build == null;
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = major != null ? major.hashCode() : 0;
+    result = 31 * result + (minor != null ? minor.hashCode() : 0);
+    result = 31 * result + (revision != null ? revision.hashCode() : 0);
+    result = 31 * result + (build != null ? build.hashCode() : 0);
+    return result;
+  }
 
   @Override
   public int compareTo(AppVersion other) {
