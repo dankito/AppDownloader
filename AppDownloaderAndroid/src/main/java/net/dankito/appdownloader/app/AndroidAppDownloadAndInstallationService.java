@@ -101,12 +101,15 @@ public class AndroidAppDownloadAndInstallationService implements IAppDownloadAnd
   protected void getAppDownloadLinkCompleted(AppInfo app, GetAppDownloadUrlResponse response, AtomicBoolean hasDownloadUrlBeenRetrieved, AtomicBoolean hasDownloadBeenStarted, List<IAppDownloader> downloadersNotYetCompleted) {
     IAppDownloader appDownloader = response.getAppDownloader();
     downloadersNotYetCompleted.remove(appDownloader);
-    // TODO: move add AppDownloadInfo to AppInfo to here (so it's centrally placed)
+
+    AppDownloadInfo downloadInfo = response.getDownloadInfo();
+    if(response.getDownloadInfo() != null) {
+      app.addDownloadInfo(downloadInfo);
+    }
 
     if(response.isSuccessful()) {
       hasDownloadUrlBeenRetrieved.set(true);
 
-      AppDownloadInfo downloadInfo = response.getDownloadInfo();
       if(hasDownloadBeenStarted.get() == false &&
           (appDownloader.isTrustworthySource() || areOnlyNotFullyTrustworthySourcesLeft(downloadersNotYetCompleted))) {
         hasDownloadBeenStarted.set(true);
