@@ -13,8 +13,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -36,10 +36,10 @@ public class PlayStoreAppSearcherTest {
 
   @Test
   public void searchAsync() {
-    final List<AppInfo> searchResults = new ArrayList<>();
-    final CountDownLatch countDownLatch = new CountDownLatch(1);
+    final Set<AppInfo> searchResults = new HashSet<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(PlayStoreAppSearcher.MAX_SEARCH_RESULT_PAGE_NUMBER);
 
-    underTest.searchAsync("video", new SearchAppsResponseCallback() {
+    underTest.searchAsync("noroot", new SearchAppsResponseCallback() {
       @Override
       public void searchResultsRetrieved(SearchAppsResponse response) {
         searchResults.addAll(response.getSearchResults());
