@@ -56,7 +56,7 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
   }
 
   protected void successfullyRetrievedAppDetailsPageUrl(final AppInfo appToDownload, GetUrlResponse response, final GetAppDownloadUrlResponseCallback callback) {
-    RequestParameters parameters = new RequestParameters(response.getUrl());
+    RequestParameters parameters = createRequestParametersWithDefaultValues(response.getUrl());
 
     webClient.getAsync(parameters, new RequestCallback() {
       @Override
@@ -172,7 +172,7 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
 
 
   protected void getAppDownloadPageUrl(final AppInfo appToDownload, final AppDownloadInfo downloadInfo, final String appDownloadPageUrl, final GetAppDownloadUrlResponseCallback callback) {
-    RequestParameters parameters = new RequestParameters(appDownloadPageUrl);
+    RequestParameters parameters = createRequestParametersWithDefaultValues(appDownloadPageUrl);
 
     webClient.getAsync(parameters, new RequestCallback() {
       @Override
