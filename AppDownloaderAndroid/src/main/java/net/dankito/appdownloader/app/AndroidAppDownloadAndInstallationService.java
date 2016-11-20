@@ -16,8 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by ganymed on 20/11/16.
@@ -74,35 +74,37 @@ public class AndroidAppDownloadAndInstallationService implements IAppDownloadAnd
 
     final AtomicBoolean hasDownloadUrlBeenRetrieved = new AtomicBoolean(false);
     final AtomicBoolean hasDownloadBeenStarted = new AtomicBoolean(false);
-    final AtomicInteger countRequestsAppDownloadLinkCompleted = new AtomicInteger(0);
+    final List<IAppDownloader> downloadersNotYetCompleted = new CopyOnWriteArrayList<>(appDownloaders);
 
     for(IAppDownloader appDownloader : appDownloaders) {
       appDownloader.getAppDownloadLinkAsync(app, new GetAppDownloadUrlResponseCallback() {
         @Override
         public void completed(GetAppDownloadUrlResponse response) {
           synchronized(hasDownloadUrlBeenRetrieved) {
-            getAppDownloadLinkCompleted(app, response, hasDownloadUrlBeenRetrieved, hasDownloadBeenStarted, countRequestsAppDownloadLinkCompleted);
+            getAppDownloadLinkCompleted(app, response, hasDownloadUrlBeenRetrieved, hasDownloadBeenStarted, downloadersNotYetCompleted);
           }
         }
       });
     }
   }
 
-  protected void getAppDownloadLinkCompleted(AppInfo app, GetAppDownloadUrlResponse response, AtomicBoolean hasDownloadUrlBeenRetrieved, AtomicBoolean hasDownloadBeenStarted, AtomicInteger countRequestsAppDownloadLinkCompleted) {
-    countRequestsAppDownloadLinkCompleted.incrementAndGet();
+  protected void getAppDownloadLinkCompleted(AppInfo app, GetAppDownloadUrlResponse response, AtomicBoolean hasDownloadUrlBeenRetrieved, AtomicBoolean hasDownloadBeenStarted, List<IAppDownloader> downloadersNotYetCompleted) {
+    IAppDownloader appDownloader = response.getAppDownloader();
+    downloadersNotYetCompleted.remove(appDownloader);
     // TODO: move add AppDownloadInfo to AppInfo to here (so it's centrally placed)
 
     if(response.isSuccessful()) {
       hasDownloadUrlBeenRetrieved.set(true);
 
       AppDownloadInfo downloadInfo = response.getDownloadInfo();
-      if(hasDownloadBeenStarted.get() == false && downloadInfo.getAppDownloader().isTrustworthySource()) {
+      if(hasDownloadBeenStarted.get() == false &&
+          (appDownloader.isTrustworthySource() || areOnlyNotFullyTrustworthySourcesLeft(downloadersNotYetCompleted))) {
         hasDownloadBeenStarted.set(true);
         downloadApp(app, downloadInfo);
       }
     }
 
-    if(countRequestsAppDownloadLinkCompleted.get() == appDownloaders.size()) {
+    if(downloadersNotYetCompleted.size() == 0) {
       if(hasDownloadUrlBeenRetrieved.get() == false) {
         app.setToItsDefaultState();
         showErrorMessageThreadSafe(activity.getString(R.string.error_message_could_not_download_app, response.getError()), null);
@@ -111,6 +113,16 @@ public class AndroidAppDownloadAndInstallationService implements IAppDownloadAnd
         downloadApp(app, getBestAppDownloadUrl(app));
       }
     }
+  }
+
+  protected boolean areOnlyNotFullyTrustworthySourcesLeft(List<IAppDownloader> downloadersNotYetCompleted) {
+    for(IAppDownloader appDownloader : downloadersNotYetCompleted) {
+      if(appDownloader.isTrustworthySource()) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   protected void downloadApp(AppInfo app, AppDownloadInfo downloadInfo) {
