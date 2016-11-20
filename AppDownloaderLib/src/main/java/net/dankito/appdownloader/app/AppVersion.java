@@ -1,5 +1,7 @@
 package net.dankito.appdownloader.app;
 
+import net.dankito.appdownloader.util.StringUtils;
+
 /**
  * Created by ganymed on 19/11/16.
  */
@@ -169,25 +171,28 @@ public class AppVersion implements Comparable<AppVersion> {
       versionString = versionString.replace('-', '.'); // sometimes revision is separated by '-' from minor
       versionString = versionString.replace(" (", ".").replace(")", ""); // sometimes revision or build are in braces with a leading white space
       versionString = versionString.replaceAll("[^\\d.]", ""); // remove non numeric symbols
-      String[] versionParts = versionString.split("\\.");
 
-      if(versionParts.length > 0) {
-        appVersion.setMajor(tryToParseToInteger(versionParts[0]));
+      if(StringUtils.isNotNullOrEmpty(versionString)) {
+        String[] versionParts = versionString.split("\\.");
+
+        if(versionParts.length > 0) {
+          appVersion.setMajor(tryToParseToInteger(versionParts[0]));
+        }
+
+        if(versionParts.length > 1) {
+          appVersion.setMinor(tryToParseToInteger(versionParts[1]));
+        }
+
+        if(versionParts.length > 2) {
+          appVersion.setRevision(tryToParseToInteger(versionParts[2]));
+        }
+
+        if(versionParts.length > 3) {
+          appVersion.setBuild(tryToParseToInteger(versionParts[3]));
+        }
+
+        return appVersion;
       }
-
-      if(versionParts.length > 1) {
-        appVersion.setMinor(tryToParseToInteger(versionParts[1]));
-      }
-
-      if(versionParts.length > 2) {
-        appVersion.setRevision(tryToParseToInteger(versionParts[2]));
-      }
-
-      if(versionParts.length > 3) {
-        appVersion.setBuild(tryToParseToInteger(versionParts[3]));
-      }
-
-      return appVersion;
     } catch(Exception ignored) { }
 
     return null;
