@@ -20,6 +20,7 @@ import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.ApkLeecherPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.ApkMirrorPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.EvoziPlayStoreAppDownloader;
+import net.dankito.appdownloader.downloader.FDroidAppDownloader;
 import net.dankito.appdownloader.downloader.IAppDownloader;
 import net.dankito.appdownloader.util.AndroidOnUiThreadRunner;
 import net.dankito.appdownloader.util.IOnUiThreadRunner;
@@ -131,6 +132,12 @@ public class AndroidDiContainer {
 
   @Provides
   @Singleton
+  public FDroidAppDownloader provideFDroidAppDownloader(IWebClient webClient) {
+    return new FDroidAppDownloader(webClient);
+  }
+
+  @Provides
+  @Singleton
   public ApkDownloaderPlayStoreAppDownloader provideApkDownloaderPlayStoreAppDownloader(IWebClient webClient) {
     return new ApkDownloaderPlayStoreAppDownloader(webClient);
   }
@@ -149,11 +156,13 @@ public class AndroidDiContainer {
 
   @Provides
   @Singleton
-  public List<IAppDownloader> provideAppDownloaders(ApkMirrorPlayStoreAppDownloader apkMirrorDownloader, ApkDownloaderPlayStoreAppDownloader apkDownloaderDownloader,
-                                                    ApkLeecherPlayStoreAppDownloader apkLeecherDownloader, EvoziPlayStoreAppDownloader evoziDownloader) {
+  public List<IAppDownloader> provideAppDownloaders(ApkMirrorPlayStoreAppDownloader apkMirrorDownloader, FDroidAppDownloader fdroidDownloader,
+                                                    ApkDownloaderPlayStoreAppDownloader apkDownloaderDownloader, ApkLeecherPlayStoreAppDownloader apkLeecherDownloader,
+                                                    EvoziPlayStoreAppDownloader evoziDownloader) {
     List<IAppDownloader> appDownloaders = new ArrayList<>();
 
     appDownloaders.add(apkMirrorDownloader);
+    appDownloaders.add(fdroidDownloader);
     appDownloaders.add(apkDownloaderDownloader);
     appDownloaders.add(apkLeecherDownloader);
     appDownloaders.add(evoziDownloader);
