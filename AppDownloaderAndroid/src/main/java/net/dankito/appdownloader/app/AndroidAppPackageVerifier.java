@@ -1,6 +1,6 @@
 package net.dankito.appdownloader.app;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -36,10 +36,10 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
   private static final Logger log = LoggerFactory.getLogger(AndroidAppPackageVerifier.class);
 
 
-  protected Activity context;
+  protected Context context;
 
 
-  public AndroidAppPackageVerifier(Activity context) {
+  public AndroidAppPackageVerifier(Context context) {
     this.context = context;
   }
 
