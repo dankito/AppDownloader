@@ -1,4 +1,4 @@
-package net.dankito.appdownloader.app;
+package net.dankito.appdownloader.app.listener;
 
 /**
  * Created by ganymed on 19/11/16.

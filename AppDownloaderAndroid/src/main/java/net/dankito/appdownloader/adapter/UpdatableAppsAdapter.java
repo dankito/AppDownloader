@@ -14,8 +14,8 @@ import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.app.GetUpdatableAppsCallback;
 import net.dankito.appdownloader.app.IAppDownloadAndInstallationService;
 import net.dankito.appdownloader.app.IUpdatableAppsManager;
-import net.dankito.appdownloader.app.UpdatableAppsListener;
-import net.dankito.appdownloader.app.UpdatableAppsListenerInfo;
+import net.dankito.appdownloader.app.listener.UpdatableAppsListener;
+import net.dankito.appdownloader.app.listener.UpdatableAppsListenerInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;

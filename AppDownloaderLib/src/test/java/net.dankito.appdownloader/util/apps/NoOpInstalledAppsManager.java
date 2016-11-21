@@ -2,7 +2,7 @@ package net.dankito.appdownloader.util.apps;
 
 import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.app.IInstalledAppsManager;
-import net.dankito.appdownloader.app.InstalledAppsListener;
+import net.dankito.appdownloader.app.listener.InstalledAppsListener;
 
 import java.util.ArrayList;
 import java.util.List;

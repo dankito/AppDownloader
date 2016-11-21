@@ -13,7 +13,7 @@ import android.widget.TextView;
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.app.model.AppState;
-import net.dankito.appdownloader.app.AppStateListener;
+import net.dankito.appdownloader.app.listener.AppStateListener;
 import net.dankito.appdownloader.app.IAppDownloadAndInstallationService;
 import net.dankito.appdownloader.app.IAppInstaller;
 import net.dankito.appdownloader.app.IAppVerifier;

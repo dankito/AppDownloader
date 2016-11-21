@@ -1,4 +1,4 @@
-package net.dankito.appdownloader.app;
+package net.dankito.appdownloader.app.listener;
 
 import net.dankito.appdownloader.app.model.AppState;
 
