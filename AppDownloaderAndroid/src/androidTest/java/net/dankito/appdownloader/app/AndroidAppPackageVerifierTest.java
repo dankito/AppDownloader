@@ -30,6 +30,8 @@ public class AndroidAppPackageVerifierTest {
 
   protected static final String AUTO_START_APP_FILENAME = "AutoStart.apk";
 
+  protected static final String AUTO_START_APP_TITLE = "com.autostart";
+
   protected static final String AUTO_START_APP_PACKAGE_NAME = "com.autostart";
 
   protected static final String AUTO_START_APP_VERSION = "2.2";
@@ -64,6 +66,8 @@ public class AndroidAppPackageVerifierTest {
   public void apkHasWrongPackageName_ReturnsError() throws Exception {
     File apkFile = getApkFilePath(AUTO_START_APP_FILENAME);
     AppInfo testApp = new AppInfo(AUTO_START_APP_PACKAGE_NAME + "_error");
+    testApp.setTitle(AUTO_START_APP_TITLE);
+    testApp.setVersionString(AUTO_START_APP_VERSION);
 
     AppDownloadInfo downloadInfo = new AppDownloadInfo(testApp, null);
     downloadInfo.setDownloadLocationPath(apkFile.getPath());
@@ -72,11 +76,74 @@ public class AndroidAppPackageVerifierTest {
     AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
 
     Assert.assertFalse(result.wasVerificationSuccessful());
+
     Assert.assertTrue(result.isCompletelyDownloaded());
     Assert.assertFalse(result.isPackageNameCorrect());
     Assert.assertFalse(result.isVersionCorrect());
     Assert.assertFalse(result.isFileChecksumCorrect());
     Assert.assertFalse(result.isAppSignatureCorrect());
+  }
+
+  @Test
+  public void apkHasCorrectPackageName_Succeeds() throws Exception {
+    File apkFile = getApkFilePath(AUTO_START_APP_FILENAME);
+    AppInfo testApp = new AppInfo(AUTO_START_APP_PACKAGE_NAME);
+    testApp.setTitle(AUTO_START_APP_TITLE);
+    testApp.setVersionString(AUTO_START_APP_VERSION);
+
+    AppDownloadInfo downloadInfo = new AppDownloadInfo(testApp, null);
+    downloadInfo.setDownloadLocationPath(apkFile.getPath());
+    testApp.addDownloadInfo(downloadInfo);
+
+    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+
+    Assert.assertFalse(result.wasVerificationSuccessful());
+
+    Assert.assertTrue(result.isCompletelyDownloaded());
+    Assert.assertTrue(result.isPackageNameCorrect());
+  }
+
+
+  @Test
+  public void apkHasWrongVersion_ReturnsError() throws Exception {
+    File apkFile = getApkFilePath(AUTO_START_APP_FILENAME);
+    AppInfo testApp = new AppInfo(AUTO_START_APP_PACKAGE_NAME);
+    testApp.setTitle(AUTO_START_APP_TITLE);
+    testApp.setVersionString(AUTO_START_APP_VERSION + ".42");
+
+    AppDownloadInfo downloadInfo = new AppDownloadInfo(testApp, null);
+    downloadInfo.setDownloadLocationPath(apkFile.getPath());
+    testApp.addDownloadInfo(downloadInfo);
+
+    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+
+    Assert.assertFalse(result.wasVerificationSuccessful());
+
+    Assert.assertTrue(result.isCompletelyDownloaded());
+    Assert.assertTrue(result.isPackageNameCorrect());
+    Assert.assertFalse(result.isVersionCorrect());
+    Assert.assertFalse(result.isFileChecksumCorrect());
+    Assert.assertFalse(result.isAppSignatureCorrect());
+  }
+
+  @Test
+  public void apkHasCorrectVersion_Succeeds() throws Exception {
+    File apkFile = getApkFilePath(AUTO_START_APP_FILENAME);
+    AppInfo testApp = new AppInfo(AUTO_START_APP_PACKAGE_NAME);
+    testApp.setTitle(AUTO_START_APP_TITLE);
+    testApp.setVersionString(AUTO_START_APP_VERSION);
+
+    AppDownloadInfo downloadInfo = new AppDownloadInfo(testApp, null);
+    downloadInfo.setDownloadLocationPath(apkFile.getPath());
+    testApp.addDownloadInfo(downloadInfo);
+
+    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+
+    Assert.assertFalse(result.wasVerificationSuccessful());
+
+    Assert.assertTrue(result.isCompletelyDownloaded());
+    Assert.assertTrue(result.isPackageNameCorrect());
+    Assert.assertTrue(result.isVersionCorrect());
   }
 
 
