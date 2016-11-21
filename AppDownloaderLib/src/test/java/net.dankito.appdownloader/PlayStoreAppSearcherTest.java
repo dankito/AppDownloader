@@ -1,7 +1,7 @@
 package net.dankito.appdownloader;
 
 import net.dankito.appdownloader.app.AppDetailsCache;
-import net.dankito.appdownloader.app.AppInfo;
+import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.responses.SearchAppsResponse;
 import net.dankito.appdownloader.responses.callbacks.SearchAppsResponseCallback;
 import net.dankito.appdownloader.util.StringUtils;

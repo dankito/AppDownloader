@@ -1,6 +1,6 @@
 package net.dankito.appdownloader.responses;
 
-import net.dankito.appdownloader.app.AppInfo;
+import net.dankito.appdownloader.app.model.AppInfo;
 
 import java.io.File;
 

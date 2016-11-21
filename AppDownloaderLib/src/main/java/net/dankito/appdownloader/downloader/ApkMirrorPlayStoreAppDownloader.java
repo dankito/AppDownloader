@@ -1,8 +1,8 @@
 package net.dankito.appdownloader.downloader;
 
-import net.dankito.appdownloader.app.AppDownloadInfo;
-import net.dankito.appdownloader.app.AppInfo;
-import net.dankito.appdownloader.app.HashAlgorithm;
+import net.dankito.appdownloader.app.model.AppDownloadInfo;
+import net.dankito.appdownloader.app.model.AppInfo;
+import net.dankito.appdownloader.app.model.HashAlgorithm;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.GetUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;

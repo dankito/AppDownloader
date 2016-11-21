@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.dankito.appdownloader.R;
-import net.dankito.appdownloader.app.AppInfo;
+import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.app.GetUpdatableAppsCallback;
 import net.dankito.appdownloader.app.IAppDownloadAndInstallationService;
 import net.dankito.appdownloader.app.IUpdatableAppsManager;

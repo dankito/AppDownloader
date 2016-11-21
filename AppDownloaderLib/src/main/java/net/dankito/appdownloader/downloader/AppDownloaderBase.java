@@ -1,7 +1,7 @@
 package net.dankito.appdownloader.downloader;
 
-import net.dankito.appdownloader.app.AppInfo;
-import net.dankito.appdownloader.app.AppVersion;
+import net.dankito.appdownloader.app.model.AppInfo;
+import net.dankito.appdownloader.app.model.AppVersion;
 import net.dankito.appdownloader.util.web.IWebClient;
 import net.dankito.appdownloader.util.web.RequestParameters;
 

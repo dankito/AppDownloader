@@ -7,6 +7,11 @@ import android.content.pm.Signature;
 import android.content.res.Resources;
 
 import net.dankito.appdownloader.R;
+import net.dankito.appdownloader.app.model.AppDownloadInfo;
+import net.dankito.appdownloader.app.model.AppInfo;
+import net.dankito.appdownloader.app.model.AppState;
+import net.dankito.appdownloader.app.model.AppVersion;
+import net.dankito.appdownloader.app.model.HashAlgorithm;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

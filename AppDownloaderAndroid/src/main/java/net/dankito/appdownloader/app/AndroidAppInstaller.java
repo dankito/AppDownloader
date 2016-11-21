@@ -8,6 +8,9 @@ import android.content.IntentFilter;
 import android.net.Uri;
 
 import net.dankito.appdownloader.MainActivity;
+import net.dankito.appdownloader.app.model.AppDownloadInfo;
+import net.dankito.appdownloader.app.model.AppInfo;
+import net.dankito.appdownloader.app.model.AppState;
 import net.dankito.appdownloader.util.android.IActivityResultListener;
 
 import org.slf4j.Logger;

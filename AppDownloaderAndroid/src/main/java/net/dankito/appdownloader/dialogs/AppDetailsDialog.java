@@ -11,8 +11,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import net.dankito.appdownloader.R;
-import net.dankito.appdownloader.app.AppInfo;
-import net.dankito.appdownloader.app.AppState;
+import net.dankito.appdownloader.app.model.AppInfo;
+import net.dankito.appdownloader.app.model.AppState;
 import net.dankito.appdownloader.app.AppStateListener;
 import net.dankito.appdownloader.app.IAppDownloadAndInstallationService;
 import net.dankito.appdownloader.app.IAppInstaller;

@@ -1,4 +1,4 @@
-package net.dankito.appdownloader.app;
+package net.dankito.appdownloader.app.model;
 
 /**
  * Created by ganymed on 18/11/16.

@@ -3,6 +3,7 @@ package net.dankito.appdownloader.app;
 import android.app.Activity;
 
 import net.dankito.appdownloader.IPlayStoreAppSearcher;
+import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.responses.GetAppDetailsResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDetailsCallback;
 import net.dankito.appdownloader.util.IThreadPool;

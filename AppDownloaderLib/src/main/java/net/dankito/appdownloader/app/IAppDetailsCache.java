@@ -1,5 +1,7 @@
 package net.dankito.appdownloader.app;
 
+import net.dankito.appdownloader.app.model.AppInfo;
+
 /**
  * Created by ganymed on 18/11/16.
  */

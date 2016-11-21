@@ -1,6 +1,6 @@
 package net.dankito.appdownloader.util.apps;
 
-import net.dankito.appdownloader.app.AppInfo;
+import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.app.IInstalledAppsManager;
 import net.dankito.appdownloader.app.InstalledAppsListener;
 

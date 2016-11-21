@@ -20,7 +20,7 @@ import net.dankito.appdownloader.IPlayStoreAppSearcher;
 import net.dankito.appdownloader.MainActivity;
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.adapter.AppSearchResultsAdapter;
-import net.dankito.appdownloader.app.AppInfo;
+import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.dialogs.AppDetailsDialog;
 import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.ApkMirrorPlayStoreAppDownloader;

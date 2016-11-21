@@ -8,6 +8,8 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
+import net.dankito.appdownloader.app.model.AppInfo;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

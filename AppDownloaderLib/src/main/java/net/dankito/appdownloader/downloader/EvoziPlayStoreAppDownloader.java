@@ -2,9 +2,9 @@ package net.dankito.appdownloader.downloader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import net.dankito.appdownloader.app.AppDownloadInfo;
-import net.dankito.appdownloader.app.AppInfo;
-import net.dankito.appdownloader.app.HashAlgorithm;
+import net.dankito.appdownloader.app.model.AppDownloadInfo;
+import net.dankito.appdownloader.app.model.AppInfo;
+import net.dankito.appdownloader.app.model.HashAlgorithm;
 import net.dankito.appdownloader.responses.AppDownloadRequestParameters;
 import net.dankito.appdownloader.responses.EvoziGetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;

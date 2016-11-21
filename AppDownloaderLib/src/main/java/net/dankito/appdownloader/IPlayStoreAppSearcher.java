@@ -1,6 +1,6 @@
 package net.dankito.appdownloader;
 
-import net.dankito.appdownloader.app.AppInfo;
+import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.responses.callbacks.GetAppDetailsCallback;
 import net.dankito.appdownloader.responses.callbacks.SearchAppsResponseCallback;
 

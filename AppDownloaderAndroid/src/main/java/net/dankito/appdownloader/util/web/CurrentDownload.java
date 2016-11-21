@@ -1,6 +1,6 @@
 package net.dankito.appdownloader.util.web;
 
-import net.dankito.appdownloader.app.AppDownloadInfo;
+import net.dankito.appdownloader.app.model.AppDownloadInfo;
 
 /**
  * Created by ganymed on 18/11/16.

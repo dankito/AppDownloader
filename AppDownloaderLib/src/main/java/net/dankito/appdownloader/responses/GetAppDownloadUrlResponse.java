@@ -1,7 +1,7 @@
 package net.dankito.appdownloader.responses;
 
-import net.dankito.appdownloader.app.AppDownloadInfo;
-import net.dankito.appdownloader.app.AppInfo;
+import net.dankito.appdownloader.app.model.AppDownloadInfo;
+import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.downloader.IAppDownloader;
 
 /**

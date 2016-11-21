@@ -6,6 +6,9 @@ import android.content.res.Resources;
 import android.support.v7.app.AlertDialog;
 
 import net.dankito.appdownloader.R;
+import net.dankito.appdownloader.app.model.AppDownloadInfo;
+import net.dankito.appdownloader.app.model.AppInfo;
+import net.dankito.appdownloader.app.model.AppState;
 import net.dankito.appdownloader.downloader.IAppDownloader;
 import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
