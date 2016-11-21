@@ -6,6 +6,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import net.dankito.appdownloader.app.model.AppDownloadInfo;
 import net.dankito.appdownloader.app.model.AppInfo;
+import net.dankito.appdownloader.app.model.HashAlgorithm;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -36,6 +37,10 @@ public class AndroidAppPackageVerifierTest {
 
   protected static final String AUTO_START_APP_VERSION = "2.2";
 
+  protected static final String AUTO_START_APP_MD5_CHECKSUM = "dd19f8ad04467e1ac3ae562a2c49fd17";
+
+  protected static final String AUTO_START_APP_SHA1_CHECKSUM = "1a1d512f8cd59bcfb0ae7b9be121c36d800eabb4";
+
 
   protected AndroidAppPackageVerifier underTest;
 
@@ -64,14 +69,7 @@ public class AndroidAppPackageVerifierTest {
 
   @Test
   public void apkHasWrongPackageName_ReturnsError() throws Exception {
-    File apkFile = getApkFilePath(AUTO_START_APP_FILENAME);
-    AppInfo testApp = new AppInfo(AUTO_START_APP_PACKAGE_NAME + "_error");
-    testApp.setTitle(AUTO_START_APP_TITLE);
-    testApp.setVersionString(AUTO_START_APP_VERSION);
-
-    AppDownloadInfo downloadInfo = new AppDownloadInfo(testApp, null);
-    downloadInfo.setDownloadLocationPath(apkFile.getPath());
-    testApp.addDownloadInfo(downloadInfo);
+    AppDownloadInfo downloadInfo = createTestDownloadInfo(AUTO_START_APP_PACKAGE_NAME + "_error");
 
     AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
 
@@ -86,14 +84,7 @@ public class AndroidAppPackageVerifierTest {
 
   @Test
   public void apkHasCorrectPackageName_Succeeds() throws Exception {
-    File apkFile = getApkFilePath(AUTO_START_APP_FILENAME);
-    AppInfo testApp = new AppInfo(AUTO_START_APP_PACKAGE_NAME);
-    testApp.setTitle(AUTO_START_APP_TITLE);
-    testApp.setVersionString(AUTO_START_APP_VERSION);
-
-    AppDownloadInfo downloadInfo = new AppDownloadInfo(testApp, null);
-    downloadInfo.setDownloadLocationPath(apkFile.getPath());
-    testApp.addDownloadInfo(downloadInfo);
+    AppDownloadInfo downloadInfo = createTestDownloadInfo();
 
     AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
 
@@ -106,14 +97,9 @@ public class AndroidAppPackageVerifierTest {
 
   @Test
   public void apkHasWrongVersion_ReturnsError() throws Exception {
-    File apkFile = getApkFilePath(AUTO_START_APP_FILENAME);
-    AppInfo testApp = new AppInfo(AUTO_START_APP_PACKAGE_NAME);
-    testApp.setTitle(AUTO_START_APP_TITLE);
-    testApp.setVersionString(AUTO_START_APP_VERSION + ".42");
+    AppDownloadInfo downloadInfo = createTestDownloadInfo();
 
-    AppDownloadInfo downloadInfo = new AppDownloadInfo(testApp, null);
-    downloadInfo.setDownloadLocationPath(apkFile.getPath());
-    testApp.addDownloadInfo(downloadInfo);
+    downloadInfo.getAppInfo().setVersionString(AUTO_START_APP_VERSION + ".42");
 
     AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
 
@@ -128,14 +114,7 @@ public class AndroidAppPackageVerifierTest {
 
   @Test
   public void apkHasCorrectVersion_Succeeds() throws Exception {
-    File apkFile = getApkFilePath(AUTO_START_APP_FILENAME);
-    AppInfo testApp = new AppInfo(AUTO_START_APP_PACKAGE_NAME);
-    testApp.setTitle(AUTO_START_APP_TITLE);
-    testApp.setVersionString(AUTO_START_APP_VERSION);
-
-    AppDownloadInfo downloadInfo = new AppDownloadInfo(testApp, null);
-    downloadInfo.setDownloadLocationPath(apkFile.getPath());
-    testApp.addDownloadInfo(downloadInfo);
+    AppDownloadInfo downloadInfo = createTestDownloadInfo();
 
     AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
 
@@ -146,6 +125,105 @@ public class AndroidAppPackageVerifierTest {
     Assert.assertTrue(result.isVersionCorrect());
   }
 
+
+  @Test
+  public void apkHasWrongMD5Checksum_ReturnsError() throws Exception {
+    AppDownloadInfo downloadInfo = createTestDownloadInfo();
+
+    downloadInfo.setFileHashAlgorithm(HashAlgorithm.MD5);
+    downloadInfo.setFileChecksum("error");
+
+    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+
+    Assert.assertFalse(result.wasVerificationSuccessful());
+
+    Assert.assertTrue(result.isCompletelyDownloaded());
+    Assert.assertTrue(result.isPackageNameCorrect());
+    Assert.assertTrue(result.isVersionCorrect());
+    Assert.assertFalse(result.isFileChecksumCorrect());
+    Assert.assertFalse(result.isAppSignatureCorrect());
+  }
+
+  @Test
+  public void apkHasCorrectMD5Checksum_Succeeds() throws Exception {
+    AppDownloadInfo downloadInfo = createTestDownloadInfo();
+
+    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+
+    Assert.assertFalse(result.wasVerificationSuccessful());
+
+    Assert.assertTrue(result.isCompletelyDownloaded());
+    Assert.assertTrue(result.isPackageNameCorrect());
+    Assert.assertTrue(result.isVersionCorrect());
+    Assert.assertTrue(result.isFileChecksumCorrect());
+  }
+
+
+  @Test
+  public void apkHasWrongSHA1Checksum_ReturnsError() throws Exception {
+    AppDownloadInfo downloadInfo = createTestDownloadInfo();
+
+    downloadInfo.setFileHashAlgorithm(HashAlgorithm.SHA1);
+    downloadInfo.setFileChecksum("error");
+
+    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+
+    Assert.assertFalse(result.wasVerificationSuccessful());
+
+    Assert.assertTrue(result.isCompletelyDownloaded());
+    Assert.assertTrue(result.isPackageNameCorrect());
+    Assert.assertTrue(result.isVersionCorrect());
+    Assert.assertFalse(result.isFileChecksumCorrect());
+    Assert.assertFalse(result.isAppSignatureCorrect());
+  }
+
+  @Test
+  public void apkHasCorrectSHA1Checksum_Succeeds() throws Exception {
+    AppDownloadInfo downloadInfo = createTestDownloadInfo();
+
+    downloadInfo.setFileHashAlgorithm(HashAlgorithm.SHA1);
+    downloadInfo.setFileChecksum(AUTO_START_APP_SHA1_CHECKSUM);
+
+    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+
+    Assert.assertFalse(result.wasVerificationSuccessful());
+
+    Assert.assertTrue(result.isCompletelyDownloaded());
+    Assert.assertTrue(result.isPackageNameCorrect());
+    Assert.assertTrue(result.isVersionCorrect());
+    Assert.assertTrue(result.isFileChecksumCorrect());
+  }
+
+
+  protected AppDownloadInfo createTestDownloadInfo() {
+    return createTestDownloadInfo(AUTO_START_APP_PACKAGE_NAME);
+  }
+
+  protected AppDownloadInfo createTestDownloadInfo(String packageName) {
+    File apkFile = getApkFilePath(AUTO_START_APP_FILENAME);
+
+    AppInfo testApp = new AppInfo(packageName);
+    testApp.setTitle(AUTO_START_APP_TITLE);
+    testApp.setVersionString(AUTO_START_APP_VERSION);
+
+    AppDownloadInfo downloadInfo = new AppDownloadInfo(testApp, null);
+    downloadInfo.setDownloadLocationPath(apkFile.getPath());
+    downloadInfo.setFileHashAlgorithm(HashAlgorithm.MD5);
+    downloadInfo.setFileChecksum(AUTO_START_APP_MD5_CHECKSUM);
+    testApp.addDownloadInfo(downloadInfo);
+
+    AppDownloadInfo independentSourceDownloadInfoWithMD5Checksum = new AppDownloadInfo(testApp, null);
+    independentSourceDownloadInfoWithMD5Checksum.setFileHashAlgorithm(HashAlgorithm.MD5);
+    independentSourceDownloadInfoWithMD5Checksum.setFileChecksum(AUTO_START_APP_MD5_CHECKSUM);
+    testApp.addDownloadInfo(independentSourceDownloadInfoWithMD5Checksum);
+
+    AppDownloadInfo independentSourceDownloadInfoWithSHA1Checksum = new AppDownloadInfo(testApp, null);
+    independentSourceDownloadInfoWithSHA1Checksum.setFileHashAlgorithm(HashAlgorithm.SHA1);
+    independentSourceDownloadInfoWithSHA1Checksum.setFileChecksum(AUTO_START_APP_SHA1_CHECKSUM);
+    testApp.addDownloadInfo(independentSourceDownloadInfoWithSHA1Checksum);
+
+    return downloadInfo;
+  }
 
 
   protected static void copyFromResourcesToReadableDirectory(String resourceFilename) throws Exception {
