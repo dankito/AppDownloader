@@ -41,6 +41,8 @@ public class AndroidAppPackageVerifierTest {
 
   protected static final String AUTO_START_APP_SHA1_CHECKSUM = "1a1d512f8cd59bcfb0ae7b9be121c36d800eabb4";
 
+  protected static final String AUTO_START_APP_APK_SIGNATURE = "79a7b1a36ab88550403b1fa34d47473713a81031";
+
 
   protected AndroidAppPackageVerifier underTest;
 
@@ -88,10 +90,13 @@ public class AndroidAppPackageVerifierTest {
 
     AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
 
-    Assert.assertFalse(result.wasVerificationSuccessful());
+    Assert.assertTrue(result.wasVerificationSuccessful());
 
     Assert.assertTrue(result.isCompletelyDownloaded());
     Assert.assertTrue(result.isPackageNameCorrect());
+    Assert.assertTrue(result.isVersionCorrect());
+    Assert.assertTrue(result.isFileChecksumCorrect());
+    Assert.assertTrue(result.isAppSignatureCorrect());
   }
 
 
@@ -118,11 +123,13 @@ public class AndroidAppPackageVerifierTest {
 
     AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
 
-    Assert.assertFalse(result.wasVerificationSuccessful());
+    Assert.assertTrue(result.wasVerificationSuccessful());
 
     Assert.assertTrue(result.isCompletelyDownloaded());
     Assert.assertTrue(result.isPackageNameCorrect());
     Assert.assertTrue(result.isVersionCorrect());
+    Assert.assertTrue(result.isFileChecksumCorrect());
+    Assert.assertTrue(result.isAppSignatureCorrect());
   }
 
 
@@ -150,12 +157,13 @@ public class AndroidAppPackageVerifierTest {
 
     AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
 
-    Assert.assertFalse(result.wasVerificationSuccessful());
+    Assert.assertTrue(result.wasVerificationSuccessful());
 
     Assert.assertTrue(result.isCompletelyDownloaded());
     Assert.assertTrue(result.isPackageNameCorrect());
     Assert.assertTrue(result.isVersionCorrect());
     Assert.assertTrue(result.isFileChecksumCorrect());
+    Assert.assertTrue(result.isAppSignatureCorrect());
   }
 
 
@@ -186,12 +194,46 @@ public class AndroidAppPackageVerifierTest {
 
     AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
 
+    Assert.assertTrue(result.wasVerificationSuccessful());
+
+    Assert.assertTrue(result.isCompletelyDownloaded());
+    Assert.assertTrue(result.isPackageNameCorrect());
+    Assert.assertTrue(result.isVersionCorrect());
+    Assert.assertTrue(result.isFileChecksumCorrect());
+    Assert.assertTrue(result.isAppSignatureCorrect());
+  }
+
+
+  @Test
+  public void apkHasWrongSignature_ReturnsError() throws Exception {
+    AppDownloadInfo downloadInfo = createTestDownloadInfo();
+
+    downloadInfo.setApkSignature("wrong");
+
+    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+
     Assert.assertFalse(result.wasVerificationSuccessful());
 
     Assert.assertTrue(result.isCompletelyDownloaded());
     Assert.assertTrue(result.isPackageNameCorrect());
     Assert.assertTrue(result.isVersionCorrect());
     Assert.assertTrue(result.isFileChecksumCorrect());
+    Assert.assertFalse(result.isAppSignatureCorrect());
+  }
+
+  @Test
+  public void apkHasCorrectApkSignature_Succeeds() throws Exception {
+    AppDownloadInfo downloadInfo = createTestDownloadInfo();
+
+    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+
+    Assert.assertTrue(result.wasVerificationSuccessful());
+
+    Assert.assertTrue(result.isCompletelyDownloaded());
+    Assert.assertTrue(result.isPackageNameCorrect());
+    Assert.assertTrue(result.isVersionCorrect());
+    Assert.assertTrue(result.isFileChecksumCorrect());
+    Assert.assertTrue(result.isAppSignatureCorrect());
   }
 
 
@@ -210,16 +252,19 @@ public class AndroidAppPackageVerifierTest {
     downloadInfo.setDownloadLocationPath(apkFile.getPath());
     downloadInfo.setFileHashAlgorithm(HashAlgorithm.MD5);
     downloadInfo.setFileChecksum(AUTO_START_APP_MD5_CHECKSUM);
+    downloadInfo.setApkSignature(AUTO_START_APP_APK_SIGNATURE);
     testApp.addDownloadInfo(downloadInfo);
 
     AppDownloadInfo independentSourceDownloadInfoWithMD5Checksum = new AppDownloadInfo(testApp, null);
     independentSourceDownloadInfoWithMD5Checksum.setFileHashAlgorithm(HashAlgorithm.MD5);
     independentSourceDownloadInfoWithMD5Checksum.setFileChecksum(AUTO_START_APP_MD5_CHECKSUM);
+    independentSourceDownloadInfoWithMD5Checksum.setApkSignature(AUTO_START_APP_APK_SIGNATURE);
     testApp.addDownloadInfo(independentSourceDownloadInfoWithMD5Checksum);
 
     AppDownloadInfo independentSourceDownloadInfoWithSHA1Checksum = new AppDownloadInfo(testApp, null);
     independentSourceDownloadInfoWithSHA1Checksum.setFileHashAlgorithm(HashAlgorithm.SHA1);
     independentSourceDownloadInfoWithSHA1Checksum.setFileChecksum(AUTO_START_APP_SHA1_CHECKSUM);
+    independentSourceDownloadInfoWithSHA1Checksum.setApkSignature(AUTO_START_APP_APK_SIGNATURE);
     testApp.addDownloadInfo(independentSourceDownloadInfoWithSHA1Checksum);
 
     return downloadInfo;
