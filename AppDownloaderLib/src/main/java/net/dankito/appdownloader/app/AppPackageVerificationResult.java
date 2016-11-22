@@ -18,6 +18,8 @@ public class AppPackageVerificationResult {
 
   protected boolean isFileChecksumCorrect;
 
+  protected boolean hasFileChecksumBeenCheckedFromIndependentSource;
+
   protected boolean isAppSignatureCorrect;
 
   protected String errorMessage;
@@ -68,6 +70,14 @@ public class AppPackageVerificationResult {
 
   public void setFileChecksumCorrect(boolean fileChecksumCorrect) {
     isFileChecksumCorrect = fileChecksumCorrect;
+  }
+
+  public boolean isHasFileChecksumBeenCheckedFromIndependentSource() {
+    return hasFileChecksumBeenCheckedFromIndependentSource;
+  }
+
+  public void setHasFileChecksumBeenCheckedFromIndependentSource(boolean hasFileChecksumBeenCheckedFromIndependentSource) {
+    this.hasFileChecksumBeenCheckedFromIndependentSource = hasFileChecksumBeenCheckedFromIndependentSource;
   }
 
   public boolean isAppSignatureCorrect() {

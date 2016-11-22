@@ -26,6 +26,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by ganymed on 18/11/16.
@@ -109,8 +110,11 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
   }
 
   protected boolean verifyFileCheckSumIsCorrect(AppDownloadInfo downloadInfo, AppPackageVerificationResult result, Resources resources) {
-    if(isFileCheckSumCorrect(downloadInfo)) {
+    AtomicBoolean checksumHasBeenVerifiedFromIndependentSource = new AtomicBoolean(false);
+
+    if(isFileCheckSumCorrect(downloadInfo, checksumHasBeenVerifiedFromIndependentSource)) {
       result.setFileChecksumCorrect(true);
+      result.setHasFileChecksumBeenCheckedFromIndependentSource(checksumHasBeenVerifiedFromIndependentSource.get());
       return true;
     }
     else {
@@ -120,7 +124,7 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
     }
   }
 
-  protected boolean isFileCheckSumCorrect(AppDownloadInfo downloadInfo) {
+  protected boolean isFileCheckSumCorrect(AppDownloadInfo downloadInfo, AtomicBoolean checksumHasBeenVerifiedFromIndependentSource) {
     File file = new File(downloadInfo.getDownloadLocationPath());
     if(file.exists()) {
       try {
@@ -135,7 +139,7 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
 
         dataInputStream.close();
 
-        return verifyAllCheckSumsEqual(downloadInfo, md5CheckSum, sha1CheckSum);
+        return verifyAllCheckSumsEqual(downloadInfo, md5CheckSum, sha1CheckSum, checksumHasBeenVerifiedFromIndependentSource);
       } catch(Exception e) {
         log.error("Could not verify file check sum");
       }
@@ -144,17 +148,16 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
     return false;
   }
 
-  protected boolean verifyAllCheckSumsEqual(AppDownloadInfo linkAppDownloadedFrom, byte[] md5CheckSum, byte[] sha1CheckSum) {
+  protected boolean verifyAllCheckSumsEqual(AppDownloadInfo linkAppDownloadedFrom, byte[] md5CheckSum, byte[] sha1CheckSum, AtomicBoolean checksumHasBeenVerifiedFromIndependentSource) {
     AppInfo downloadedApp = linkAppDownloadedFrom.getAppInfo();
     boolean result = true;
-    boolean hasIndependentSourceBeenChecked = false;
     int countChecksumsChecked = 0;
 
     for(AppDownloadInfo downloadInfo : downloadedApp.getDownloadInfos()) {
       if(downloadInfo.isFileChecksumSet()) {
         if(verifyCheckSumsEqual(downloadInfo.getFileChecksum(), downloadInfo.getFileHashAlgorithm() == HashAlgorithm.MD5 ? md5CheckSum : sha1CheckSum)) {
           if(downloadInfo != linkAppDownloadedFrom) {
-            hasIndependentSourceBeenChecked = true;
+            checksumHasBeenVerifiedFromIndependentSource.set(true);
           }
           countChecksumsChecked++;
         }
@@ -165,7 +168,6 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
     }
 
     result &= countChecksumsChecked > 0; // we need at least two independent sources to verify that file has correct check sum
-    result &= hasIndependentSourceBeenChecked;
 
     return result;
   }
