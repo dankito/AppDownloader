@@ -107,7 +107,7 @@ public class AppSearchResultsFragment extends Fragment {
       appDetailsDialog.onCreateOptionsMenu(menu);
     }
     else {
-      inflater.inflate(R.menu.menu_main, menu);
+      inflater.inflate(R.menu.menu_app_search_results_fragment, menu);
 
       MenuItem searchMenuItem = menu.findItem(R.id.search);
       searchView = (SearchView) searchMenuItem.getActionView();
