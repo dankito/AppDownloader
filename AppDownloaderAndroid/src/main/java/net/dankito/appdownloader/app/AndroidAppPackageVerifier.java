@@ -45,7 +45,7 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
   }
 
 
-  public AppPackageVerificationResult verifyDownloadedApk(AppDownloadInfo downloadInfo) {
+  public void verifyDownloadedApk(AppDownloadInfo downloadInfo, AppPackageVerificationCallback callback) {
     AppInfo appToInstall = downloadInfo.getAppInfo();
     appToInstall.setState(AppState.VERIFYING_SIGNATURE);
 
@@ -73,7 +73,7 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
       appToInstall.setToItsDefaultState();
     }
 
-    return result;
+    callback.completed(result);
   }
 
   protected boolean verifyPackageNameIsCorrect(AppInfo appToInstall, PackageInfo packageInfo, AppPackageVerificationResult result, Resources resources) {

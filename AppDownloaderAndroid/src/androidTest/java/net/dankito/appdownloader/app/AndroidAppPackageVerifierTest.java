@@ -19,6 +19,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
 
@@ -28,6 +32,9 @@ import static android.support.test.InstrumentationRegistry.getTargetContext;
 
 @RunWith(AndroidJUnit4.class)
 public class AndroidAppPackageVerifierTest {
+
+  protected static final int WAIT_FOR_RESULT_SECONDS = 20;
+
 
   protected static final String AUTO_START_APP_FILENAME = "AutoStart.apk";
 
@@ -73,8 +80,22 @@ public class AndroidAppPackageVerifierTest {
   public void apkHasWrongPackageName_ReturnsError() throws Exception {
     AppDownloadInfo downloadInfo = createTestDownloadInfo(AUTO_START_APP_PACKAGE_NAME + "_error");
 
-    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+    final List<AppPackageVerificationResult> resultList = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
 
+    underTest.verifyDownloadedApk(downloadInfo, new AppPackageVerificationCallback() {
+      @Override
+      public void completed(AppPackageVerificationResult result) {
+        resultList.add(result);
+        countDownLatch.countDown();
+      }
+    });
+
+    try { countDownLatch.await(WAIT_FOR_RESULT_SECONDS, TimeUnit.SECONDS); } catch(Exception ignored) { }
+
+    Assert.assertEquals(1, resultList.size());
+
+    AppPackageVerificationResult result = resultList.get(0);
     Assert.assertFalse(result.wasVerificationSuccessful());
 
     Assert.assertTrue(result.isCompletelyDownloaded());
@@ -88,8 +109,22 @@ public class AndroidAppPackageVerifierTest {
   public void apkHasCorrectPackageName_Succeeds() throws Exception {
     AppDownloadInfo downloadInfo = createTestDownloadInfo();
 
-    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+    final List<AppPackageVerificationResult> resultList = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
 
+    underTest.verifyDownloadedApk(downloadInfo, new AppPackageVerificationCallback() {
+      @Override
+      public void completed(AppPackageVerificationResult result) {
+        resultList.add(result);
+        countDownLatch.countDown();
+      }
+    });
+
+    try { countDownLatch.await(WAIT_FOR_RESULT_SECONDS, TimeUnit.SECONDS); } catch(Exception ignored) { }
+
+    Assert.assertEquals(1, resultList.size());
+
+    AppPackageVerificationResult result = resultList.get(0);
     Assert.assertTrue(result.wasVerificationSuccessful());
 
     Assert.assertTrue(result.isCompletelyDownloaded());
@@ -106,8 +141,22 @@ public class AndroidAppPackageVerifierTest {
 
     downloadInfo.getAppInfo().setVersionString(AUTO_START_APP_VERSION + ".42");
 
-    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+    final List<AppPackageVerificationResult> resultList = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
 
+    underTest.verifyDownloadedApk(downloadInfo, new AppPackageVerificationCallback() {
+      @Override
+      public void completed(AppPackageVerificationResult result) {
+        resultList.add(result);
+        countDownLatch.countDown();
+      }
+    });
+
+    try { countDownLatch.await(WAIT_FOR_RESULT_SECONDS, TimeUnit.SECONDS); } catch(Exception ignored) { }
+
+    Assert.assertEquals(1, resultList.size());
+
+    AppPackageVerificationResult result = resultList.get(0);
     Assert.assertFalse(result.wasVerificationSuccessful());
 
     Assert.assertTrue(result.isCompletelyDownloaded());
@@ -121,8 +170,22 @@ public class AndroidAppPackageVerifierTest {
   public void apkHasCorrectVersion_Succeeds() throws Exception {
     AppDownloadInfo downloadInfo = createTestDownloadInfo();
 
-    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+    final List<AppPackageVerificationResult> resultList = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
 
+    underTest.verifyDownloadedApk(downloadInfo, new AppPackageVerificationCallback() {
+      @Override
+      public void completed(AppPackageVerificationResult result) {
+        resultList.add(result);
+        countDownLatch.countDown();
+      }
+    });
+
+    try { countDownLatch.await(WAIT_FOR_RESULT_SECONDS, TimeUnit.SECONDS); } catch(Exception ignored) { }
+
+    Assert.assertEquals(1, resultList.size());
+
+    AppPackageVerificationResult result = resultList.get(0);
     Assert.assertTrue(result.wasVerificationSuccessful());
 
     Assert.assertTrue(result.isCompletelyDownloaded());
@@ -140,8 +203,22 @@ public class AndroidAppPackageVerifierTest {
     downloadInfo.setFileHashAlgorithm(HashAlgorithm.MD5);
     downloadInfo.setFileChecksum("error");
 
-    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+    final List<AppPackageVerificationResult> resultList = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
 
+    underTest.verifyDownloadedApk(downloadInfo, new AppPackageVerificationCallback() {
+      @Override
+      public void completed(AppPackageVerificationResult result) {
+        resultList.add(result);
+        countDownLatch.countDown();
+      }
+    });
+
+    try { countDownLatch.await(WAIT_FOR_RESULT_SECONDS, TimeUnit.SECONDS); } catch(Exception ignored) { }
+
+    Assert.assertEquals(1, resultList.size());
+
+    AppPackageVerificationResult result = resultList.get(0);
     Assert.assertFalse(result.wasVerificationSuccessful());
 
     Assert.assertTrue(result.isCompletelyDownloaded());
@@ -155,8 +232,22 @@ public class AndroidAppPackageVerifierTest {
   public void apkHasCorrectMD5Checksum_Succeeds() throws Exception {
     AppDownloadInfo downloadInfo = createTestDownloadInfo();
 
-    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+    final List<AppPackageVerificationResult> resultList = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
 
+    underTest.verifyDownloadedApk(downloadInfo, new AppPackageVerificationCallback() {
+      @Override
+      public void completed(AppPackageVerificationResult result) {
+        resultList.add(result);
+        countDownLatch.countDown();
+      }
+    });
+
+    try { countDownLatch.await(WAIT_FOR_RESULT_SECONDS, TimeUnit.SECONDS); } catch(Exception ignored) { }
+
+    Assert.assertEquals(1, resultList.size());
+
+    AppPackageVerificationResult result = resultList.get(0);
     Assert.assertTrue(result.wasVerificationSuccessful());
 
     Assert.assertTrue(result.isCompletelyDownloaded());
@@ -174,8 +265,22 @@ public class AndroidAppPackageVerifierTest {
     downloadInfo.setFileHashAlgorithm(HashAlgorithm.SHA1);
     downloadInfo.setFileChecksum("error");
 
-    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+    final List<AppPackageVerificationResult> resultList = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
 
+    underTest.verifyDownloadedApk(downloadInfo, new AppPackageVerificationCallback() {
+      @Override
+      public void completed(AppPackageVerificationResult result) {
+        resultList.add(result);
+        countDownLatch.countDown();
+      }
+    });
+
+    try { countDownLatch.await(WAIT_FOR_RESULT_SECONDS, TimeUnit.SECONDS); } catch(Exception ignored) { }
+
+    Assert.assertEquals(1, resultList.size());
+
+    AppPackageVerificationResult result = resultList.get(0);
     Assert.assertFalse(result.wasVerificationSuccessful());
 
     Assert.assertTrue(result.isCompletelyDownloaded());
@@ -192,8 +297,22 @@ public class AndroidAppPackageVerifierTest {
     downloadInfo.setFileHashAlgorithm(HashAlgorithm.SHA1);
     downloadInfo.setFileChecksum(AUTO_START_APP_SHA1_CHECKSUM);
 
-    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+    final List<AppPackageVerificationResult> resultList = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
 
+    underTest.verifyDownloadedApk(downloadInfo, new AppPackageVerificationCallback() {
+      @Override
+      public void completed(AppPackageVerificationResult result) {
+        resultList.add(result);
+        countDownLatch.countDown();
+      }
+    });
+
+    try { countDownLatch.await(WAIT_FOR_RESULT_SECONDS, TimeUnit.SECONDS); } catch(Exception ignored) { }
+
+    Assert.assertEquals(1, resultList.size());
+
+    AppPackageVerificationResult result = resultList.get(0);
     Assert.assertTrue(result.wasVerificationSuccessful());
 
     Assert.assertTrue(result.isCompletelyDownloaded());
@@ -210,8 +329,22 @@ public class AndroidAppPackageVerifierTest {
 
     downloadInfo.setApkSignature("wrong");
 
-    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+    final List<AppPackageVerificationResult> resultList = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
 
+    underTest.verifyDownloadedApk(downloadInfo, new AppPackageVerificationCallback() {
+      @Override
+      public void completed(AppPackageVerificationResult result) {
+        resultList.add(result);
+        countDownLatch.countDown();
+      }
+    });
+
+    try { countDownLatch.await(WAIT_FOR_RESULT_SECONDS, TimeUnit.SECONDS); } catch(Exception ignored) { }
+
+    Assert.assertEquals(1, resultList.size());
+
+    AppPackageVerificationResult result = resultList.get(0);
     Assert.assertFalse(result.wasVerificationSuccessful());
 
     Assert.assertTrue(result.isCompletelyDownloaded());
@@ -225,8 +358,22 @@ public class AndroidAppPackageVerifierTest {
   public void apkHasCorrectApkSignature_Succeeds() throws Exception {
     AppDownloadInfo downloadInfo = createTestDownloadInfo();
 
-    AppPackageVerificationResult result = underTest.verifyDownloadedApk(downloadInfo);
+    final List<AppPackageVerificationResult> resultList = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
 
+    underTest.verifyDownloadedApk(downloadInfo, new AppPackageVerificationCallback() {
+      @Override
+      public void completed(AppPackageVerificationResult result) {
+        resultList.add(result);
+        countDownLatch.countDown();
+      }
+    });
+
+    try { countDownLatch.await(WAIT_FOR_RESULT_SECONDS, TimeUnit.SECONDS); } catch(Exception ignored) { }
+
+    Assert.assertEquals(1, resultList.size());
+
+    AppPackageVerificationResult result = resultList.get(0);
     Assert.assertTrue(result.wasVerificationSuccessful());
 
     Assert.assertTrue(result.isCompletelyDownloaded());

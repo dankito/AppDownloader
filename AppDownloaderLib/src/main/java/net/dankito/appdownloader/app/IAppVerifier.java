@@ -8,6 +8,6 @@ import net.dankito.appdownloader.app.model.AppDownloadInfo;
 
 public interface IAppVerifier {
 
-  AppPackageVerificationResult verifyDownloadedApk(AppDownloadInfo downloadInfo);
+  void verifyDownloadedApk(AppDownloadInfo downloadInfo, AppPackageVerificationCallback callback);
 
 }

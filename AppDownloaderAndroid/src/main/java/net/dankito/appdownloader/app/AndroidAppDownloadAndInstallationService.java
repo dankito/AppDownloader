@@ -162,17 +162,21 @@ public class AndroidAppDownloadAndInstallationService implements IAppDownloadAnd
   }
 
   protected void appDownloadCompleted(DownloadResult result) {
-    AppDownloadInfo downloadInfo = result.getDownloadInfo();
-    AppInfo app = downloadInfo.getAppInfo();
+    final AppDownloadInfo downloadInfo = result.getDownloadInfo();
+    final AppInfo app = downloadInfo.getAppInfo();
 
     if(result.isSuccessful()) {
-      AppPackageVerificationResult verificationResult = appVerifier.verifyDownloadedApk(downloadInfo);
-      if(verificationResult.wasVerificationSuccessful()) {
-        doAppInstall(downloadInfo);
-      }
-      else {
-        showApkVerificationWasNotSuccessfulErrorMessage(app, downloadInfo, verificationResult);
-      }
+      appVerifier.verifyDownloadedApk(downloadInfo, new AppPackageVerificationCallback() {
+        @Override
+        public void completed(AppPackageVerificationResult verificationResult) {
+          if(verificationResult.wasVerificationSuccessful()) {
+            doAppInstall(downloadInfo);
+          }
+          else {
+            showApkVerificationWasNotSuccessfulErrorMessage(app, downloadInfo, verificationResult);
+          }
+        }
+      });
     }
     else if(result.isUserCancelled() == false) {
       showErrorMessageThreadSafe(result.getError(), activity.getResources().getString(R.string.error_message_could_not_download_app, app.getTitle()));
