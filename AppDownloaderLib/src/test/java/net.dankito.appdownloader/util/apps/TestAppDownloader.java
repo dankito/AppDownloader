@@ -1,9 +1,8 @@
-package net.dankito.appdownloader.utils;
+package net.dankito.appdownloader.util.apps;
 
 import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.downloader.AppDownloaderBase;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
-import net.dankito.appdownloader.util.web.IWebClient;
 
 /**
  * Created by ganymed on 04/12/16.
@@ -11,8 +10,8 @@ import net.dankito.appdownloader.util.web.IWebClient;
 
 public class TestAppDownloader extends AppDownloaderBase {
 
-  public TestAppDownloader(IWebClient webClient) {
-    super(webClient);
+  public TestAppDownloader() {
+    super(null);
   }
 
 

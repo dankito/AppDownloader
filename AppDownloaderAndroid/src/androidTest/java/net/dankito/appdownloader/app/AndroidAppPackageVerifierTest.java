@@ -13,7 +13,7 @@ import net.dankito.appdownloader.app.model.HashAlgorithm;
 import net.dankito.appdownloader.downloader.IAppDownloader;
 import net.dankito.appdownloader.util.web.IWebClient;
 import net.dankito.appdownloader.util.web.OkHttpWebClient;
-import net.dankito.appdownloader.utils.TestAppDownloader;
+import net.dankito.appdownloader.util.apps.TestAppDownloader;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -404,7 +404,7 @@ public class AndroidAppPackageVerifierTest {
   protected AppDownloadInfo createTestDownloadInfo(String packageName) {
     File apkFile = getApkFilePath(AUTO_START_APP_FILENAME);
 
-    IAppDownloader testAppDownloader = new TestAppDownloader(null);
+    IAppDownloader testAppDownloader = new TestAppDownloader();
 
     AppInfo testApp = new AppInfo(packageName);
     testApp.setTitle(AUTO_START_APP_TITLE);
