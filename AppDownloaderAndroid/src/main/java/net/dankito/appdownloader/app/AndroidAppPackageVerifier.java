@@ -7,6 +7,7 @@ import android.content.pm.Signature;
 import android.content.res.Resources;
 
 import net.dankito.appdownloader.R;
+import net.dankito.appdownloader.app.apkverifier.DownloadedApkInfo;
 import net.dankito.appdownloader.app.model.AppDownloadInfo;
 import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.app.model.AppState;
@@ -26,6 +27,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -75,15 +78,6 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
 
   }
 
-  protected void verifyFileChecksumAndApkSignatureAsync(AppDownloadInfo downloadInfo, PackageManager packageManager, PackageInfo packageInfo, AppPackageVerificationResult result, Resources resources, AppPackageVerificationCallback callback) {
-    if(verifyFileCheckSumIsCorrect(downloadInfo, result, resources)
-        && verifyApkSignatureIsCorrect(downloadInfo, packageManager, result, resources) == false) {
-      downloadInfo.getAppInfo().setToItsDefaultState();
-    }
-
-    callback.completed(result);
-  }
-
   protected boolean verifyPackageNameIsCorrect(AppInfo appToInstall, PackageInfo packageInfo, AppPackageVerificationResult result, Resources resources) {
     if(isPackageNameCorrect(appToInstall, packageInfo)) {
       result.setPackageNameCorrect(true);
@@ -117,6 +111,83 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
     return appToInstall.isVersionSet() == false || packageVersion.equals(appToInstall.getVersion());
   }
 
+
+  protected void verifyFileChecksumAndApkSignatureAsync(AppDownloadInfo downloadInfo, PackageManager packageManager, PackageInfo packageInfo, AppPackageVerificationResult result, Resources resources, AppPackageVerificationCallback callback) {
+    DownloadedApkInfo downloadedApkInfo = new DownloadedApkInfo(downloadInfo.getAppInfo(), downloadInfo, packageInfo.packageName);
+    if(readFileChecksums(downloadInfo, downloadedApkInfo) && readApkSignatures(downloadInfo, packageManager, downloadedApkInfo)) {
+
+    }
+
+    if(verifyFileCheckSumIsCorrect(downloadInfo, result, resources)
+        && verifyApkSignatureIsCorrect(downloadInfo, packageManager, result, resources) == false) {
+      downloadInfo.getAppInfo().setToItsDefaultState();
+    }
+
+    callback.completed(result);
+  }
+
+  protected boolean readFileChecksums(AppDownloadInfo downloadInfo, DownloadedApkInfo downloadedApkInfo) {
+    File file = new File(downloadInfo.getDownloadLocationPath());
+    if(file.exists()) {
+      try {
+        FileInputStream fileInputStream = new FileInputStream(file);
+        DataInputStream dataInputStream = new DataInputStream(fileInputStream);
+
+        byte[] buffer = new byte[(int)file.length()];
+        dataInputStream.read(buffer);
+
+        byte[] md5CheckSum = calculateCheckSum(HashAlgorithm.MD5.getAlgorithmName(), buffer);
+        byte[] sha1CheckSum = calculateCheckSum(HashAlgorithm.SHA1.getAlgorithmName(), buffer);
+        byte[] sha256CheckSum = calculateCheckSum(HashAlgorithm.SHA256.getAlgorithmName(), buffer);
+
+        downloadedApkInfo.setMd5CheckSum(bytesToHex(md5CheckSum));
+        downloadedApkInfo.setSha1CheckSum(bytesToHex(sha1CheckSum));
+        downloadedApkInfo.setSha256CheckSum(bytesToHex(sha256CheckSum));
+
+        dataInputStream.close();
+
+        return true;
+      } catch(Exception e) {
+        log.error("Could not read file check sums of " + downloadInfo.getAppInfo());
+      }
+    }
+
+    return false;
+  }
+
+  protected boolean readApkSignatures(AppDownloadInfo downloadInfo, PackageManager packageManager, DownloadedApkInfo downloadedApkInfo) {
+    // So, you call that, passing in the path to the APK, along with PackageManager.GET_SIGNATURES.
+    // If you get null back, the APK was tampered with and does not have valid digital signature.
+    // If you get a PackageInfo back, it will have the "signatures", which you can use for comparison purposes.
+    PackageInfo packageInfo = packageManager.getPackageArchiveInfo(downloadInfo.getDownloadLocationPath(), PackageManager.GET_SIGNATURES);
+    if(packageInfo == null) {
+      return false;
+    }
+
+    Signature[] signatures = packageInfo.signatures;
+    if(signatures == null || signatures.length == 0) {
+      return false;
+    }
+
+    List<byte[]> signatureDigests = new ArrayList<>();
+
+    for(Signature signature : signatures) {
+      try {
+        final byte[] signatureBytes = signature.toByteArray();
+        byte[] digest = calculateCheckSum("SHA", signatureBytes);
+
+        signatureDigests.add(digest);
+      } catch(Exception e) {
+        log.error("Could not read signature digest from " + downloadInfo.getAppInfo(), e);
+        return false;
+      }
+    }
+
+    downloadedApkInfo.setSignatureDigests(signatureDigests);
+
+    return signatureDigests.size() > 0;
+  }
+
   protected boolean verifyFileCheckSumIsCorrect(AppDownloadInfo downloadInfo, AppPackageVerificationResult result, Resources resources) {
     AtomicBoolean checksumHasBeenVerifiedFromIndependentSource = new AtomicBoolean(false);
 
@@ -144,11 +215,6 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
 
         byte[] md5CheckSum = calculateCheckSum(HashAlgorithm.MD5.getAlgorithmName(), buffer);
         byte[] sha1CheckSum = calculateCheckSum(HashAlgorithm.SHA1.getAlgorithmName(), buffer);
-        byte[] sha256CheckSum = calculateCheckSum("SHA256", buffer);
-
-        String md5 = bytesToHex(md5CheckSum);
-        String sha1 = bytesToHex(sha1CheckSum);
-        String sha256 = bytesToHex(sha256CheckSum);
 
         dataInputStream.close();
 
