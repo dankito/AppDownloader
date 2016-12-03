@@ -28,6 +28,11 @@ public class VirusTotalApkFileVerifier implements IApkFileVerifier {
 
   private static final String VIRUS_TOTAL_API_KEY_PROPERTY_NAME = "api.key";
 
+
+  public static final String BASE_URL = "https://www.virustotal.com/vtapi/v2/";
+
+  public static final String FILE_SCAN_REPORT_SUB_URL = "file/report";
+
   public static final int MAX_NUMBER_OF_POSITIVE_FILE_SCANS_TO_JUDGE_SECURE = 2;
 
 
@@ -53,7 +58,7 @@ public class VirusTotalApkFileVerifier implements IApkFileVerifier {
 
   public void verifyApkFile(DownloadedApkInfo downloadedApkInfo, VerifyApkFileCallback callback) {
     try {
-      String url = "https://www.virustotal.com/vtapi/v2/file/report";
+      String url = BASE_URL + FILE_SCAN_REPORT_SUB_URL;
       String body = API_KEY_FIELD + "=" + getApiKey() + "&" + RESOURCE_FIELD + "=" + downloadedApkInfo.getSha256CheckSum();
       RequestParameters parameters = new RequestParameters(url, body);
 
