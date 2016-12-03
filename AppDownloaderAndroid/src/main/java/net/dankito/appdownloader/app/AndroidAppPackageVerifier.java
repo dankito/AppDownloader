@@ -53,24 +53,32 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
     Resources resources = context.getResources();
 
     PackageManager packageManager = context.getPackageManager();
-    PackageInfo packageInfo = packageManager.getPackageArchiveInfo(downloadInfo.getDownloadLocationPath(), PackageManager.GET_PERMISSIONS | PackageManager.GET_META_DATA);
-
-    boolean appPackageCouldBeVerified = false;
+    PackageInfo packageInfo = packageManager.getPackageArchiveInfo(downloadInfo.getDownloadLocationPath(), PackageManager.GET_PERMISSIONS | PackageManager.GET_META_DATA | PackageManager.GET_SIGNATURES);
 
     if(packageInfo != null) {
       result.setCompletelyDownloaded(true);
 
-      appPackageCouldBeVerified = verifyPackageNameIsCorrect(appToInstall, packageInfo, result, resources)
-          && verifyVersionIsCorrect(appToInstall, packageInfo, result, resources)
-          && verifyFileCheckSumIsCorrect(downloadInfo, result, resources)
-          && verifyApkSignatureIsCorrect(downloadInfo, packageManager, result, resources);
+      if(verifyPackageNameIsCorrect(appToInstall, packageInfo, result, resources)
+          && verifyVersionIsCorrect(appToInstall, packageInfo, result, resources)) {
+        verifyFileChecksumAndApkSignatureAsync(downloadInfo, packageManager, packageInfo, result, resources, callback);
+      }
+      else {
+        appToInstall.setToItsDefaultState();
+        callback.completed(result);
+      }
     }
     else {
+      appToInstall.setToItsDefaultState();
       setErrorMessage(result, resources, R.string.error_message_app_file_not_valid);
+      callback.completed(result);
     }
 
-    if(appPackageCouldBeVerified == false) {
-      appToInstall.setToItsDefaultState();
+  }
+
+  protected void verifyFileChecksumAndApkSignatureAsync(AppDownloadInfo downloadInfo, PackageManager packageManager, PackageInfo packageInfo, AppPackageVerificationResult result, Resources resources, AppPackageVerificationCallback callback) {
+    if(verifyFileCheckSumIsCorrect(downloadInfo, result, resources)
+        && verifyApkSignatureIsCorrect(downloadInfo, packageManager, result, resources) == false) {
+      downloadInfo.getAppInfo().setToItsDefaultState();
     }
 
     callback.completed(result);
@@ -136,6 +144,11 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
 
         byte[] md5CheckSum = calculateCheckSum(HashAlgorithm.MD5.getAlgorithmName(), buffer);
         byte[] sha1CheckSum = calculateCheckSum(HashAlgorithm.SHA1.getAlgorithmName(), buffer);
+        byte[] sha256CheckSum = calculateCheckSum("SHA256", buffer);
+
+        String md5 = bytesToHex(md5CheckSum);
+        String sha1 = bytesToHex(sha1CheckSum);
+        String sha256 = bytesToHex(sha256CheckSum);
 
         dataInputStream.close();
 
