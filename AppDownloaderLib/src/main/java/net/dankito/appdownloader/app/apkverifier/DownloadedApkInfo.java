@@ -27,14 +27,10 @@ public class DownloadedApkInfo {
   protected String sha256CheckSum;
 
 
-  public DownloadedApkInfo(AppInfo app, AppDownloadInfo downloadSource, String packageName, List<byte[]> signatureDigests, String md5CheckSum, String sha1CheckSum, String sha256CheckSum) {
+  public DownloadedApkInfo(AppInfo app, AppDownloadInfo downloadSource, String packageName) {
     this.app = app;
     this.downloadSource = downloadSource;
     this.packageName = packageName;
-    this.signatureDigests = signatureDigests;
-    this.md5CheckSum = md5CheckSum;
-    this.sha1CheckSum = sha1CheckSum;
-    this.sha256CheckSum = sha256CheckSum;
   }
 
 

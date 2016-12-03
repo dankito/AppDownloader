@@ -1,10 +1,9 @@
 package net.dankito.appdownloader.app.apkverifier.virustotal;
 
-import net.dankito.appdownloader.app.apkverifier.virustotal.VirusTotalApkFileVerifier;
-import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.app.apkverifier.DownloadedApkInfo;
-import net.dankito.appdownloader.app.apkverifier.VerifyApkFileResult;
 import net.dankito.appdownloader.app.apkverifier.VerifyApkFileCallback;
+import net.dankito.appdownloader.app.apkverifier.VerifyApkFileResult;
+import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.util.web.OkHttpWebClient;
 
 import org.junit.Assert;
@@ -40,7 +39,10 @@ public class VirusTotalApkFileVerifierTest {
     final List<VerifyApkFileResult> resultList = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    underTest.verifyApkFile(new DownloadedApkInfo(new AppInfo(""), null, "", new ArrayList<byte[]>(0), "", "", NO_ROOT_FIREWALL_SHA_256), new VerifyApkFileCallback() {
+    DownloadedApkInfo downloadedApkInfo = new DownloadedApkInfo(new AppInfo(""), null, "");
+    downloadedApkInfo.setSha256CheckSum(NO_ROOT_FIREWALL_SHA_256);
+
+    underTest.verifyApkFile(downloadedApkInfo, new VerifyApkFileCallback() {
       @Override
       public void completed(VerifyApkFileResult result) {
         resultList.add(result);
