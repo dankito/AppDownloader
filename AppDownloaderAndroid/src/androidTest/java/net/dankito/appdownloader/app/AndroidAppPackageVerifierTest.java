@@ -10,8 +10,10 @@ import net.dankito.appdownloader.app.apkverifier.virustotal.VirusTotalApkFileVer
 import net.dankito.appdownloader.app.model.AppDownloadInfo;
 import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.app.model.HashAlgorithm;
+import net.dankito.appdownloader.downloader.IAppDownloader;
 import net.dankito.appdownloader.util.web.IWebClient;
 import net.dankito.appdownloader.util.web.OkHttpWebClient;
+import net.dankito.appdownloader.utils.TestAppDownloader;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -236,7 +238,7 @@ public class AndroidAppPackageVerifierTest {
     Assert.assertTrue(result.isPackageNameCorrect());
     Assert.assertTrue(result.isVersionCorrect());
     Assert.assertFalse(result.isFileChecksumCorrect());
-    Assert.assertFalse(result.isAppSignatureCorrect());
+    Assert.assertTrue(result.isAppSignatureCorrect());
   }
 
   @Test
@@ -298,7 +300,7 @@ public class AndroidAppPackageVerifierTest {
     Assert.assertTrue(result.isPackageNameCorrect());
     Assert.assertTrue(result.isVersionCorrect());
     Assert.assertFalse(result.isFileChecksumCorrect());
-    Assert.assertFalse(result.isAppSignatureCorrect());
+    Assert.assertTrue(result.isAppSignatureCorrect());
   }
 
   @Test
@@ -402,24 +404,26 @@ public class AndroidAppPackageVerifierTest {
   protected AppDownloadInfo createTestDownloadInfo(String packageName) {
     File apkFile = getApkFilePath(AUTO_START_APP_FILENAME);
 
+    IAppDownloader testAppDownloader = new TestAppDownloader(null);
+
     AppInfo testApp = new AppInfo(packageName);
     testApp.setTitle(AUTO_START_APP_TITLE);
     testApp.setVersionString(AUTO_START_APP_VERSION);
 
-    AppDownloadInfo downloadInfo = new AppDownloadInfo(testApp, null);
+    AppDownloadInfo downloadInfo = new AppDownloadInfo(testApp, testAppDownloader);
     downloadInfo.setDownloadLocationPath(apkFile.getPath());
     downloadInfo.setFileHashAlgorithm(HashAlgorithm.MD5);
     downloadInfo.setFileChecksum(AUTO_START_APP_MD5_CHECKSUM);
     downloadInfo.setApkSignature(AUTO_START_APP_APK_SIGNATURE);
     testApp.addDownloadInfo(downloadInfo);
 
-    AppDownloadInfo independentSourceDownloadInfoWithMD5Checksum = new AppDownloadInfo(testApp, null);
+    AppDownloadInfo independentSourceDownloadInfoWithMD5Checksum = new AppDownloadInfo(testApp, testAppDownloader);
     independentSourceDownloadInfoWithMD5Checksum.setFileHashAlgorithm(HashAlgorithm.MD5);
     independentSourceDownloadInfoWithMD5Checksum.setFileChecksum(AUTO_START_APP_MD5_CHECKSUM);
     independentSourceDownloadInfoWithMD5Checksum.setApkSignature(AUTO_START_APP_APK_SIGNATURE);
     testApp.addDownloadInfo(independentSourceDownloadInfoWithMD5Checksum);
 
-    AppDownloadInfo independentSourceDownloadInfoWithSHA1Checksum = new AppDownloadInfo(testApp, null);
+    AppDownloadInfo independentSourceDownloadInfoWithSHA1Checksum = new AppDownloadInfo(testApp, testAppDownloader);
     independentSourceDownloadInfoWithSHA1Checksum.setFileHashAlgorithm(HashAlgorithm.SHA1);
     independentSourceDownloadInfoWithSHA1Checksum.setFileChecksum(AUTO_START_APP_SHA1_CHECKSUM);
     independentSourceDownloadInfoWithSHA1Checksum.setApkSignature(AUTO_START_APP_APK_SIGNATURE);
