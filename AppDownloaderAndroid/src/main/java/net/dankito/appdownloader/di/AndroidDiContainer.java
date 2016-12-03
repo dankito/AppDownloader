@@ -18,6 +18,7 @@ import net.dankito.appdownloader.app.IInstalledAppsManager;
 import net.dankito.appdownloader.app.IUpdatableAppsManager;
 import net.dankito.appdownloader.app.apkverifier.DownloadedInfoApkFileVerifier;
 import net.dankito.appdownloader.app.apkverifier.IApkFileVerifier;
+import net.dankito.appdownloader.app.apkverifier.virustotal.VirusTotalApkFileVerifier;
 import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.ApkLeecherPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.ApkMirrorPlayStoreAppDownloader;
@@ -109,14 +110,20 @@ public class AndroidDiContainer {
 
   @Provides
   @Singleton
-  public DownloadedInfoApkFileVerifier provideDownloadedInfoApkFileVerifier(IWebClient webClient) {
+  public DownloadedInfoApkFileVerifier provideDownloadedInfoApkFileVerifier() {
     return new DownloadedInfoApkFileVerifier();
   }
 
   @Provides
   @Singleton
-  public List<IApkFileVerifier> provideApkFileVerifiers(final DownloadedInfoApkFileVerifier downloadedInfoApkFileVerifier) {
-    return new ArrayList<IApkFileVerifier>() {{ add(downloadedInfoApkFileVerifier); }};
+  public VirusTotalApkFileVerifier provideVirusTotalApkFileVerifier(IWebClient webClient) {
+    return new VirusTotalApkFileVerifier(webClient);
+  }
+
+  @Provides
+  @Singleton
+  public List<IApkFileVerifier> provideApkFileVerifiers(final DownloadedInfoApkFileVerifier downloadedInfoApkFileVerifier, final VirusTotalApkFileVerifier virusTotalApkFileVerifier) {
+    return new ArrayList<IApkFileVerifier>() {{ add(downloadedInfoApkFileVerifier); add(virusTotalApkFileVerifier); }};
   }
 
   @Provides
