@@ -18,7 +18,7 @@ public class DownloadedApkInfo {
 
   protected String packageName;
 
-  protected List<byte[]> signatureDigests = new ArrayList<>();
+  protected List<String> signatureDigests = new ArrayList<>();
 
   protected String md5CheckSum;
 
@@ -58,11 +58,11 @@ public class DownloadedApkInfo {
     this.packageName = packageName;
   }
 
-  public List<byte[]> getSignatureDigests() {
+  public List<String> getSignatureDigests() {
     return signatureDigests;
   }
 
-  public void setSignatureDigests(List<byte[]> signatureDigests) {
+  public void setSignatureDigests(List<String> signatureDigests) {
     this.signatureDigests = signatureDigests;
   }
 

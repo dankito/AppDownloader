@@ -4,6 +4,8 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.test.runner.AndroidJUnit4;
 
+import net.dankito.appdownloader.app.apkverifier.DownloadedInfoApkFileVerifier;
+import net.dankito.appdownloader.app.apkverifier.IApkFileVerifier;
 import net.dankito.appdownloader.app.model.AppDownloadInfo;
 import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.app.model.HashAlgorithm;
@@ -72,7 +74,10 @@ public class AndroidAppPackageVerifierTest {
 
   @Before
   public void setUp() {
-    underTest = new AndroidAppPackageVerifier(getTargetContext());
+    List<IApkFileVerifier> apkFileVerifiers = new ArrayList<>();
+    apkFileVerifiers.add(new DownloadedInfoApkFileVerifier());
+
+    underTest = new AndroidAppPackageVerifier(getTargetContext(), apkFileVerifiers);
   }
 
 

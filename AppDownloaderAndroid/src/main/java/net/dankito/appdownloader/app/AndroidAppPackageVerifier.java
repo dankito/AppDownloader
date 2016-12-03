@@ -8,6 +8,9 @@ import android.content.res.Resources;
 
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.app.apkverifier.DownloadedApkInfo;
+import net.dankito.appdownloader.app.apkverifier.IApkFileVerifier;
+import net.dankito.appdownloader.app.apkverifier.VerifyApkFileCallback;
+import net.dankito.appdownloader.app.apkverifier.VerifyApkFileResult;
 import net.dankito.appdownloader.app.model.AppDownloadInfo;
 import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.app.model.AppState;
@@ -29,7 +32,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by ganymed on 18/11/16.
@@ -42,9 +45,12 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
 
   protected Context context;
 
+  protected List<IApkFileVerifier> apkFileVerifiers;
 
-  public AndroidAppPackageVerifier(Context context) {
+
+  public AndroidAppPackageVerifier(Context context, List<IApkFileVerifier> apkFileVerifiers) {
     this.context = context;
+    this.apkFileVerifiers = apkFileVerifiers;
   }
 
 
@@ -56,7 +62,7 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
     Resources resources = context.getResources();
 
     PackageManager packageManager = context.getPackageManager();
-    PackageInfo packageInfo = packageManager.getPackageArchiveInfo(downloadInfo.getDownloadLocationPath(), PackageManager.GET_PERMISSIONS | PackageManager.GET_META_DATA | PackageManager.GET_SIGNATURES);
+    PackageInfo packageInfo = packageManager.getPackageArchiveInfo(downloadInfo.getDownloadLocationPath(), PackageManager.GET_PERMISSIONS | PackageManager.GET_META_DATA);
 
     if(packageInfo != null) {
       result.setCompletelyDownloaded(true);
@@ -115,15 +121,8 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
   protected void verifyFileChecksumAndApkSignatureAsync(AppDownloadInfo downloadInfo, PackageManager packageManager, PackageInfo packageInfo, AppPackageVerificationResult result, Resources resources, AppPackageVerificationCallback callback) {
     DownloadedApkInfo downloadedApkInfo = new DownloadedApkInfo(downloadInfo.getAppInfo(), downloadInfo, packageInfo.packageName);
     if(readFileChecksums(downloadInfo, downloadedApkInfo) && readApkSignatures(downloadInfo, packageManager, downloadedApkInfo)) {
-
+      verifyFileChecksumAndApkSignatureAsync(downloadedApkInfo, result, resources, callback);
     }
-
-    if(verifyFileCheckSumIsCorrect(downloadInfo, result, resources)
-        && verifyApkSignatureIsCorrect(downloadInfo, packageManager, result, resources) == false) {
-      downloadInfo.getAppInfo().setToItsDefaultState();
-    }
-
-    callback.completed(result);
   }
 
   protected boolean readFileChecksums(AppDownloadInfo downloadInfo, DownloadedApkInfo downloadedApkInfo) {
@@ -169,14 +168,14 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
       return false;
     }
 
-    List<byte[]> signatureDigests = new ArrayList<>();
+    List<String> signatureDigests = new ArrayList<>();
 
     for(Signature signature : signatures) {
       try {
         final byte[] signatureBytes = signature.toByteArray();
         byte[] digest = calculateCheckSum("SHA", signatureBytes);
 
-        signatureDigests.add(digest);
+        signatureDigests.add(bytesToHex(digest));
       } catch(Exception e) {
         log.error("Could not read signature digest from " + downloadInfo.getAppInfo(), e);
         return false;
@@ -188,116 +187,76 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
     return signatureDigests.size() > 0;
   }
 
-  protected boolean verifyFileCheckSumIsCorrect(AppDownloadInfo downloadInfo, AppPackageVerificationResult result, Resources resources) {
-    AtomicBoolean checksumHasBeenVerifiedFromIndependentSource = new AtomicBoolean(false);
+  protected void verifyFileChecksumAndApkSignatureAsync(DownloadedApkInfo downloadedApkInfo, AppPackageVerificationResult result, Resources resources, AppPackageVerificationCallback callback) {
+    final List<VerifyApkFileResult> results = new ArrayList<>(apkFileVerifiers.size());
+    final CountDownLatch countDownLatch = new CountDownLatch(apkFileVerifiers.size());
 
-    if(isFileCheckSumCorrect(downloadInfo, checksumHasBeenVerifiedFromIndependentSource)) {
-      result.setFileChecksumCorrect(true);
-      result.setHasFileChecksumBeenCheckedFromIndependentSource(checksumHasBeenVerifiedFromIndependentSource.get());
-      return true;
+    for(IApkFileVerifier apkFileVerifier : apkFileVerifiers) {
+      apkFileVerifier.verifyApkFile(downloadedApkInfo, new VerifyApkFileCallback() {
+        @Override
+        public void completed(VerifyApkFileResult verifyApkFileResult) {
+          results.add(verifyApkFileResult);
+          countDownLatch.countDown();
+        }
+      });
     }
-    else {
-      result.setFileChecksumCorrect(false);
+
+    try { countDownLatch.await(); } catch(Exception ignored) { }
+
+    evaluateVerifyApkFileResults(downloadedApkInfo, results, result, resources, callback);
+  }
+
+  protected void evaluateVerifyApkFileResults(DownloadedApkInfo downloadedApkInfo, List<VerifyApkFileResult> verifyApkFileResults, AppPackageVerificationResult result,
+                                              Resources resources, AppPackageVerificationCallback callback) {
+    evaluateVerifyFileChecksumResults(verifyApkFileResults, result);
+    evaluateVerifyApkSignatureResults(verifyApkFileResults, result);
+
+    if(result.isFileChecksumCorrect() == false) {
       setErrorMessage(result, resources, R.string.error_message_app_file_checksum_not_correct);
-      return false;
     }
-  }
-
-  protected boolean isFileCheckSumCorrect(AppDownloadInfo downloadInfo, AtomicBoolean checksumHasBeenVerifiedFromIndependentSource) {
-    File file = new File(downloadInfo.getDownloadLocationPath());
-    if(file.exists()) {
-      try {
-        FileInputStream fileInputStream = new FileInputStream(file);
-        DataInputStream dataInputStream = new DataInputStream(fileInputStream);
-
-        byte[] buffer = new byte[(int)file.length()];
-        dataInputStream.read(buffer);
-
-        byte[] md5CheckSum = calculateCheckSum(HashAlgorithm.MD5.getAlgorithmName(), buffer);
-        byte[] sha1CheckSum = calculateCheckSum(HashAlgorithm.SHA1.getAlgorithmName(), buffer);
-
-        dataInputStream.close();
-
-        return verifyAllCheckSumsEqual(downloadInfo, md5CheckSum, sha1CheckSum, checksumHasBeenVerifiedFromIndependentSource);
-      } catch(Exception e) {
-        log.error("Could not verify file check sum");
-      }
-    }
-
-    return false;
-  }
-
-  protected boolean verifyAllCheckSumsEqual(AppDownloadInfo linkAppDownloadedFrom, byte[] md5CheckSum, byte[] sha1CheckSum, AtomicBoolean checksumHasBeenVerifiedFromIndependentSource) {
-    AppInfo downloadedApp = linkAppDownloadedFrom.getAppInfo();
-    boolean result = true;
-    int countChecksumsChecked = 0;
-
-    for(AppDownloadInfo downloadInfo : downloadedApp.getDownloadInfos()) {
-      if(downloadInfo.isFileChecksumSet()) {
-        if(verifyCheckSumsEqual(downloadInfo.getFileChecksum(), downloadInfo.getFileHashAlgorithm() == HashAlgorithm.MD5 ? md5CheckSum : sha1CheckSum)) {
-          if(downloadInfo != linkAppDownloadedFrom) {
-            checksumHasBeenVerifiedFromIndependentSource.set(true);
-          }
-          countChecksumsChecked++;
-        }
-        else if(downloadInfo.getAppDownloader().isTrustworthySource()) { // file checksum of absolute trustworthy have to equal
-          result = false;
-        }
-      }
-    }
-
-    result &= countChecksumsChecked > 0; // we need at least two independent sources to verify that file has correct check sum
-
-    return result;
-  }
-
-  protected boolean verifyApkSignatureIsCorrect(AppDownloadInfo downloadInfo, PackageManager packageManager, AppPackageVerificationResult result, Resources resources) {
-    if(verifyApkSignature(downloadInfo, packageManager)) {
-      result.setAppSignatureCorrect(true);
-      return true;
-    }
-    else {
-      result.setAppSignatureCorrect(false);
+    else if(result.isAppSignatureCorrect() == false) {
       setErrorMessage(result, resources, R.string.error_message_app_signature_invalid);
-      return false;
     }
+
+    callback.completed(result);
   }
 
-  protected boolean verifyApkSignature(AppDownloadInfo downloadInfo, PackageManager packageManager) {
-    String validApkSignature = downloadInfo.getAppInfo().getApkSignature();
-    if(validApkSignature == null) { // no apk signature found at from downloader's sites -> there's no way we can verify if app has correct signature
-      return false;
-    }
+  protected void evaluateVerifyFileChecksumResults(List<VerifyApkFileResult> verifyApkFileResults, AppPackageVerificationResult result) {
+    boolean knowsFileChecksum = false, couldVerifyFileChecksum = true, isFileChecksumFromIndependentSource = false;
 
-    // So, you call that, passing in the path to the APK, along with PackageManager.GET_SIGNATURES.
-    // If you get null back, the APK was tampered with and does not have valid digital signature.
-    // If you get a PackageInfo back, it will have the "signatures", which you can use for comparison purposes.
-    PackageInfo packageInfo = packageManager.getPackageArchiveInfo(downloadInfo.getDownloadLocationPath(), PackageManager.GET_SIGNATURES);
-    if(packageInfo == null) {
-      return false;
-    }
+    for(VerifyApkFileResult verifyApkFileResult : verifyApkFileResults) {
+      if(verifyApkFileResult.knowsFileChecksum()) {
+        knowsFileChecksum = true;
 
-    Signature[] signatures = packageInfo.signatures;
-    if(signatures == null || signatures.length == 0) {
-      return false;
-    }
-
-    for(Signature signature : signatures) {
-      final byte[] signatureBytes = signature.toByteArray();
-
-//      String certificateDisplayInfo = getCertificateDisplayInfo(signatureBytes);
-
-      try {
-        byte[] digest = calculateCheckSum("SHA", signatureBytes);
-
-        return verifyCheckSumsEqual(validApkSignature, digest);
-      } catch(Exception e) {
-        log.error("Could not validate Certificate signature", e);
+        couldVerifyFileChecksum &= verifyApkFileResult.couldVerifyFileChecksum();
+        if(verifyApkFileResult.isFileChecksumFromIndependentSource()) {
+          isFileChecksumFromIndependentSource = verifyApkFileResult.isFileChecksumFromIndependentSource();
+        }
       }
     }
 
-    return false;
+    if(knowsFileChecksum) {
+      result.setFileChecksumCorrect(couldVerifyFileChecksum);
+      result.setHasFileChecksumBeenCheckedFromIndependentSource(isFileChecksumFromIndependentSource);
+    }
   }
+
+  protected void evaluateVerifyApkSignatureResults(List<VerifyApkFileResult> verifyApkFileResults, AppPackageVerificationResult result) {
+    boolean knowsApkSignature = false, couldVerifyApkSignature = true;
+
+    for(VerifyApkFileResult verifyApkFileResult : verifyApkFileResults) {
+      if(verifyApkFileResult.knowsApkSignature()) {
+        knowsApkSignature = true;
+
+        couldVerifyApkSignature &= verifyApkFileResult.couldVerifyApkSignature();
+      }
+    }
+
+    if(knowsApkSignature) {
+      result.setAppSignatureCorrect(couldVerifyApkSignature);
+    }
+  }
+
 
   private String getCertificateDisplayInfo(byte[] signatureBytes) {
     InputStream certStream = new ByteArrayInputStream(signatureBytes);
@@ -320,12 +279,6 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
     messageDigest.update(signatureBytes);
 
     return messageDigest.digest();
-  }
-
-  protected boolean verifyCheckSumsEqual(String hexCheckSum, byte[] checkSumBytes) {
-    String hexConvertedCheckSumBytes = bytesToHex(checkSumBytes);
-
-    return hexCheckSum.equals(hexConvertedCheckSumBytes);
   }
 
   protected String bytesToHex(byte[] bytes) {
