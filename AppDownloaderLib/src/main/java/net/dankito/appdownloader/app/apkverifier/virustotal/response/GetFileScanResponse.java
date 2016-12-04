@@ -6,7 +6,7 @@ import net.dankito.appdownloader.app.apkverifier.virustotal.ResponseCode;
  * Created by ganymed on 04/12/16.
  */
 
-public class GetFileScanResponse extends VirusTotalResponseBase {
+public class GetFileScanResponse extends ApiCallResponseBase {
 
   protected VirusTotalFileScanReportResponse response;
 
