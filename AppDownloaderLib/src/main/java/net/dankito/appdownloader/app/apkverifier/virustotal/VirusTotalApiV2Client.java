@@ -124,7 +124,13 @@ public class VirusTotalApiV2Client {
 
 
   protected ResponseCode getErrorCode(WebClientResponse response) {
-    // TODO: check if response code is 403 (HTTP_FORBIDDEN) or 204 (API_LIMIT_EXCEEDED) and tell user, that api key is incorrect or API limit exceeded
+    if(403 == response.getHttpStatusCode()) {
+      return ResponseCode.API_KEY_INCORRECT;
+    }
+    else if(204 == response.getHttpStatusCode()) {
+      return ResponseCode.API_REQUEST_LIMIT_EXCEEDED;
+    }
+
     return ResponseCode.NETWORK_ERROR;
   }
 

@@ -16,6 +16,10 @@ public enum ResponseCode {
 
   PARSE_ERROR(-101),
 
+  API_KEY_INCORRECT(403),
+
+  API_REQUEST_LIMIT_EXCEEDED(204),
+
   UNKNOWN(199);
 
 
