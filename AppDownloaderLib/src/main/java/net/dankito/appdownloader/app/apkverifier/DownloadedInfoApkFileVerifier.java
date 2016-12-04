@@ -6,6 +6,9 @@ import net.dankito.appdownloader.app.model.HashAlgorithm;
 import net.dankito.appdownloader.downloader.FDroidAppDownloader;
 import net.dankito.appdownloader.util.StringUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -15,6 +18,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class DownloadedInfoApkFileVerifier implements IApkFileVerifier {
 
   protected static final String FDROID_APK_SIGNATURE = "b4e515d5cda1958213f6d73383ee9b14987985fc";
+
+  private static final Logger log = LoggerFactory.getLogger(DownloadedInfoApkFileVerifier.class);
 
 
   @Override
@@ -46,6 +51,8 @@ public class DownloadedInfoApkFileVerifier implements IApkFileVerifier {
           countChecksumsChecked++;
         }
         else if(downloadInfo.getAppDownloader().isTrustworthySource()) { // file checksum of absolute trustworthy have to equal
+          log.warn(downloadInfo.getFileHashAlgorithm().getAlgorithmName() + " checksum of file (" + fileChecksum + ") and from web (" + downloadInfo.getFileChecksum() + ") do " +
+              "not equal for App " + downloadedApp);
           result = false;
         }
       }
@@ -71,6 +78,7 @@ public class DownloadedInfoApkFileVerifier implements IApkFileVerifier {
 
   protected void verifyApkSignatureIsCorrect(DownloadedApkInfo downloadedApkInfo, VerifyApkFileResult verifyApkFileResult) {
     String apkSignature = downloadedApkInfo.getApp().getApkSignature();
+
     if(StringUtils.isNotNullOrEmpty(apkSignature)) {
       verifyApkFileResult.setKnowsApkSignature(true);
 
@@ -84,6 +92,7 @@ public class DownloadedInfoApkFileVerifier implements IApkFileVerifier {
           signatureCheckResult &= true;
         }
         else {
+          log.warn("Apk Signature of App " + downloadedApkInfo.getApp() + ": " + signatureDigest + ", does not equal that one stated online: " + apkSignature);
           signatureCheckResult = false;
         }
       }
