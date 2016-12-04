@@ -218,6 +218,8 @@ public class AndroidAppPackageVerifier implements IAppVerifier {
       setErrorMessage(result, resources, R.string.error_message_app_signature_invalid);
     }
 
+    downloadedApkInfo.getApp().setToItsDefaultState();
+
     callback.completed(result);
   }
 
