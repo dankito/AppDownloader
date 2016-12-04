@@ -13,6 +13,9 @@ import net.dankito.appdownloader.app.apkverifier.virustotal.response.VirusTotalF
 import net.dankito.appdownloader.app.model.AppState;
 import net.dankito.appdownloader.util.web.IWebClient;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.Timer;
@@ -33,6 +36,10 @@ public class VirusTotalApkFileVerifier implements IApkFileVerifier {
 
   private static final String VIRUS_TOTAL_API_KEY_PROPERTY_NAME = "api.key";
 
+  private static final String COULD_NOT_LOAD_API_KEY = null;
+
+
+  private static final Logger log = LoggerFactory.getLogger(VirusTotalApkFileVerifier.class);
 
 
   protected VirusTotalApiV2Client virusTotalClient;
@@ -40,7 +47,7 @@ public class VirusTotalApkFileVerifier implements IApkFileVerifier {
   protected IWebClient webClient;
 
 
-  public VirusTotalApkFileVerifier(IWebClient webClient) throws Exception {
+  public VirusTotalApkFileVerifier(IWebClient webClient) {
     this.virusTotalClient = new VirusTotalApiV2Client(readApiKey(), webClient);
   }
 
@@ -120,15 +127,21 @@ public class VirusTotalApkFileVerifier implements IApkFileVerifier {
 
 
 
-  protected String readApiKey() throws Exception {
-    InputStream propertiesInputStream = getClass().getClassLoader().getResourceAsStream(VIRUS_TOTAL_PROPERTIES_FILENAME);
+  protected String readApiKey() {
+    try {
+      InputStream propertiesInputStream = getClass().getClassLoader().getResourceAsStream(VIRUS_TOTAL_PROPERTIES_FILENAME);
 
-    Properties virusTotalProperties = new Properties();
-    virusTotalProperties.load(propertiesInputStream);
+      Properties virusTotalProperties = new Properties();
+      virusTotalProperties.load(propertiesInputStream);
 
-    propertiesInputStream.close();
+      propertiesInputStream.close();
 
-    return virusTotalProperties.getProperty(VIRUS_TOTAL_API_KEY_PROPERTY_NAME);
+      return virusTotalProperties.getProperty(VIRUS_TOTAL_API_KEY_PROPERTY_NAME);
+    } catch(Exception e) {
+      log.error("Could not load VirusTotal API key", e);
+    }
+
+    return COULD_NOT_LOAD_API_KEY;
   }
 
 }

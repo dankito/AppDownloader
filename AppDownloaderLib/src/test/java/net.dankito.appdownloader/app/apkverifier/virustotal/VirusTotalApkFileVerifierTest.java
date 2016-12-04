@@ -57,7 +57,7 @@ public class VirusTotalApkFileVerifierTest {
 
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     underTest = new VirusTotalApkFileVerifier(new OkHttpWebClient());
   }
 
