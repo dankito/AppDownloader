@@ -8,6 +8,8 @@ import net.dankito.appdownloader.responses.ResponseBase;
 
 public class WebClientResponse extends ResponseBase {
 
+  protected int httpStatusCode;
+
   protected String body;
 
 
@@ -19,12 +21,22 @@ public class WebClientResponse extends ResponseBase {
     super(isSuccessful);
   }
 
-  public WebClientResponse(boolean successful, String body) {
-    super(successful);
+  public WebClientResponse(int httpStatusCode) {
+    this(httpStatusCode == 200);
+
+    this.httpStatusCode = httpStatusCode;
+  }
+
+  public WebClientResponse(int httpStatusCode, String body) {
+    this(httpStatusCode);
 
     this.body = body;
   }
 
+
+  public int getHttpStatusCode() {
+    return httpStatusCode;
+  }
 
   public String getBody() {
     return body;

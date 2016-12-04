@@ -286,7 +286,7 @@ public class OkHttpWebClient implements IWebClient {
 
   protected WebClientResponse getResponse(RequestParameters parameters, Response response) throws IOException {
     if(parameters.hasStringResponse()) {
-      return new WebClientResponse(true, response.body().string());
+      return new WebClientResponse(response.code(), response.body().string());
     }
     else {
       return streamBinaryResponse(parameters, response);
@@ -316,7 +316,7 @@ public class OkHttpWebClient implements IWebClient {
         }
       }
 
-      return new WebClientResponse(true);
+      return new WebClientResponse(response.code());
     } catch (IOException e) {
       log.error("Could not download binary Response for Url " + parameters.getUrl(), e);
       return new WebClientResponse(e.getLocalizedMessage());
