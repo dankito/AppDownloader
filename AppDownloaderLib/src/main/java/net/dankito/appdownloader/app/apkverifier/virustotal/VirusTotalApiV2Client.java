@@ -2,6 +2,8 @@ package net.dankito.appdownloader.app.apkverifier.virustotal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import net.dankito.appdownloader.app.apkverifier.DownloadedApkInfo;
+import net.dankito.appdownloader.app.apkverifier.VerifyApkFileCallback;
 import net.dankito.appdownloader.app.apkverifier.virustotal.calback.GetFileScanReportCallback;
 import net.dankito.appdownloader.app.apkverifier.virustotal.calback.ScanFileCallback;
 import net.dankito.appdownloader.app.apkverifier.virustotal.response.GetFileScanReportResponse;
@@ -24,14 +26,20 @@ public class VirusTotalApiV2Client {
 
   public static final String BASE_URL = "https://www.virustotal.com/vtapi/v2/";
 
-  public static final String FILE_SCAN_SUB_URL = "file/scan";
+  public static final String SCAN_FILE_SUB_URL = "file/scan";
 
   public static final String FILE_SCAN_REPORT_SUB_URL = "file/report";
+
+  public static final String SCAN_URL_SUB_URL = "url/scan";
+
+  public static final String URL_SCAN_REPORT_SUB_URL = "url/report";
 
 
   private static final String API_KEY_FIELD = "apikey";
 
   private static final String RESOURCE_FIELD = "resource";
+
+  private static final String URL_FIELD = "url";
 
   private static final String FILE_FIELD = "file";
 
@@ -88,8 +96,7 @@ public class VirusTotalApiV2Client {
   }
 
   public void scanFileAsync(final FileScanRequest request, final ScanFileCallback callback) {
-    String url = BASE_URL + FILE_SCAN_SUB_URL;
-    RequestParameters parameters = new RequestParameters(url);
+    RequestParameters parameters = new RequestParameters(BASE_URL + SCAN_FILE_SUB_URL);
     parameters.addRequestBodyPart(new StringRequestBodyPart(API_KEY_FIELD, apiKey));
     parameters.addRequestBodyPart(new FileRequestBodyPart(FILE_FIELD, new File(request.getFilePath()), request.getFileMimeType()));
 
@@ -120,6 +127,52 @@ public class VirusTotalApiV2Client {
     } catch(Exception e) {
       callback.completed(new ScanFileResponse(ResponseCode.PARSE_ERROR, e.getLocalizedMessage()));
     }
+  }
+
+
+  public void scanUrlAsync(final DownloadedApkInfo downloadedApkInfo, final VerifyApkFileCallback callback) {
+    RequestParameters parameters = new RequestParameters(BASE_URL + SCAN_URL_SUB_URL);
+    parameters.addRequestBodyPart(new StringRequestBodyPart(API_KEY_FIELD, apiKey));
+    parameters.addRequestBodyPart(new StringRequestBodyPart(URL_FIELD, downloadedApkInfo.getDownloadSource().getUrl()));
+
+    webClient.postAsync(parameters, new RequestCallback() {
+      @Override
+      public void completed(WebClientResponse response) {
+        if(response.isSuccessful() == false) {
+//          callback.completed(new ScanFileResponse(getErrorCode(response), response.getError()));
+        }
+        else {
+          parseScanUrlResponse(downloadedApkInfo, response, callback);
+        }
+      }
+    });
+  }
+
+  protected void parseScanUrlResponse(DownloadedApkInfo downloadedApkInfo, WebClientResponse response, VerifyApkFileCallback callback) {
+
+  }
+
+  public void getUrlScanReportAsync(final DownloadedApkInfo downloadedApkInfo, final VerifyApkFileCallback callback) {
+    RequestParameters parameters = new RequestParameters(BASE_URL + URL_SCAN_REPORT_SUB_URL);
+    parameters.addRequestBodyPart(new StringRequestBodyPart(API_KEY_FIELD, apiKey));
+    parameters.addRequestBodyPart(new StringRequestBodyPart(RESOURCE_FIELD, downloadedApkInfo.getDownloadSource().getUrl()));
+    // TODO: may set scan_id field
+
+    webClient.postAsync(parameters, new RequestCallback() {
+      @Override
+      public void completed(WebClientResponse response) {
+        if(response.isSuccessful() == false) {
+//          callback.completed(new ScanFileResponse(getErrorCode(response), response.getError()));
+        }
+        else {
+          parseGetUrlScanReportResponse(downloadedApkInfo, response, callback);
+        }
+      }
+    });
+  }
+
+  protected void parseGetUrlScanReportResponse(DownloadedApkInfo downloadedApkInfo, WebClientResponse response, VerifyApkFileCallback callback) {
+
   }
 
 
