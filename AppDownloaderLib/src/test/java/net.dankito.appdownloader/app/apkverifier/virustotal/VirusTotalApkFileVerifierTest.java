@@ -91,7 +91,7 @@ public class VirusTotalApkFileVerifierTest {
   @Test
   public void fileNotKnownToVirusTotal_ScansForVirusesOnline() throws Exception {
     DownloadedApkInfo downloadedApkInfo = createTestDownloadedApkInfo();
-    downloadedApkInfo.setSha256CheckSum("a" + NO_ROOT_FIREWALL_SHA_256.substring(1)); // generate fake SHA256 checksum
+    downloadedApkInfo.setSha256CheckSum("a" + AUTO_START_SHA_256.substring(1)); // generate fake SHA256 checksum
 
     Assert.assertNotEquals(AppState.SCANNING_FOR_VIRUSES, downloadedApkInfo.getApp().getState());
 
