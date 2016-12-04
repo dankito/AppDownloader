@@ -7,6 +7,7 @@ targetCompatibility = "1.7"
 
 // so that resources (like virus_total.properties) are copied to output for tests
 sourceSets.main.output.resourcesDir = sourceSets.test.output.classesDir
+sourceSets.test.output.resourcesDir = sourceSets.test.output.classesDir
 
 
 dependencies {
