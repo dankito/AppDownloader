@@ -17,6 +17,9 @@ import net.dankito.appdownloader.util.web.WebClientResponse;
 import net.dankito.appdownloader.util.web.model.FileRequestBodyPart;
 import net.dankito.appdownloader.util.web.model.StringRequestBodyPart;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 
 /**
@@ -46,6 +49,10 @@ public class VirusTotalApiV2Client {
   private static final String SCAN_ID_FIELD = "scan_id";
 
 
+  private static final Logger log = LoggerFactory.getLogger(VirusTotalApiV2Client.class);
+
+
+
   protected String apiKey;
 
   protected IWebClient webClient;
@@ -60,6 +67,8 @@ public class VirusTotalApiV2Client {
 
 
   public void getFileScanReportAsync(final FileScanRequest request, final GetFileScanReportCallback callback) {
+    log.info("Getting file scan report for " + request.getFilePath() + " (" + request.getSha256Checksum() + ") ...");
+
     RequestParameters parameters = new RequestParameters(BASE_URL + FILE_SCAN_REPORT_SUB_URL);
 
     parameters.addRequestBodyPart(new StringRequestBodyPart(API_KEY_FIELD, apiKey));
@@ -71,6 +80,8 @@ public class VirusTotalApiV2Client {
     webClient.postAsync(parameters, new RequestCallback() {
       @Override
       public void completed(WebClientResponse response) {
+        log.info("Was getting file scan report for " + request.getFilePath() + " successful ?" + response.isSuccessful());
+
         if(response.isSuccessful() == false) {
           callback.completed(new GetFileScanReportResponse(getErrorCode(response), response.getError()));
         }
@@ -89,13 +100,19 @@ public class VirusTotalApiV2Client {
       ResponseCode responseCode = ResponseCode.fromCode(fileScanReportResponse.getResponse_code());
       GetFileScanReportResponse response = new GetFileScanReportResponse(responseCode, fileScanReportResponse);
 
+      log.info("Parsed file scan report: ResponseCode = " + fileScanReportResponse.getResponse_code() + ",\nmessage = " + fileScanReportResponse.getVerbose_msg() +
+          ",\ncount positives = " + fileScanReportResponse.getPositives());
+
       callback.completed(response);
     } catch(Exception e) {
+      log.error("Could not parse file scan report", e);
       callback.completed(new GetFileScanReportResponse(ResponseCode.PARSE_ERROR, e.getLocalizedMessage()));
     }
   }
 
   public void scanFileAsync(final FileScanRequest request, final ScanFileCallback callback) {
+    log.info("Starting to scan file " + request.getFilePath() + " (" + request.getSha256Checksum() + ") ...");
+
     RequestParameters parameters = new RequestParameters(BASE_URL + SCAN_FILE_SUB_URL);
     parameters.addRequestBodyPart(new StringRequestBodyPart(API_KEY_FIELD, apiKey));
     parameters.addRequestBodyPart(new FileRequestBodyPart(FILE_FIELD, new File(request.getFilePath()), request.getFileMimeType()));
@@ -103,6 +120,8 @@ public class VirusTotalApiV2Client {
     webClient.postAsync(parameters, new RequestCallback() {
       @Override
       public void completed(WebClientResponse response) {
+        log.info("Was scanning file " + request.getFilePath() + " successful? " + response.isSuccessful());
+
         if(response.isSuccessful() == false) {
           callback.completed(new ScanFileResponse(getErrorCode(response), response.getError()));
         }
@@ -123,8 +142,11 @@ public class VirusTotalApiV2Client {
 
       ScanFileResponse response = new ScanFileResponse(responseCode, isSuccessfullyQueued, scanFileResponse);
 
+      log.info("Parsed scan file response: ResponseCode = " + scanFileResponse.getResponse_code() + ",\nmessage = " + scanFileResponse.getVerbose_msg());
+
       callback.completed(response);
     } catch(Exception e) {
+      log.error("Could not parse ScanFile response", e);
       callback.completed(new ScanFileResponse(ResponseCode.PARSE_ERROR, e.getLocalizedMessage()));
     }
   }
