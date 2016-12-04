@@ -34,6 +34,13 @@ public class VerifyApkFileResult extends ResponseBase {
     this.isFileChecksumFromIndependentSource = isFileChecksumFromIndependentSource;
   }
 
+  public VerifyApkFileResult(DownloadedApkInfo downloadedApkInfo, boolean knowsApkSignature, boolean couldVerifyApkSignature) {
+    super(true);
+    this.downloadedApkInfo = downloadedApkInfo;
+    this.knowsApkSignature = knowsApkSignature;
+    this.couldVerifyApkSignature = couldVerifyApkSignature;
+  }
+
 
   public DownloadedApkInfo getDownloadedApkInfo() {
     return downloadedApkInfo;
