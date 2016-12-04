@@ -9,6 +9,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by ganymed on 22/11/16.
@@ -17,6 +19,8 @@ import org.jsoup.select.Elements;
 public class AndroidObservatoryAkpSignatureVerifier implements IApkFileVerifier {
 
   protected static final String CHECK_APK_SIGNATURE_URL = "https://androidobservatory.org/?searchby=certhash&q=";
+
+  private static final Logger log = LoggerFactory.getLogger(AndroidObservatoryAkpSignatureVerifier.class);
 
 
   protected IWebClient webClient;
@@ -29,6 +33,8 @@ public class AndroidObservatoryAkpSignatureVerifier implements IApkFileVerifier 
 
   @Override
   public void verifyApkFile(final DownloadedApkInfo downloadedApkInfo, final VerifyApkFileCallback callback) {
+    log.info("Trying to verify Apk Signatures (" + downloadedApkInfo.getSignatureDigests().size() + ") for " + downloadedApkInfo + " ...");
+
     if(downloadedApkInfo.getSignatureDigests().size() < 1) {
       callback.completed(new VerifyApkFileResult(downloadedApkInfo, "No signatures available for apk file"));
     }
@@ -69,6 +75,7 @@ public class AndroidObservatoryAkpSignatureVerifier implements IApkFileVerifier 
     }
 
     VerifyApkFileResult result = new VerifyApkFileResult(downloadedApkInfo, signatureIsValidForThisApp, signatureIsValidForThisApp);
+    log.info("Does AndroidObservatory know Signature for this App? " + signatureIsValidForThisApp);
 
     callback.completed(result);
   }
