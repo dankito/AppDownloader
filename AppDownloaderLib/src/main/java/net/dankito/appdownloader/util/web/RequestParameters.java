@@ -2,7 +2,10 @@ package net.dankito.appdownloader.util.web;
 
 import net.dankito.appdownloader.responses.callbacks.DownloadProgressListener;
 import net.dankito.appdownloader.util.StringUtils;
+import net.dankito.appdownloader.util.web.model.RequestBodyPart;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,6 +21,8 @@ public class RequestParameters {
   protected String url;
 
   protected String body;
+
+  protected List<RequestBodyPart> requestBodyParts = new ArrayList<>();
 
   protected ContentType contentType;
 
@@ -65,6 +70,18 @@ public class RequestParameters {
 
   public void setBody(String body) {
     this.body = body;
+  }
+
+  public boolean areRequestBodyPartsSet() {
+    return requestBodyParts.size() > 0;
+  }
+
+  public boolean addRequestBodyPart(RequestBodyPart requestBodyPart) {
+    return requestBodyParts.add(requestBodyPart);
+  }
+
+  public List<RequestBodyPart> getRequestBodyParts() {
+    return new ArrayList<>(requestBodyParts);
   }
 
   public ContentType getContentType() {

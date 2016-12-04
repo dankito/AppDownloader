@@ -2,12 +2,17 @@ package net.dankito.appdownloader.util.web;
 
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.MultipartBuilder;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
 import net.dankito.appdownloader.responses.callbacks.DownloadProgressListener;
+import net.dankito.appdownloader.util.StringUtils;
+import net.dankito.appdownloader.util.web.model.FileRequestBodyPart;
+import net.dankito.appdownloader.util.web.model.RequestBodyPart;
+import net.dankito.appdownloader.util.web.model.StringRequestBodyPart;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,6 +150,28 @@ public class OkHttpWebClient implements IWebClient {
 
       requestBuilder.post(postBody);
     }
+    else if(parameters.areRequestBodyPartsSet()) {
+      setPostBodyFromRequestBodyParts(requestBuilder, parameters);
+    }
+  }
+
+  protected void setPostBodyFromRequestBodyParts(Request.Builder requestBuilder, RequestParameters parameters) {
+    MultipartBuilder multipartBuilder = new MultipartBuilder()
+        .type(MultipartBuilder.FORM);
+
+    for(RequestBodyPart part : parameters.getRequestBodyParts()) {
+      if(part instanceof StringRequestBodyPart) {
+        multipartBuilder.addFormDataPart(part.getFieldName(), ((StringRequestBodyPart)part).getValue());
+      }
+      else if(part instanceof FileRequestBodyPart) {
+        FileRequestBodyPart filePart = (FileRequestBodyPart)part;
+        String filename = StringUtils.isNullOrEmpty(filePart.getFilename()) ? filePart.getFile().getName() : filePart.getFilename();
+        multipartBuilder.addFormDataPart(filePart.getFieldName(), filename,
+            RequestBody.create(MediaType.parse(filePart.getFileMimeType()), filePart.getFile()));
+      }
+    }
+
+    requestBuilder.post(multipartBuilder.build());
   }
 
   protected void applyParameters(Request.Builder requestBuilder, RequestParameters parameters) {
