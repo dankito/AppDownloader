@@ -16,6 +16,7 @@ import net.dankito.appdownloader.app.IAppInstaller;
 import net.dankito.appdownloader.app.IAppVerifier;
 import net.dankito.appdownloader.app.IInstalledAppsManager;
 import net.dankito.appdownloader.app.IUpdatableAppsManager;
+import net.dankito.appdownloader.app.apkverifier.AndroidObservatoryAkpSignatureVerifier;
 import net.dankito.appdownloader.app.apkverifier.DownloadedInfoApkFileVerifier;
 import net.dankito.appdownloader.app.apkverifier.IApkFileVerifier;
 import net.dankito.appdownloader.app.apkverifier.virustotal.VirusTotalApkFileVerifier;
@@ -122,8 +123,15 @@ public class AndroidDiContainer {
 
   @Provides
   @Singleton
-  public List<IApkFileVerifier> provideApkFileVerifiers(final DownloadedInfoApkFileVerifier downloadedInfoApkFileVerifier, final VirusTotalApkFileVerifier virusTotalApkFileVerifier) {
-    return new ArrayList<IApkFileVerifier>() {{ add(downloadedInfoApkFileVerifier); add(virusTotalApkFileVerifier); }};
+  public AndroidObservatoryAkpSignatureVerifier provideAndroidObservatoryAkpSignatureVerifier(IWebClient webClient) {
+    return new AndroidObservatoryAkpSignatureVerifier(webClient);
+  }
+
+  @Provides
+  @Singleton
+  public List<IApkFileVerifier> provideApkFileVerifiers(final DownloadedInfoApkFileVerifier downloadedInfoApkFileVerifier, final VirusTotalApkFileVerifier virusTotalApkFileVerifier,
+                                                        final AndroidObservatoryAkpSignatureVerifier androidObservatoryAkpSignatureVerifier) {
+    return new ArrayList<IApkFileVerifier>() {{ add(downloadedInfoApkFileVerifier); add(virusTotalApkFileVerifier); add(androidObservatoryAkpSignatureVerifier); }};
   }
 
   @Provides
