@@ -3,6 +3,7 @@ package net.dankito.appdownloader.app.apkverifier;
 import net.dankito.appdownloader.app.model.AppDownloadInfo;
 import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.app.model.HashAlgorithm;
+import net.dankito.appdownloader.downloader.FDroidAppDownloader;
 import net.dankito.appdownloader.util.StringUtils;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -12,6 +13,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 
 public class DownloadedInfoApkFileVerifier implements IApkFileVerifier {
+
+  protected static final String FDROID_APK_SIGNATURE = "b4e515d5cda1958213f6d73383ee9b14987985fc";
+
 
   @Override
   public void verifyApkFile(DownloadedApkInfo downloadedApkInfo, VerifyApkFileCallback callback) {
@@ -73,7 +77,15 @@ public class DownloadedInfoApkFileVerifier implements IApkFileVerifier {
       boolean signatureCheckResult = downloadedApkInfo.getSignatureDigests().size() > 0;
 
       for(String signatureDigest : downloadedApkInfo.getSignatureDigests()) {
-        signatureCheckResult &= apkSignature.equals(signatureDigest);
+        if(apkSignature.equals(signatureDigest)) {
+          signatureCheckResult &= true;
+        }
+        else if(FDROID_APK_SIGNATURE.equals(signatureDigest) && downloadedApkInfo.getDownloadSource().getAppDownloader() instanceof FDroidAppDownloader) {
+          signatureCheckResult &= true;
+        }
+        else {
+          signatureCheckResult = false;
+        }
       }
 
       verifyApkFileResult.setCouldVerifyApkSignature(signatureCheckResult);
