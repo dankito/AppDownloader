@@ -10,11 +10,7 @@ import java.util.Map;
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class VirusTotalFileScanReportResponse extends VirusTotalFileScanResponseBase {
-
-  protected String md5;
-
-  protected String sha1;
+public class VirusTotalFileScanReportResponse extends VirusTotalFileScanResponse {
 
   protected String scan_date;
 
@@ -24,21 +20,7 @@ public class VirusTotalFileScanReportResponse extends VirusTotalFileScanResponse
 
   protected Map<String, VirusTotalScanReport> scans = new HashMap<>();
 
-  public String getMd5() {
-    return md5;
-  }
 
-  public void setMd5(String md5) {
-    this.md5 = md5;
-  }
-
-  public String getSha1() {
-    return sha1;
-  }
-
-  public void setSha1(String sha1) {
-    this.sha1 = sha1;
-  }
 
   public String getScan_date() {
     return scan_date;
