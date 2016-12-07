@@ -12,6 +12,7 @@ import com.squareup.picasso.Picasso;
 
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.app.model.AppInfo;
+import net.dankito.appdownloader.responses.GetAppDetailsResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,13 @@ public class AppSearchResultsAdapter extends BaseAdapter {
       notifyDataSetChanged();
     }
   }
+
+  public void appDetailsRetrieved(GetAppDetailsResponse response) {
+    synchronized(this) {
+      notifyDataSetChanged();
+    }
+  }
+
 
   @Override
   public int getCount() {
@@ -106,4 +114,5 @@ public class AppSearchResultsAdapter extends BaseAdapter {
 
     return convertView;
   }
+
 }

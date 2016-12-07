@@ -217,11 +217,11 @@ public class AppSearchResultsFragment extends Fragment {
 
   protected GetAppDetailsCallback appDetailsRetrievedListener = new GetAppDetailsCallback() {
     @Override
-    public void completed(GetAppDetailsResponse response) {
+    public void completed(final GetAppDetailsResponse response) {
       getActivity().runOnUiThread(new Runnable() {
         @Override
         public void run() {
-          searchResultsAdapter.notifyDataSetChanged();
+          searchResultsAdapter.appDetailsRetrieved(response);
         }
       });
     }
