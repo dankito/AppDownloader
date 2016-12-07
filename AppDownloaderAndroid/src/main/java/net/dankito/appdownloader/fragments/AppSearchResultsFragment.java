@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
@@ -112,10 +113,13 @@ public class AppSearchResultsFragment extends Fragment {
       MenuItem searchMenuItem = menu.findItem(R.id.search);
       searchView = (SearchView) searchMenuItem.getActionView();
       if(searchView != null) {
-        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-        searchView.setQueryHint(getActivity().getString(R.string.search_hint_search_apps));
-        searchView.setOnQueryTextListener(entriesQueryTextListener);
+        FragmentActivity activity = getActivity();
+        if(activity != null) {
+          SearchManager searchManager = (SearchManager) activity.getSystemService(Context.SEARCH_SERVICE);
+          searchView.setSearchableInfo(searchManager.getSearchableInfo(activity.getComponentName()));
+          searchView.setQueryHint(getActivity().getString(R.string.search_hint_search_apps));
+          searchView.setOnQueryTextListener(entriesQueryTextListener);
+        }
       }
 
       super.onCreateOptionsMenu(menu, inflater);
