@@ -7,6 +7,7 @@ import net.dankito.appdownloader.responses.GetAppDownloadUrlResponse;
 import net.dankito.appdownloader.responses.GetUrlResponse;
 import net.dankito.appdownloader.responses.callbacks.GetAppDownloadUrlResponseCallback;
 import net.dankito.appdownloader.responses.callbacks.GetUrlCallback;
+import net.dankito.appdownloader.util.StringUtils;
 import net.dankito.appdownloader.util.web.IWebClient;
 import net.dankito.appdownloader.util.web.RequestCallback;
 import net.dankito.appdownloader.util.web.RequestParameters;
@@ -30,7 +31,7 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
   protected static final String SEARCH_APPS_URL_PREFIX = "https://www.apkmirror.com/?s=";
   protected static final String SEARCH_APPS_URL_SUFFIX = "&post_type=app_release&searchtype=apk";
 
-  protected static final String DETAILS_PAGE_URL_PREFIX = "https://www.apkmirror.com";
+  protected static final String BASE_URL = "https://www.apkmirror.com";
 
   private static final Logger log = LoggerFactory.getLogger(ApkMirrorPlayStoreAppDownloader.class);
 
@@ -95,12 +96,12 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
     Elements downloadButtonElements = document.body().select(".downloadButton");
     if(downloadButtonElements.size() > 0) {
       Element downloadButtonElement = downloadButtonElements.first();
-      appDownloadPageUrl = DETAILS_PAGE_URL_PREFIX + downloadButtonElement.attr("href");
+      appDownloadPageUrl = BASE_URL + downloadButtonElement.attr("href");
     }
 
     parseAppDetails(downloadInfo, document);
 
-    if(appDownloadPageUrl == null) {
+    if(appDownloadPageUrl == null) { // TODO: check for variants, as e.g. on https://www.apkmirror.com/apk/opera-software-asa/opera/opera-37-0-2192-105088-release/
       callback.completed(new GetAppDownloadUrlResponse(appToDownload, this, "Could not find App Download Page Url")); // TODO: translate
     }
     else {
@@ -165,7 +166,7 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
 
       if("a".equals(tagIconElementParent.nodeName())) {
         String realAppDetailsPageUrl = tagIconElementParent.attr("href");
-        realAppDetailsPageUrl = DETAILS_PAGE_URL_PREFIX + realAppDetailsPageUrl;
+        realAppDetailsPageUrl = BASE_URL + realAppDetailsPageUrl;
 
         successfullyRetrievedAppDetailsPageUrl(appToDownload, new GetUrlResponse(true, realAppDetailsPageUrl), callback);
         return;
@@ -198,7 +199,7 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
     Elements clickHereElements = document.body().select("a[data-google-vignette]");
     if(clickHereElements.size() > 0) {
       Element clickHereElement = clickHereElements.first();
-      String appDownloadUrl = DETAILS_PAGE_URL_PREFIX + clickHereElement.attr("href");
+      String appDownloadUrl = BASE_URL + clickHereElement.attr("href");
       downloadInfo.setUrl(appDownloadUrl);
 
       callback.completed(new GetAppDownloadUrlResponse(true, appToDownload, this, downloadInfo));
@@ -238,10 +239,10 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
     if(tabContainerElements.size() > 0) {
       Element tabContainerElement = tabContainerElements.first();
 
-      Elements downloadIconElements = tabContainerElement.parent().select(".download-icon");
+      Elements appRowElements = tabContainerElement.parent().select(".appRow");
 
-      if(downloadIconElements.size() > 0) {
-        if(extractAppDetailsPageUrl(downloadIconElements, callback)) {
+      if(appRowElements.size() > 0) {
+        if(findAppDetails(appToDownload, document, appRowElements, getAppDownloadUrlResponseCallback, callback)) {
           return;
         }
       }
@@ -257,19 +258,80 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
     callback.completed(new GetUrlResponse("Could not find App Details Page Url")); // TODO: translate
   }
 
-  protected boolean extractAppDetailsPageUrl(Elements downloadIconElements, GetUrlCallback callback) {
-    Element downloadIconElement = downloadIconElements.first();
-    Element downloadIconElementParent = downloadIconElement.parent();
+  protected boolean findAppDetails(AppInfo appToDownload, Document document, Elements appRowElements, GetAppDownloadUrlResponseCallback getAppDownloadUrlResponseCallback, GetUrlCallback callback) {
+    for(Element appRowElement : appRowElements) {
+      String text = appRowElement.text();
+      if(StringUtils.isNotNullOrEmpty(text) && text.contains("by ")) {
+        String appTitleAndVersion = text.substring(0, text.lastIndexOf(" by")).trim();
+        if(appTitleAndVersion.startsWith(appToDownload.getTitle())) {
+          if(isCorrectApp(appToDownload, appTitleAndVersion)) {
+            return extractAppDetailsPageUrl(appRowElement, callback);
+          }
+        }
+      }
+    }
 
-    if("a".equals(downloadIconElementParent.nodeName())) {
-      String appDetailsPageUrl = downloadIconElementParent.attr("href");
-      appDetailsPageUrl = DETAILS_PAGE_URL_PREFIX + appDetailsPageUrl;
+    return checkIfHasMoreSearchResults(appToDownload, document, getAppDownloadUrlResponseCallback, callback);
+  }
+
+  protected boolean isCorrectApp(AppInfo appToDownload, String appTitleAndVersion) {
+    boolean searchingForBetaVersion = appToDownload.getTitle().toLowerCase().contains("beta");
+
+    String appVersion = appTitleAndVersion.substring(appToDownload.getTitle().length()).trim();
+    boolean foundAppIsBeta = appVersion.toLowerCase().contains("beta");
+
+    if(appToDownload.isVersionSet() == false) {
+      return searchingForBetaVersion == foundAppIsBeta;
+    }
+    else {
+      return appVersion.startsWith(appToDownload.getVersionString()) && searchingForBetaVersion == foundAppIsBeta;
+    }
+  }
+
+  protected boolean extractAppDetailsPageUrl(Element appRowElement, GetUrlCallback callback) {
+    Element downloadIconElement = appRowElement.select("a.fontBlack").first();
+
+    if(downloadIconElement != null) {
+      String appDetailsPageUrl = downloadIconElement.attr("href");
+      appDetailsPageUrl = BASE_URL + appDetailsPageUrl;
 
       callback.completed(new GetUrlResponse(true, appDetailsPageUrl));
       return true;
     }
 
     return false;
+  }
+
+  protected boolean checkIfHasMoreSearchResults(AppInfo appToDownload, Document document, GetAppDownloadUrlResponseCallback getAppDownloadUrlResponseCallback, GetUrlCallback callback) {
+    Element paginationElement = document.body().select("div.pagination").first();
+
+    if(paginationElement != null) {
+      Elements anchors = paginationElement.select("a");
+      for(Element anchor : anchors) {
+        if("Next >".equals(anchor.text().trim())) {
+          getNextSearchResultsPage(appToDownload, anchor.attr("href"), getAppDownloadUrlResponseCallback, callback);
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  protected void getNextSearchResultsPage(final AppInfo appToDownload, String nextSearchResultPageSubUrl, final GetAppDownloadUrlResponseCallback getAppDownloadUrlResponseCallback, final GetUrlCallback callback) {
+    RequestParameters parameters = new RequestParameters(BASE_URL + nextSearchResultPageSubUrl);
+
+    webClient.getAsync(parameters, new RequestCallback() {
+      @Override
+      public void completed(WebClientResponse response) {
+        if(response.isSuccessful() == false) {
+          callback.completed(new GetUrlResponse(response.getError()));
+        }
+        else {
+          parseAppSearchResultPage(appToDownload, response, getAppDownloadUrlResponseCallback, callback);
+        }
+      }
+    });
   }
 
   protected boolean checkIfDoesNotHaveThisApp(Element tabContainerElement) {
