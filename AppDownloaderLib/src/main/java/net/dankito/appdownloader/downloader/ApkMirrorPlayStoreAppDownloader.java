@@ -263,15 +263,13 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
       String text = appRowElement.text();
       if(StringUtils.isNotNullOrEmpty(text) && text.contains("by ")) {
         String appTitleAndVersion = text.substring(0, text.lastIndexOf(" by")).trim();
-        if(appTitleAndVersion.startsWith(appToDownload.getTitle())) {
-          if(isCorrectApp(appToDownload, appTitleAndVersion)) {
-            if(appRowElement.select(".appRowVariantTag").first() != null) { // app has variants -> link doesn't redirect directly to app details page but to ab app variants page
-              getAppVariantsPage(appToDownload, appRowElement, getAppDownloadUrlResponseCallback, callback);
-              return true;
-            }
-            else {
-              return extractAppDetailsPageUrl(appRowElement, callback);
-            }
+        if(isCorrectApp(appToDownload, appTitleAndVersion)) {
+          if(appRowElement.select(".appRowVariantTag").first() != null) { // app has variants -> link doesn't redirect directly to app details page but to ab app variants page
+            getAppVariantsPage(appToDownload, appRowElement, getAppDownloadUrlResponseCallback, callback);
+            return true;
+          }
+          else {
+            return extractAppDetailsPageUrl(appRowElement, callback);
           }
         }
       }
@@ -282,15 +280,13 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
 
   protected boolean isCorrectApp(AppInfo appToDownload, String appTitleAndVersion) {
     boolean searchingForBetaVersion = appToDownload.getTitle().toLowerCase().contains("beta");
-
-    String appVersion = appTitleAndVersion.substring(appToDownload.getTitle().length()).trim();
-    boolean foundAppIsBeta = appVersion.toLowerCase().contains("beta");
+    boolean foundAppIsBeta = appTitleAndVersion.toLowerCase().contains("beta");
 
     if(appToDownload.isVersionSet() == false) {
       return searchingForBetaVersion == foundAppIsBeta;
     }
     else {
-      return appVersion.startsWith(appToDownload.getVersionString()) && searchingForBetaVersion == foundAppIsBeta;
+      return appTitleAndVersion.contains(appToDownload.getVersionString()) && searchingForBetaVersion == foundAppIsBeta;
     }
   }
 
