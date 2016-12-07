@@ -191,7 +191,9 @@ public class AppVersion implements Comparable<AppVersion> {
           appVersion.setBuild(tryToParseToInteger(versionParts[3]));
         }
 
-        return appVersion;
+        if("0".equals(appVersion.getVersionString()) == false || "0".equals(versionString) == true) { // filter out versions we could not parse
+          return appVersion;
+        }
       }
     } catch(Exception ignored) { }
 
