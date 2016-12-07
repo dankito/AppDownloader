@@ -265,7 +265,13 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
         String appTitleAndVersion = text.substring(0, text.lastIndexOf(" by")).trim();
         if(appTitleAndVersion.startsWith(appToDownload.getTitle())) {
           if(isCorrectApp(appToDownload, appTitleAndVersion)) {
-            return extractAppDetailsPageUrl(appRowElement, callback);
+            if(appRowElement.select(".appRowVariantTag").first() != null) { // app has variants -> link doesn't redirect directly to app details page but to ab app variants page
+              getAppVariantsPage(appToDownload, appRowElement, getAppDownloadUrlResponseCallback, callback);
+              return true;
+            }
+            else {
+              return extractAppDetailsPageUrl(appRowElement, callback);
+            }
           }
         }
       }
@@ -289,10 +295,10 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
   }
 
   protected boolean extractAppDetailsPageUrl(Element appRowElement, GetUrlCallback callback) {
-    Element downloadIconElement = appRowElement.select("a.fontBlack").first();
+    Element appDetailsPageAnchorElement = appRowElement.select("a.fontBlack").first();
 
-    if(downloadIconElement != null) {
-      String appDetailsPageUrl = downloadIconElement.attr("href");
+    if(appDetailsPageAnchorElement != null) {
+      String appDetailsPageUrl = appDetailsPageAnchorElement.attr("href");
       appDetailsPageUrl = BASE_URL + appDetailsPageUrl;
 
       callback.completed(new GetUrlResponse(true, appDetailsPageUrl));
@@ -346,5 +352,56 @@ public class ApkMirrorPlayStoreAppDownloader extends AppDownloaderBase {
     }
 
     return false;
+  }
+
+
+  protected void getAppVariantsPage(final AppInfo appToDownload, Element appRowElement, final GetAppDownloadUrlResponseCallback getAppDownloadUrlResponseCallback, final GetUrlCallback callback) {
+    Element appVariantsAnchorElement = appRowElement.select("a.fontBlack").first();
+
+    if(appVariantsAnchorElement != null) {
+      String appVariantsPageUrl = appVariantsAnchorElement.attr("href");
+      appVariantsPageUrl = BASE_URL + appVariantsPageUrl;
+
+      webClient.getAsync(new RequestParameters(appVariantsPageUrl), new RequestCallback() {
+        @Override
+        public void completed(WebClientResponse response) {
+          if(response.isSuccessful() == false) {
+            callback.completed(new GetUrlResponse(response.getError()));
+          }
+          else {
+            parseAppVariantsPage(appToDownload, response, getAppDownloadUrlResponseCallback, callback);
+          }
+        }
+      });
+    }
+    else {
+      callback.completed(new GetUrlResponse("Could not find link for Page with App Variants"));
+    }
+  }
+
+  protected void parseAppVariantsPage(AppInfo appToDownload, WebClientResponse response, GetAppDownloadUrlResponseCallback getAppDownloadUrlResponseCallback, GetUrlCallback callback) {
+    try {
+      Document document = Jsoup.parse(response.getBody());
+      Elements debug = document.body().select(".variants-table");
+      Element variantsTableElement = document.body().select(".variants-table").first();
+
+      if(variantsTableElement != null) {
+        for(Element rowElement : variantsTableElement.children()) {
+          if(rowElement.children().size() > 1 && "arm".equals(rowElement.child(1).text().trim())) {
+            // found variant for ARM processor architecture // TODO: check machine's architecture
+            Element appDetailsPageAnchor = rowElement.select("a").first();
+            if(appDetailsPageAnchor != null) {
+              String appDetailsPageUrl = BASE_URL + appDetailsPageAnchor.attr("href");
+              callback.completed(new GetUrlResponse(true, appDetailsPageUrl));
+              return;
+            }
+          }
+        }
+      }
+
+      callback.completed(new GetUrlResponse("Could not find App Details Page Url"));
+    } catch(Exception e) {
+      callback.completed(new GetUrlResponse("Could not parse App Variants Page: " + e.getLocalizedMessage()));
+    }
   }
 }
