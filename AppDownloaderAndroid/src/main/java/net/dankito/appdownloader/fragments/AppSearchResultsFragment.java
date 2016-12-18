@@ -27,9 +27,7 @@ import net.dankito.appdownloader.downloader.ApkDownloaderPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.ApkMirrorPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.EvoziPlayStoreAppDownloader;
 import net.dankito.appdownloader.downloader.IAppDownloader;
-import net.dankito.appdownloader.responses.GetAppDetailsResponse;
 import net.dankito.appdownloader.responses.SearchAppsResponse;
-import net.dankito.appdownloader.responses.callbacks.GetAppDetailsCallback;
 import net.dankito.appdownloader.responses.callbacks.SearchAppsResponseCallback;
 import net.dankito.appdownloader.util.AlertHelper;
 import net.dankito.appdownloader.util.IOnUiThreadRunner;
@@ -97,8 +95,6 @@ public class AppSearchResultsFragment extends Fragment {
 
   protected void injectComponents() {
     ((MainActivity) getActivity()).getComponent().inject(this);
-
-    appSearcher.addRetrievedAppDetailsListener(appDetailsRetrievedListener);
   }
 
 
@@ -218,18 +214,6 @@ public class AppSearchResultsFragment extends Fragment {
 
     return appDetailsDialog;
   }
-
-  protected GetAppDetailsCallback appDetailsRetrievedListener = new GetAppDetailsCallback() {
-    @Override
-    public void completed(final GetAppDetailsResponse response) {
-      getActivity().runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          searchResultsAdapter.appDetailsRetrieved(response);
-        }
-      });
-    }
-  };
 
 
   protected View.OnClickListener floatingActionButtonSearchOnClickListener = new View.OnClickListener() {

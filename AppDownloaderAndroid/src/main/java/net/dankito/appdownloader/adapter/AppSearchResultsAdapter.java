@@ -46,10 +46,6 @@ public class AppSearchResultsAdapter extends BaseAdapter {
     }
   }
 
-  public void appDetailsRetrieved(GetAppDetailsResponse response) {
-
-  }
-
 
   @Override
   public int getCount() {
