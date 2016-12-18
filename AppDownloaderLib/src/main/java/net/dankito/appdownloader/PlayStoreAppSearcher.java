@@ -109,7 +109,7 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
             if(app != null) {
               addAppInstallationInfo(app);
               searchResults.add(app);
-              setAppDetails(app);
+              setAppDetailsIfCached(app);
             }
           }
         }
@@ -262,12 +262,9 @@ public class PlayStoreAppSearcher implements IPlayStoreAppSearcher {
     }
   }
 
-  protected void setAppDetails(AppInfo appInfo) {
+  protected void setAppDetailsIfCached(AppInfo appInfo) {
     if(appDetailsCache.hasAppDetailsRetrievedForApp(appInfo)) {
       appDetailsCache.setAppDetailsForApp(appInfo);
-    }
-    else {
-      getAppDetailsAsync(appInfo);
     }
   }
 
