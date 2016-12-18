@@ -10,9 +10,11 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import net.dankito.appdownloader.IPlayStoreAppSearcher;
 import net.dankito.appdownloader.R;
 import net.dankito.appdownloader.app.model.AppInfo;
 import net.dankito.appdownloader.responses.GetAppDetailsResponse;
+import net.dankito.appdownloader.responses.callbacks.GetAppDetailsCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +27,14 @@ public class AppSearchResultsAdapter extends BaseAdapter {
 
   protected Activity activity;
 
+  protected IPlayStoreAppSearcher appSearcher;
+
   protected List<AppInfo> searchResults = new ArrayList<>(0);
 
 
-  public AppSearchResultsAdapter(Activity activity) {
+  public AppSearchResultsAdapter(Activity activity, IPlayStoreAppSearcher appSearcher) {
     this.activity = activity;
+    this.appSearcher = appSearcher;
   }
 
 
@@ -42,9 +47,7 @@ public class AppSearchResultsAdapter extends BaseAdapter {
   }
 
   public void appDetailsRetrieved(GetAppDetailsResponse response) {
-    synchronized(this) {
-      notifyDataSetChanged();
-    }
+
   }
 
 
@@ -79,22 +82,6 @@ public class AppSearchResultsAdapter extends BaseAdapter {
     TextView txtvwAppDeveloper = (TextView)convertView.findViewById(R.id.txtvwAppDeveloper);
     txtvwAppDeveloper.setText(appInfo.getDeveloper());
 
-    TextView txtvwRatings = (TextView)convertView.findViewById(R.id.txtvwAppRatings);
-    if(appInfo.areAppDetailsDownloaded()) {
-      txtvwRatings.setText(appInfo.getRating() + " (" + appInfo.getCountRatings() + ")");
-    }
-    else {
-      txtvwRatings.setText("");
-    }
-
-    TextView txtvwVersion = (TextView)convertView.findViewById(R.id.txtvwAppVersion);
-    if(appInfo.areAppDetailsDownloaded()) {
-      txtvwVersion.setText(appInfo.getVersionString() + " (" + appInfo.getCountInstallations() + ")");
-    }
-    else {
-      txtvwVersion.setText("");
-    }
-
     ImageView imgvwAppIcon = (ImageView)convertView.findViewById(R.id.imgvwAppIcon);
     if(appInfo.hasSmallCoverImageUrl()) {
       imgvwAppIcon.setVisibility(View.VISIBLE);
@@ -110,9 +97,53 @@ public class AppSearchResultsAdapter extends BaseAdapter {
       imgvwAppIcon.setVisibility(View.INVISIBLE);
     }
 
+    showAppDetails(appInfo, convertView);
+
+    if(appInfo.areAppDetailsDownloaded() == false) {
+      getAndShowAppDetailsAsync(appInfo, convertView);
+    }
+
     convertView.setTag(appInfo);
 
     return convertView;
+  }
+
+  protected void showAppDetails(AppInfo appInfo, View convertView) {
+    TextView txtvwRatings = (TextView)convertView.findViewById(R.id.txtvwAppRatings);
+    if(appInfo.areAppDetailsDownloaded()) {
+      txtvwRatings.setText(appInfo.getRating() + " (" + appInfo.getCountRatings() + ")");
+    }
+    else {
+      txtvwRatings.setText("");
+    }
+
+    TextView txtvwVersion = (TextView)convertView.findViewById(R.id.txtvwAppVersion);
+    if(appInfo.areAppDetailsDownloaded()) {
+      txtvwVersion.setText(appInfo.getVersionString() + " (" + appInfo.getCountInstallations() + ")");
+    }
+    else {
+      txtvwVersion.setText("");
+    }
+  }
+
+  protected void getAndShowAppDetailsAsync(final AppInfo appInfo, final View convertView) {
+    appSearcher.getAppDetailsAsync(appInfo, new GetAppDetailsCallback() {
+      @Override
+      public void completed(GetAppDetailsResponse response) {
+        appDetailsRetrievedThreadSafe(appInfo, convertView);
+      }
+    });
+  }
+
+  protected void appDetailsRetrievedThreadSafe(final AppInfo appInfo, final View convertView) {
+    activity.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        if(convertView.getTag() == appInfo) {
+          showAppDetails(appInfo, convertView);
+        }
+      }
+    });
   }
 
 }

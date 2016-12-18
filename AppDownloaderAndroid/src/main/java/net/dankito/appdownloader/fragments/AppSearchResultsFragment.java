@@ -83,7 +83,7 @@ public class AppSearchResultsFragment extends Fragment {
 
     injectComponents();
 
-    searchResultsAdapter = new AppSearchResultsAdapter(getActivity());
+    searchResultsAdapter = new AppSearchResultsAdapter(getActivity(), appSearcher);
 
     ListView lstvwAppSearchResults = (ListView)view.findViewById(R.id.lstvwAppSearchResults);
     lstvwAppSearchResults.setAdapter(searchResultsAdapter);
